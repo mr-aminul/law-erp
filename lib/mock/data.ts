@@ -2,6 +2,7 @@ import type { Case, CaseStatus } from "@/types/case";
 import type { Client } from "@/types/client";
 import type { Invoice } from "@/types/invoice";
 import type { Staff } from "@/types/staff";
+import { chartColors } from "@/lib/theme/chart-colors";
 
 export const mockStaff: Staff[] = [
   {
@@ -351,11 +352,11 @@ export const dashboardStats = {
 };
 
 export const caseStatusChartData = [
-  { name: "Completed", value: 42, color: "#2d7a4f" },
-  { name: "In-Progress", value: 18, color: "#1d4ed8" },
-  { name: "Pending", value: 14, color: "#b87d2b" },
-  { name: "New", value: 8, color: "#5a7a6e" },
-  { name: "On-Hold", value: 5, color: "#8ca89e" },
+  { name: "Completed", value: 42, color: chartColors.theme },
+  { name: "In-Progress", value: 18, color: chartColors.blue },
+  { name: "Pending", value: 14, color: chartColors.amber },
+  { name: "New", value: 8, color: chartColors.textSec },
+  { name: "On-Hold", value: 5, color: chartColors.textMuted },
 ];
 
 export const monthlyCasesData = [

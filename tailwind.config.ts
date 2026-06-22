@@ -43,6 +43,13 @@ const config: Config = {
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",
+        theme: {
+          DEFAULT: "var(--color-theme)",
+          darkest: "var(--color-theme-darkest)",
+          darker: "var(--color-theme-darker)",
+          bright: "var(--color-theme-bright)",
+          subtle: "var(--color-theme-subtle)",
+        },
         sidebar: "var(--color-sidebar)",
         "sidebar-alt": "var(--color-sidebar-alt)",
         "active-nav": "var(--color-active-nav)",
@@ -77,7 +84,8 @@ const config: Config = {
         badge: "var(--radius-badge)",
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+        sans: ["Inter", "system-ui", "sans-serif"],
+        heading: ["Inter", "system-ui", "sans-serif"],
       },
       width: {
         sidebar: "var(--sidebar-width)",

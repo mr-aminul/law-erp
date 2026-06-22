@@ -2,6 +2,7 @@
 
 import { formatLongDate } from "@/lib/utils/formatDate";
 import { Bell } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface TopbarProps {
   title: string;
@@ -9,7 +10,11 @@ interface TopbarProps {
 }
 
 export function Topbar({ title, subtitle }: TopbarProps) {
-  const dateLabel = subtitle ?? formatLongDate();
+  const [dateLabel, setDateLabel] = useState<string | null>(null);
+
+  useEffect(() => {
+    setDateLabel(subtitle ?? formatLongDate());
+  }, [subtitle]);
 
   return (
     <header className="mb-4 flex items-center justify-between">
@@ -18,7 +23,9 @@ export function Topbar({ title, subtitle }: TopbarProps) {
           <h1 className="text-2xl font-bold tracking-tight text-text-primary">
             {title}
           </h1>
-          <span className="text-sm text-text-muted">{dateLabel}</span>
+          {dateLabel && (
+            <span className="text-sm text-text-muted">{dateLabel}</span>
+          )}
         </div>
       </div>
 

@@ -47,12 +47,15 @@ export function Sidebar() {
     <aside
       className={cn(
         "fixed z-30 flex flex-col rounded-panel bg-sidebar transition-[width,padding] duration-200 ease-in-out",
-        sidebarCollapsed ? "w-[var(--sidebar-width-collapsed)] p-2" : "w-sidebar p-4"
+        sidebarCollapsed ? "p-2" : "p-4"
       )}
       style={{
         left: "var(--shell-margin)",
         top: "var(--shell-margin)",
         height: "calc(100vh - calc(var(--shell-margin) * 2))",
+        width: sidebarCollapsed
+          ? "var(--sidebar-width-collapsed)"
+          : "var(--sidebar-width)",
       }}
     >
       <div className={cn("mb-4 flex items-center", sidebarCollapsed ? "justify-center" : "justify-between gap-2")}>

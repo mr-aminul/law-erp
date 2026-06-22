@@ -12,17 +12,15 @@ import {
 } from "@/components/ui/Card";
 import { dashboardStats } from "@/lib/mock/data";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
-import { Briefcase, CalendarDays, Receipt, Users } from "lucide-react";
 
 export default function DashboardPage() {
   const { hearings, invoices, cases, hr } = dashboardStats;
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-4 items-start gap-2">
         <StatCard
           title="Hearings"
-          icon={CalendarDays}
           accent="green"
           primaryValue={hearings.today}
           primaryLabel="Scheduled today"
@@ -34,7 +32,6 @@ export default function DashboardPage() {
 
         <StatCard
           title="Invoices"
-          icon={Receipt}
           accent="blue"
           primaryValue={formatCurrency(invoices.amount)}
           primaryLabel={`${invoices.count} invoices issued`}
@@ -50,7 +47,6 @@ export default function DashboardPage() {
 
         <StatCard
           title="Cases"
-          icon={Briefcase}
           accent="sidebar"
           primaryValue={cases.new + cases.pending}
           primaryLabel="Active matters"
@@ -62,7 +58,6 @@ export default function DashboardPage() {
 
         <StatCard
           title="HR / Staff"
-          icon={Users}
           accent="amber"
           primaryValue={`${hr.present}/${hr.total}`}
           primaryLabel="Present today"

@@ -1,5 +1,6 @@
 "use client";
 
+import { chartColors } from "@/lib/theme/chart-colors";
 import { monthlyCasesData } from "@/lib/mock/data";
 import {
   Area,
@@ -18,26 +19,26 @@ export function MonthlyCasesChart() {
       <AreaChart data={monthlyCasesData} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
         <defs>
           <linearGradient id="casesGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#2d7a4f" stopOpacity={0.2} />
-            <stop offset="95%" stopColor="#2d7a4f" stopOpacity={0} />
+            <stop offset="5%" stopColor={chartColors.theme} stopOpacity={0.2} />
+            <stop offset="95%" stopColor={chartColors.theme} stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#d4c9b0" vertical={false} />
+        <CartesianGrid strokeDasharray="3 3" stroke={chartColors.divider} vertical={false} />
         <XAxis
           dataKey="month"
-          tick={{ fontSize: 11, fill: "#8ca89e" }}
+          tick={{ fontSize: 11, fill: chartColors.textMuted }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tick={{ fontSize: 11, fill: "#8ca89e" }}
+          tick={{ fontSize: 11, fill: chartColors.textMuted }}
           axisLine={false}
           tickLine={false}
         />
         <Tooltip
           contentStyle={{
             borderRadius: 8,
-            border: "1px solid #d4c9b0",
+            border: `1px solid ${chartColors.divider}`,
             fontSize: 12,
           }}
         />
@@ -50,9 +51,9 @@ export function MonthlyCasesChart() {
         <Line
           type="monotone"
           dataKey="cases"
-          stroke="#2d7a4f"
+          stroke={chartColors.theme}
           strokeWidth={2}
-          dot={{ r: 4, fill: "#2d7a4f", strokeWidth: 0 }}
+          dot={{ r: 4, fill: chartColors.theme, strokeWidth: 0 }}
           activeDot={{ r: 6 }}
         />
       </AreaChart>

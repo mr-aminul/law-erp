@@ -1,3 +1,8 @@
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/inter/700.css";
+@import "./theme.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @tailwind base;
@@ -5,26 +10,6 @@
 @tailwind utilities;
 
 :root {
-  --color-sidebar: #0d362e;
-  --color-sidebar-alt: #09481b;
-  --color-active-nav: #1a5c45;
-  --color-cream: #f5f0e6;
-  --color-cream-card: #faf7f0;
-  --color-white: #ffffff;
-  --color-text-primary: #0d2b22;
-  --color-text-sec: #5a7a6e;
-  --color-text-muted: #8ca89e;
-  --color-green: #2d7a4f;
-  --color-green-light: #d5ebde;
-  --color-amber: #b87d2b;
-  --color-amber-light: #fdecc2;
-  --color-red: #c0392b;
-  --color-red-light: #fde8e6;
-  --color-blue: #1d4ed8;
-  --color-blue-light: #dbeafe;
-  --color-divider: #e4ddd0;
-  --color-muted-bg: #f3f0ea;
-
   --radius-panel: 18px;
   --radius-card: 12px;
   --radius-input: 10px;
@@ -50,29 +35,27 @@
   body {
     background-color: var(--color-cream);
     color: var(--color-text-primary);
-    font-family: var(--font-inter), Inter, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     min-width: 1280px;
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
   }
 
   a {
     color: inherit;
     text-decoration: none;
   }
-  .theme {
-    --font-heading: var(--font-sans);
-    --font-sans: var(--font-sans);
-  }
+
   :root {
+    --font-sans: "Inter", system-ui, sans-serif;
+    --font-heading: "Inter", system-ui, sans-serif;
     --background: var(--color-cream);
     --foreground: var(--color-text-primary);
     --card: var(--color-white);
     --card-foreground: var(--color-text-primary);
     --popover: var(--color-white);
     --popover-foreground: var(--color-text-primary);
-    --primary: var(--color-active-nav);
+    --primary: var(--color-theme);
     --primary-foreground: var(--color-white);
     --secondary: var(--color-cream-card);
     --secondary-foreground: var(--color-text-primary);
@@ -83,7 +66,7 @@
     --destructive: var(--color-red);
     --border: var(--color-divider);
     --input: var(--color-divider);
-    --ring: var(--color-active-nav);
+    --ring: var(--color-theme);
     --chart-1: oklch(0.87 0 0);
     --chart-2: oklch(0.556 0 0);
     --chart-3: oklch(0.439 0 0);
