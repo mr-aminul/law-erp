@@ -1,0 +1,75 @@
+"""Law ERP GraphQL API — read-heavy dashboard and case queries."""
+
+type Query {
+  """Service health (also available at GET /health)."""
+  health: Health!
+
+  """Dashboard aggregates for the home screen."""
+  dashboard: Dashboard!
+}
+
+type Health {
+  status: String!
+  service: String!
+  env: String!
+}
+
+type Dashboard {
+  stats: DashboardStats!
+  caseStatusChart: [StatusSlice!]!
+  monthlyCases: [MonthlyCasePoint!]!
+  recentCases(first: Int = 10): [CaseSummary!]!
+}
+
+type DashboardStats {
+  hearings: HearingStats!
+  invoices: InvoiceStats!
+  cases: CaseCountStats!
+  hr: HRStats!
+}
+
+type HearingStats {
+  today: Int!
+  thisMonth: Int!
+  thisYear: Int!
+}
+
+type InvoiceStats {
+  count: Int!
+  amount: Float!
+  receiptCount: Int!
+  receiptAmount: Float!
+}
+
+type CaseCountStats {
+  new: Int!
+  pending: Int!
+  completed: Int!
+}
+
+type HRStats {
+  total: Int!
+  present: Int!
+  absent: Int!
+}
+
+type StatusSlice {
+  name: String!
+  value: Int!
+  color: String!
+}
+
+type MonthlyCasePoint {
+  month: String!
+  cases: Int!
+}
+
+type CaseSummary {
+  id: ID!
+  caseId: String!
+  matter: String!
+  clientName: String!
+  status: String!
+  nextHearing: String
+  assignedLawyers: [String!]!
+}

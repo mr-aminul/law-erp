@@ -1,0 +1,38 @@
+/**
+ * Shared layout tokens and shadcn-style CSS variable mappings.
+ * Imported by both the Rails app and the legacy Next.js prototype.
+ */
+
+:root {
+  --radius-panel: 18px;
+  --radius-card: 12px;
+  --radius-input: 10px;
+  --radius-badge: 8px;
+
+  --sidebar-width: 251px;
+  --sidebar-width-collapsed: 72px;
+  --shell-margin: 12px;
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-heading: "Inter", system-ui, sans-serif;
+
+  --background: var(--color-cream);
+  --foreground: var(--color-text-primary);
+  --card: var(--color-white);
+  --card-foreground: var(--color-text-primary);
+  --popover: var(--color-white);
+  --popover-foreground: var(--color-text-primary);
+  --primary: var(--color-theme);
+  --primary-foreground: var(--color-white);
+  --secondary: var(--color-cream-card);
+  --secondary-foreground: var(--color-text-primary);
+  --muted: var(--color-cream-card);
+  --muted-foreground: var(--color-text-muted);
+  --accent: var(--color-green-light);
+  --accent-foreground: var(--color-green);
+  --destructive: var(--color-red);
+  --border: var(--color-divider);
+  --input: var(--color-divider);
+  --ring: var(--color-theme);
+  --radius: 0.625rem;
+}

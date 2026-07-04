@@ -1,0 +1,17 @@
+# Local Postgres for Law ERP development.
+# Production: use managed Postgres; training store should be a separate cluster.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: law_erp
+      POSTGRES_PASSWORD: law_erp
+      POSTGRES_DB: law_erp
+    ports:
+      - "5432:5432"
+    volumes:
+      - law_erp_pg:/var/lib/postgresql/data
+
+volumes:
+  law_erp_pg:

@@ -1,0 +1,28 @@
+/**
+ * Shared base styles for Law ERP apps.
+ */
+
+*,
+*::before,
+*::after {
+  border-color: var(--color-divider);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  font-family: var(--font-sans);
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-width: 1280px;
+  font-family: var(--font-sans);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

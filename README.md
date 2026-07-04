@@ -1,40 +1,49 @@
 # Law ERP
 
-Law firm management dashboard built with Next.js 14, React, Tailwind CSS, and shadcn/ui.
-
-## Features
-
-- Dashboard with case stats, charts, and alerts
-- Case, client, and staff management
-- Billing (invoices, time tracking, expenses)
-- Calendar, documents, court filing, and communications
-- Settings, roles, and audit logs
-
-## Getting Started
-
-```bash
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-## Scripts
-
-| Command       | Description              |
-| ------------- | ------------------------ |
-| `npm run dev` | Start development server |
-| `npm run build` | Production build       |
-| `npm run start` | Start production server |
-| `npm run lint` | Run ESLint              |
+Law firm ERP monorepo — Next.js frontend + Go API.
 
 ## Stack
 
-- [Next.js 14](https://nextjs.org/) (App Router)
-- [React 18](https://react.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [shadcn/ui](https://ui.shadcn.com/)
-- [Zustand](https://zustand-demo.pmnd.rs/) (state)
-- [Recharts](https://recharts.org/) (charts)
+- **Frontend:** Next.js 14 (`apps/web`)
+- **Backend:** Go + [chi router](https://github.com/go-chi/chi) (`services/api`)
+- **Design:** Shared tokens in `design/`
 
-Data is currently mocked in `lib/mock/` for UI development.
+## Quick start
+
+```bash
+npm install
+cd services/api && go mod tidy
+cp apps/web/.env.example apps/web/.env.local
+make dev
+```
+
+| Service | URL |
+|---------|-----|
+| Web | http://localhost:3000 |
+| API | http://localhost:8080/graphql |
+| GraphiQL (dev) | http://localhost:8080/ |
+| Health | http://localhost:8080/health |
+
+## Repo layout
+
+```text
+apps/web/           Next.js UI
+services/api/       Go REST API (chi)
+design/             Shared CSS/Tailwind tokens
+docs/               Architecture & handoffs
+```
+
+## Commands
+
+```bash
+make dev          # API + web together
+make dev-api      # Go only
+make dev-web      # Next.js only
+make test-api     # go test ./...
+```
+
+## Docs
+
+- Agent workflow: [AGENTS.md](AGENTS.md)
+- Architecture: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
+- API service: [services/api/README.md](services/api/README.md)

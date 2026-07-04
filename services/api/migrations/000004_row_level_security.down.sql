@@ -1,0 +1,10 @@
+DROP POLICY IF EXISTS tenant_isolation_export_batches ON ai_export_batches;
+DROP POLICY IF EXISTS tenant_isolation_audit ON audit_events;
+DROP POLICY IF EXISTS tenant_isolation_consents ON firm_ai_consents;
+DROP POLICY IF EXISTS tenant_isolation_document_texts ON document_texts;
+DROP POLICY IF EXISTS tenant_isolation_documents ON documents;
+DROP POLICY IF EXISTS tenant_isolation_case_notes ON case_notes;
+DROP POLICY IF EXISTS tenant_isolation_cases ON cases;
+DROP POLICY IF EXISTS tenant_isolation_clients ON clients;
+DROP POLICY IF EXISTS tenant_isolation_users ON users;
+DROP FUNCTION IF EXISTS app_current_firm_id();

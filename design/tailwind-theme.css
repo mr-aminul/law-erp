@@ -1,0 +1,59 @@
+/**
+ * Tailwind v4 theme extensions for the Rails app.
+ * Maps design tokens to utility classes (bg-cream, rounded-panel, etc.)
+ */
+@theme inline {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-heading: "Inter", system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-theme: var(--color-theme);
+  --color-theme-darkest: var(--color-theme-darkest);
+  --color-theme-darker: var(--color-theme-darker);
+  --color-theme-bright: var(--color-theme-bright);
+  --color-theme-subtle: var(--color-theme-subtle);
+  --color-sidebar: var(--color-sidebar);
+  --color-sidebar-alt: var(--color-sidebar-alt);
+  --color-active-nav: var(--color-active-nav);
+  --color-cream: var(--color-cream);
+  --color-cream-card: var(--color-cream-card);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-sec: var(--color-text-sec);
+  --color-text-muted: var(--color-text-muted);
+  --color-green: var(--color-green);
+  --color-green-light: var(--color-green-light);
+  --color-amber: var(--color-amber);
+  --color-amber-light: var(--color-amber-light);
+  --color-red: var(--color-red);
+  --color-red-light: var(--color-red-light);
+  --color-blue: var(--color-blue);
+  --color-blue-light: var(--color-blue-light);
+  --color-divider: var(--color-divider);
+  --color-muted-bg: var(--color-muted-bg);
+
+  --radius-panel: var(--radius-panel);
+  --radius-card: var(--radius-card);
+  --radius-input: var(--radius-input);
+  --radius-badge: var(--radius-badge);
+
+  --spacing-shell: var(--shell-margin);
+  --width-sidebar: var(--sidebar-width);
+}
