@@ -118,7 +118,7 @@ function HearingCard({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-start gap-3 rounded-card border border-divider/60 bg-white p-3 text-left transition-colors hover:bg-cream-card"
+      className="flex w-full items-start gap-3 rounded-card border border-divider/60 bg-surface p-3 text-left transition-colors hover:bg-cream-card"
     >
       <div className="flex h-10 w-10 shrink-0 flex-col items-center justify-center rounded-input bg-green-light text-green">
         <Calendar className="h-4 w-4" />

@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 function getPageTitle(pathname: string): string {
   const titles: [RegExp | string, string][] = [
     ["/", "Dashboard"],
-    ["/cases/new", "New Case"],
+    ["/cases/new", "New Matter"],
     [/^\/cases\/[^/]+$/, "Case Detail"],
-    ["/cases", "Cases"],
+    ["/cases", "Matters"],
     ["/clients/new", "New Client"],
     [/^\/clients\/[^/]+$/, "Client Detail"],
     ["/clients", "Clients"],

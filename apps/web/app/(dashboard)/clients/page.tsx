@@ -82,7 +82,7 @@ export default function ClientsPage() {
         />
       </div>
 
-      <div className="rounded-card border border-divider/70 bg-white p-4 shadow-sm">
+      <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
         <Table>
           <TableHeader>
             <TableHead>Client ID</TableHead>

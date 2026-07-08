@@ -12,15 +12,17 @@ import {
 } from "@/components/ui/Card";
 import { getDashboardStats } from "@/lib/graphql/getDashboard";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
+import { Briefcase, Gavel, Receipt, Users } from "lucide-react";
 
 export default async function DashboardPage() {
   const { hearings, invoices, cases, hr } = await getDashboardStats();
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 items-start gap-2">
+      <div className="grid grid-cols-4 gap-3">
         <StatCard
           title="Hearings"
+          icon={Gavel}
           accent="green"
           primaryValue={hearings.today}
           primaryLabel="Scheduled today"
@@ -32,6 +34,7 @@ export default async function DashboardPage() {
 
         <StatCard
           title="Invoices"
+          icon={Receipt}
           accent="blue"
           primaryValue={formatCurrency(invoices.amount)}
           primaryLabel={`${invoices.count} invoices issued`}
@@ -47,17 +50,19 @@ export default async function DashboardPage() {
 
         <StatCard
           title="Cases"
+          icon={Briefcase}
           accent="sidebar"
-          primaryValue={cases.new + cases.pending}
+          primaryValue={cases.pending}
           primaryLabel="Active matters"
           metrics={[
-            { label: "New", value: cases.new, highlight: true },
+            { label: "Pending", value: cases.pending, highlight: true },
             { label: "Completed", value: cases.completed },
           ]}
         />
 
         <StatCard
           title="HR / Staff"
+          icon={Users}
           accent="amber"
           primaryValue={`${hr.present}/${hr.total}`}
           primaryLabel="Present today"

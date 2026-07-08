@@ -1,8 +1,9 @@
 "use client";
 
 import { cn } from "@/lib/utils/cn";
-import { ChevronDown } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Check, ChevronDown } from "lucide-react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 interface DropdownOption {
   value: string;
@@ -15,7 +16,13 @@ interface DropdownProps {
   onChange: (value: string) => void;
   label?: string;
   className?: string;
+  size?: "default" | "sm";
+  disabled?: boolean;
+  id?: string;
+  menuPlacement?: "auto" | "bottom" | "top";
 }
+
+const MENU_GAP = 4;
 
 export function Dropdown({
   options,
@@ -23,54 +30,174 @@ export function Dropdown({
   onChange,
   label,
   className,
+  size = "default",
+  disabled = false,
+  id,
+  menuPlacement = "bottom",
 }: DropdownProps) {
+  const fallbackId = useId();
+  const triggerId = id ?? fallbackId;
   const [open, setOpen] = useState(false);
+  const [menuStyle, setMenuStyle] = useState<{
+    top: number;
+    left: number;
+    minWidth: number;
+  } | null>(null);
   const ref = useRef<HTMLDivElement>(null);
   const selected = options.find((o) => o.value === value);
+  const usePortal = menuPlacement === "auto";
+  const isSmall = size === "sm";
+
+  const updateMenuPosition = useCallback(() => {
+    if (!ref.current) return;
+
+    const rect = ref.current.getBoundingClientRect();
+    const itemHeight = isSmall ? 28 : 36;
+    const menuHeight = options.length * itemHeight + (isSmall ? 4 : 0);
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const openUp =
+      menuPlacement === "top" ||
+      (menuPlacement === "auto" && spaceBelow < menuHeight && spaceAbove > spaceBelow);
+
+    setMenuStyle({
+      left: rect.left,
+      minWidth: rect.width,
+      top: openUp ? rect.top - menuHeight - MENU_GAP : rect.bottom + MENU_GAP,
+    });
+  }, [isSmall, menuPlacement, options.length]);
+
+  useLayoutEffect(() => {
+    if (!open || !usePortal) return;
+    updateMenuPosition();
+  }, [open, usePortal, updateMenuPosition]);
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      const target = e.target as Node;
+      if (ref.current?.contains(target)) return;
+      if ((target as HTMLElement).closest?.("[data-dropdown-menu]")) return;
+      setOpen(false);
     }
+
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  return (
-    <div ref={ref} className={cn("relative", className)}>
-      {label && (
-        <span className="mb-1 block text-xs font-semibold text-text-sec">
-          {label}
-        </span>
-      )}
+  useEffect(() => {
+    if (!open || !usePortal) return;
+
+    function handleReposition() {
+      updateMenuPosition();
+    }
+
+    window.addEventListener("resize", handleReposition);
+    window.addEventListener("scroll", handleReposition, true);
+
+    return () => {
+      window.removeEventListener("resize", handleReposition);
+      window.removeEventListener("scroll", handleReposition, true);
+    };
+  }, [open, usePortal, updateMenuPosition]);
+
+  const menuItems = options.map((option) => {
+    const isSelected = option.value === value;
+    return (
       <button
-        onClick={() => setOpen(!open)}
-        className="flex h-9 min-w-[140px] items-center justify-between gap-2 rounded-input border border-divider bg-white px-3 text-sm font-medium text-text-primary"
+        key={option.value}
+        type="button"
+        role="option"
+        aria-selected={isSelected}
+        onClick={() => {
+          onChange(option.value);
+          setOpen(false);
+        }}
+        className={cn(
+          "flex w-full items-center text-left text-text-primary transition-colors hover:bg-cream-card",
+          isSmall ? "gap-2 px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm",
+          isSelected && (isSmall ? "bg-cream-card font-semibold" : "bg-green-light font-semibold text-green")
+        )}
       >
-        {selected?.label}
-        <ChevronDown className="h-4 w-4 text-text-muted" />
-      </button>
-      {open && (
-        <div className="absolute right-0 top-full z-50 mt-1 min-w-full overflow-hidden rounded-input border border-divider bg-white shadow-lg">
-          {options.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => {
-                onChange(option.value);
-                setOpen(false);
-              }}
+        {isSmall ? (
+          <>
+            <span
               className={cn(
-                "block w-full px-3 py-2 text-left text-sm hover:bg-cream-card",
-                option.value === value && "bg-green-light font-semibold text-green"
+                "flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border border-divider bg-white",
+                isSelected &&
+                  "border-[var(--color-theme)] bg-[var(--color-theme)] text-white"
               )}
             >
-              {option.label}
-            </button>
-          ))}
-        </div>
+              {isSelected ? <Check className="h-2.5 w-2.5" /> : null}
+            </span>
+            <span className="whitespace-nowrap">{option.label}</span>
+          </>
+        ) : (
+          option.label
+        )}
+      </button>
+    );
+  });
+
+  const menu = open ? (
+    <div
+      data-dropdown-menu
+      role="listbox"
+      style={
+        usePortal && menuStyle
+          ? {
+              position: "fixed",
+              top: menuStyle.top,
+              left: menuStyle.left,
+              minWidth: menuStyle.minWidth,
+              width: "max-content",
+              zIndex: 50,
+            }
+          : undefined
+      }
+      className={cn(
+        "border border-divider bg-white shadow-lg",
+        isSmall ? "w-max rounded-lg py-1" : "overflow-hidden rounded-input",
+        usePortal ? "" : "absolute right-0 top-full z-50 mt-1 min-w-full overflow-hidden"
       )}
+    >
+      {menuItems}
+    </div>
+  ) : null;
+
+  return (
+    <div ref={ref} className={cn("relative", className)}>
+      {label ? (
+        <span className="mb-1 block text-[10px] font-semibold leading-none text-text-muted">
+          {label}
+        </span>
+      ) : null}
+      <button
+        id={triggerId}
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen(!open)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className={cn(
+          "flex items-center justify-between gap-2 border border-divider bg-white text-text-primary transition-colors focus:border-green focus:outline-none focus:ring-2 focus:ring-green/20 disabled:opacity-40",
+          isSmall
+            ? "h-6 min-w-[2.75rem] rounded-lg px-2 text-xs font-semibold"
+            : "h-9 min-w-[140px] rounded-input px-3 text-sm font-medium"
+        )}
+      >
+        {selected?.label}
+        <ChevronDown
+          className={cn(
+            "shrink-0 text-text-muted",
+            isSmall ? "h-3 w-3" : "h-4 w-4"
+          )}
+        />
+      </button>
+      {usePortal
+        ? typeof document !== "undefined" && menu
+          ? createPortal(menu, document.body)
+          : null
+        : menu}
     </div>
   );
 }

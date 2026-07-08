@@ -1,6 +1,7 @@
 "use client";
 
 import { useAppStore } from "@/lib/store/appStore";
+import { NotificationDrawer } from "./NotificationDrawer";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 
@@ -16,6 +17,7 @@ export function Shell({ children, title, subtitle }: ShellProps) {
   return (
     <div className="min-h-screen bg-cream">
       <Sidebar />
+      <NotificationDrawer />
       <div
         className="min-h-screen p-shell transition-[margin-left] duration-200 ease-in-out"
         style={{

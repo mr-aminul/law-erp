@@ -1,0 +1,20 @@
+{
+  "name": "@law-erp/ukil-notion-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local Notion MCP server for Ukil task tracking (PAT auth)",
+  "bin": {
+    "ukil-notion-mcp": "./index.mjs"
+  },
+  "scripts": {
+    "start": "node index.mjs",
+    "setup": "node scripts/setup.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.1",
+    "@notionhq/client": "^2.2.15",
+    "dotenv": "^16.4.7",
+    "zod": "^3.24.1"
+  }
+}

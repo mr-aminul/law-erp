@@ -11,6 +11,11 @@
 
   --sidebar-width: 251px;
   --sidebar-width-collapsed: 72px;
+  --sidebar-logo-size: 2.25rem;
+  --sidebar-logo-inset: calc(
+    (var(--sidebar-width-collapsed) - var(--sidebar-logo-size)) / 2
+  );
+  --sidebar-logo-inset-collapsed: var(--sidebar-logo-inset);
   --shell-margin: 12px;
 
   --font-sans: "Inter", system-ui, sans-serif;

@@ -39,7 +39,7 @@ export default function StaffPage() {
         value={role}
         onChange={setRole}
       />
-      <div className="rounded-card border border-divider/70 bg-white p-4 shadow-sm">
+      <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
         <Table compact>
           <TableHeader>
             <TableHead>Name</TableHead>

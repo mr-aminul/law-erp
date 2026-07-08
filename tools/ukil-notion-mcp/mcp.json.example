@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ukil-notion": {
+      "command": "node",
+      "args": ["tools/ukil-notion-mcp/index.mjs"]
+    }
+  }
+}

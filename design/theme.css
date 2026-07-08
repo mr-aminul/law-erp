@@ -31,15 +31,24 @@
   --color-text-sec: color-mix(in srgb, var(--color-theme) 32%, #64748b);
   --color-text-muted: color-mix(in srgb, var(--color-theme) 18%, #94a3b8);
 
-  /* Status colors — each with one base hex + auto-generated light shade */
-  --color-amber: #b87d2b;
-  --color-amber-light: color-mix(in srgb, var(--color-amber) 12%, white);
+  /* Status colors — modern surface + foreground pairs */
+  --color-blue: #4f6fd9;
+  --color-blue-light: #edf2fb;
 
-  --color-red: #c0392b;
-  --color-red-light: color-mix(in srgb, var(--color-red) 10%, white);
+  --color-amber: #c2882c;
+  --color-amber-light: #fbf4e8;
 
-  --color-blue: #1d4ed8;
-  --color-blue-light: color-mix(in srgb, var(--color-blue) 10%, white);
+  --color-red: #d45c4f;
+  --color-red-light: #fceeed;
+
+  --color-status-in-progress: #4f6fd9;
+  --color-status-in-progress-surface: #edf2fb;
+  --color-status-pending: #c2882c;
+  --color-status-pending-surface: #fbf4e8;
+  --color-status-completed: #3d8f72;
+  --color-status-completed-surface: #e8f4ef;
+  --color-status-on-hold: #6b7585;
+  --color-status-on-hold-surface: #f2f4f7;
 
   /* Neutrals — surfaces & chrome (not derived from theme) */
   --color-cream: #f5f0e6;

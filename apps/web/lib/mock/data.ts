@@ -191,7 +191,7 @@ export const mockCases: Case[] = [
     clientId: "2",
     clientName: "Mohammad Ali",
     type: "Family",
-    status: "New",
+    status: "Pending",
     stage: "Filing",
     court: "District Court",
     courtName: "Dhaka Family Court",
@@ -277,7 +277,7 @@ export const mockCases: Case[] = [
     clientId: "4",
     clientName: "Rashida Akter",
     type: "Property",
-    status: "New",
+    status: "Pending",
     stage: "Filing",
     court: "District Court",
     courtName: "District Judge Court, Rajshahi",
@@ -347,15 +347,14 @@ export const dashboardStats = {
     receiptCount: 18,
     receiptAmount: 1420000,
   },
-  cases: { new: 8, pending: 14, completed: 42 },
+  cases: { pending: 22, completed: 42 },
   hr: { total: 12, present: 10, absent: 2 },
 };
 
 export const caseStatusChartData = [
   { name: "Completed", value: 42, color: chartColors.theme },
   { name: "In-Progress", value: 18, color: chartColors.blue },
-  { name: "Pending", value: 14, color: chartColors.amber },
-  { name: "New", value: 8, color: chartColors.textSec },
+  { name: "Pending", value: 22, color: chartColors.amber },
   { name: "On-Hold", value: 5, color: chartColors.textMuted },
 ];
 

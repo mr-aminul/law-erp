@@ -193,7 +193,7 @@ function DocumentSheet({
 }) {
   return (
     <div
-      className="absolute inset-0 bg-white shadow-[0_12px_24px_-8px_rgba(0,0,0,0.28)]"
+      className="absolute inset-0 bg-surface shadow-[0_12px_24px_-8px_rgba(0,0,0,0.28)]"
       style={{
         transform,
         transformOrigin: "bottom center",

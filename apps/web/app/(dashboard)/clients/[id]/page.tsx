@@ -49,7 +49,7 @@ export default function ClientDetailPage({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between rounded-card border border-divider/70 bg-white p-4 shadow-sm">
+      <div className="flex items-start justify-between rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-bold text-text-primary">{client.name}</h2>

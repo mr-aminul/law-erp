@@ -1,8 +1,10 @@
 "use client";
 
 import { CaseStatusBadge } from "@/components/cases/CaseStatusBadge";
+import { UploadDocumentForm } from "@/components/cases/UploadDocumentForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 import { DetailField, PageSection } from "@/components/ui/PageSection";
 import { Tabs } from "@/components/ui/Tabs";
 import {
@@ -35,6 +37,7 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const caseData = getCaseById(params.id);
   const [tab, setTab] = useState("overview");
+  const [uploadOpen, setUploadOpen] = useState(false);
 
   if (!caseData) notFound();
 
@@ -55,7 +58,7 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-card border border-divider/70 bg-white p-4 shadow-sm">
+      <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="flex flex-wrap items-center gap-2">
@@ -94,7 +97,7 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
             <DetailField label="Case Number" value={caseData.caseNumber ?? "—"} />
             <DetailField label="Cause List Ref" value={caseData.causeListRef ?? "—"} />
             <DetailField label="Next Hearing" value={caseData.nextHearing ? formatDate(caseData.nextHearing) : "—"} />
-            <DetailField label="Limitation Date" value={caseData.limitationDate ? formatDate(caseData.limitationDate) : "—"} />
+            <DetailField label="Deadline" value={caseData.limitationDate ? formatDate(caseData.limitationDate) : "—"} />
             <DetailField label="Created" value={formatDate(caseData.createdAt)} />
             <DetailField label="Last Updated" value={formatDate(caseData.updatedAt)} />
             <DetailField label="Opposite Party" value={caseData.opposingParty?.name ?? "—"} />
@@ -142,7 +145,14 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
       )}
 
       {tab === "documents" && (
-        <PageSection title="Case Documents" action={<Button size="sm">Upload Document</Button>}>
+        <PageSection
+          title="Case Documents"
+          action={
+            <Button size="sm" onClick={() => setUploadOpen(true)}>
+              Upload Document
+            </Button>
+          }
+        >
           <Table compact>
             <TableHeader>
               <TableHead>Name</TableHead>
@@ -165,6 +175,17 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
           </Table>
         </PageSection>
       )}
+
+      <Modal
+        open={uploadOpen}
+        onClose={() => setUploadOpen(false)}
+        title="Upload Document"
+      >
+        <UploadDocumentForm
+          onSubmit={() => setUploadOpen(false)}
+          onCancel={() => setUploadOpen(false)}
+        />
+      </Modal>
 
       {tab === "notes" && (
         <PageSection title="Notes & Internal Memos" action={<Button size="sm">Add Note</Button>}>

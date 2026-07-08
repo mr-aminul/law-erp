@@ -58,6 +58,7 @@ Before marking work complete:
 | Fix bugs | `bug-fix` |
 | Remove unused code | `dead-code-sweep` |
 | Review changes | `code-reviewer` |
+| Log/sync Notion tasks after code changes (`/notion-task-tracker`) | `notion-task-tracker` — MCP: `tools/ukil-notion-mcp/` |
 | Local setup issues | `env-doctor` |
 | End session | `handoff` |
 

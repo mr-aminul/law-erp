@@ -1,7 +1,6 @@
 import type { CourtLevel } from "./hearing";
 
 export type CaseStatus =
-  | "New"
   | "In-Progress"
   | "Pending"
   | "On-Hold"

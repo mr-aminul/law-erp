@@ -38,7 +38,7 @@ export function SubNav({ items, className }: SubNavProps) {
   return (
     <nav
       className={cn(
-        "flex flex-wrap gap-1 rounded-input border border-divider/70 bg-white p-1",
+        "flex flex-wrap gap-1 rounded-input border border-divider/70 bg-surface p-1",
         className
       )}
     >

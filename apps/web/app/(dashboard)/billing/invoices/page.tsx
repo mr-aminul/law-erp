@@ -49,7 +49,7 @@ export default function InvoicesPage() {
         />
         <Button><Plus className="mr-1.5 h-4 w-4" />Generate Invoice</Button>
       </div>
-      <div className="rounded-card border border-divider/70 bg-white p-4 shadow-sm">
+      <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
         <Table compact>
           <TableHeader>
             <TableHead>Invoice #</TableHead>

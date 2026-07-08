@@ -25,7 +25,7 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
             "rounded-input px-3 py-1.5 text-sm font-semibold transition-colors",
             activeTab === tab.id
               ? "bg-active-nav text-white shadow-sm"
-              : "text-text-sec hover:text-text-primary hover:bg-white/60"
+              : "text-text-sec hover:text-text-primary hover:bg-surface/60"
           )}
         >
           {tab.label}
