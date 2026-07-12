@@ -38,7 +38,7 @@ export function SubNav({ items, className }: SubNavProps) {
   return (
     <nav
       className={cn(
-        "flex flex-wrap gap-1 rounded-input border border-divider/70 bg-surface p-1",
+        "flex gap-1 overflow-x-auto overscroll-x-contain rounded-input border border-divider/70 bg-surface p-1",
         className
       )}
     >
@@ -47,7 +47,7 @@ export function SubNav({ items, className }: SubNavProps) {
           key={item.href}
           href={item.href}
           className={cn(
-            "rounded-input px-3 py-1.5 text-sm font-semibold transition-colors",
+            "shrink-0 rounded-input px-3 py-1.5 text-sm font-semibold transition-colors",
             isActive(item)
               ? "bg-active-nav text-white"
               : "text-text-sec hover:bg-cream-card hover:text-text-primary"

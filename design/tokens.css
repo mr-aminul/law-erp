@@ -16,12 +16,13 @@
     (var(--sidebar-width-collapsed) - var(--sidebar-logo-size)) / 2
   );
   --sidebar-logo-inset-collapsed: var(--sidebar-logo-inset);
-  --shell-margin: 12px;
+  /* Tighter on phones; desktop keeps the floating-panel gutter */
+  --shell-margin: 4px;
 
   --font-sans: "Inter", system-ui, sans-serif;
   --font-heading: "Inter", system-ui, sans-serif;
 
-  --background: var(--color-cream);
+  --background: var(--color-white);
   --foreground: var(--color-text-primary);
   --card: var(--color-white);
   --card-foreground: var(--color-text-primary);
@@ -29,9 +30,9 @@
   --popover-foreground: var(--color-text-primary);
   --primary: var(--color-theme);
   --primary-foreground: var(--color-white);
-  --secondary: var(--color-cream-card);
+  --secondary: var(--color-theme-subtle);
   --secondary-foreground: var(--color-text-primary);
-  --muted: var(--color-cream-card);
+  --muted: var(--color-theme-subtle);
   --muted-foreground: var(--color-text-muted);
   --accent: var(--color-green-light);
   --accent-foreground: var(--color-green);
@@ -40,4 +41,10 @@
   --input: var(--color-divider);
   --ring: var(--color-theme);
   --radius: 0.625rem;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --shell-margin: 6px;
+  }
 }

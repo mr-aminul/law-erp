@@ -17,9 +17,9 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-3 rounded-card border border-divider/70 bg-surface p-3 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-4">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-lg font-bold">{invoice.invoiceNumber}</h2>
             <Badge variant={invoice.status === "Paid" ? "green" : invoice.status === "Overdue" ? "red" : "amber"}>
               {invoice.status}
@@ -27,14 +27,14 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
           </div>
           <p className="mt-1 text-sm text-text-sec">{invoice.clientName} · {invoice.caseName}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button variant="secondary" size="sm"><FileDown className="mr-1.5 h-4 w-4" />PDF</Button>
           <Link href="/billing/invoices"><Button variant="ghost" size="sm">Back</Button></Link>
         </div>
       </div>
 
       <PageSection title="Invoice Details">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid-fields-3">
           <DetailField label="Amount (BDT)" value={formatCurrency(invoice.amount)} />
           <DetailField label="VAT (15%)" value={formatCurrency(vat)} />
           <DetailField label="Total" value={formatCurrency(invoice.amount + vat)} />

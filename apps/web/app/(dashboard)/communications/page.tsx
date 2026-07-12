@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
 import { Tabs } from "@/components/ui/Tabs";
 import { mockCaseComments, mockCommunications, mockContactLogs } from "@/lib/mock";
@@ -33,10 +34,16 @@ export default function CommunicationsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Tabs tabs={tabs} activeTab={tab} onChange={setTab} />
-        <Button size="sm"><Send className="mr-1.5 h-4 w-4" />Send Message</Button>
-      </div>
+      <ListToolbar
+        filters={<Tabs tabs={tabs} activeTab={tab} onChange={setTab} />}
+        collapseFiltersOnMobile={false}
+        actions={
+          <Button>
+            <Send className="mr-1.5 h-4 w-4" />
+            Send Message
+          </Button>
+        }
+      />
 
       {tab === "internal" ? (
         <PageSection title="Internal Case Threads">

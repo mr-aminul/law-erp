@@ -47,8 +47,46 @@
   }
 }
 
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    overflow-x: clip;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /* Shared UI type scale — use for tables, dropdowns, inputs, buttons */
+  .text-ui {
+    font-size: var(--font-size-ui);
+    line-height: var(--line-height-ui);
+  }
+
+  /* Detail / form field grids — stack on phones, expand on larger panes */
+  .grid-fields-2 {
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2;
+  }
+
+  .grid-fields-3 {
+    @apply grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .grid-stats {
+    @apply grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4;
+  }
+
+  .grid-split {
+    @apply grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(240px,280px)];
+  }
+
+  .grid-pair {
+    @apply grid grid-cols-1 gap-4 md:grid-cols-2;
   }
 }

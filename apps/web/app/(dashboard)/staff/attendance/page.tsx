@@ -3,6 +3,7 @@
 import { SubNav } from "@/components/layout/SubNav";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
 import { staffSubNav } from "@/lib/config/navigation";
 import { mockAttendance, mockStaff } from "@/lib/mock";
@@ -14,13 +15,22 @@ export default function AttendancePage() {
   return (
     <div className="space-y-4">
       <SubNav items={staffSubNav} />
-      <div className="flex items-end gap-4">
-        <div>
-          <label className="mb-1 block text-xs font-semibold text-text-sec">Date</label>
-          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-44" />
-        </div>
-        <Button size="sm">Save Attendance</Button>
-      </div>
+      <ListToolbar
+        filters={
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-text-sec">
+              Date
+            </label>
+            <Input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="w-44"
+            />
+          </div>
+        }
+        actions={<Button>Save Attendance</Button>}
+      />
 
       <PageSection title="Daily Attendance" description="Mark present / absent per staff member.">
         <div className="space-y-2">

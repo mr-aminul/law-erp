@@ -28,13 +28,34 @@ interface UserChipProps {
   name: string;
   initials: string;
   onRemove?: () => void;
+  /** Hide the name below `sm` — avatar only (tables on mobile). */
+  compactOnMobile?: boolean;
 }
 
-export function UserChip({ name, initials, onRemove }: UserChipProps) {
+export function UserChip({
+  name,
+  initials,
+  onRemove,
+  compactOnMobile = false,
+}: UserChipProps) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-divider bg-cream-card py-0.5 pl-0.5 pr-1.5 text-xs">
+    <span
+      title={name}
+      aria-label={name}
+      className={cn(
+        "inline-flex items-center gap-1 rounded-full border border-divider bg-cream-card py-0.5 pl-0.5 text-xs",
+        compactOnMobile ? "pr-0.5 sm:pr-1.5" : "pr-1.5"
+      )}
+    >
       <UserAvatar initials={initials} size="xs" />
-      <span className="font-medium text-text-primary">{name}</span>
+      <span
+        className={cn(
+          "font-medium text-text-primary",
+          compactOnMobile && "hidden sm:inline"
+        )}
+      >
+        {name}
+      </span>
       {onRemove ? (
         <button
           type="button"

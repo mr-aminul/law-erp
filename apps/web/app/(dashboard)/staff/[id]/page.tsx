@@ -26,15 +26,17 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
   return (
     <div className="space-y-4">
       <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
-        <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-sidebar text-lg font-bold text-white">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sidebar text-lg font-bold text-white">
             {staff.initials}
           </div>
-          <div>
+          <div className="min-w-0 flex-1">
             <h2 className="text-lg font-bold">{staff.name}</h2>
-            <p className="text-sm text-text-sec">{staff.role} · {staff.email}</p>
+            <p className="truncate text-sm text-text-sec">{staff.role} · {staff.email}</p>
           </div>
-          <Badge variant={staff.status === "Active" ? "green" : "amber"} className="ml-auto">{staff.status}</Badge>
+          <Badge variant={staff.status === "Active" ? "green" : "amber"} className="sm:ml-auto">
+            {staff.status}
+          </Badge>
         </div>
       </div>
 
@@ -50,7 +52,7 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
 
       {tab === "profile" && (
         <PageSection title="Employee Profile">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid-fields-3">
             <DetailField label="Bar Council No." value={staff.barCouncilNo ?? "—"} />
             <DetailField label="Join Date" value={staff.joinDate ? formatDate(staff.joinDate) : "—"} />
             <DetailField label="Phone" value={staff.phone ?? "—"} />

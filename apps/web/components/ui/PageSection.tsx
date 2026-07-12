@@ -16,15 +16,15 @@ export function PageSection({
   className,
 }: PageSectionProps) {
   return (
-    <section className={cn("rounded-card border border-divider/70 bg-surface p-4 shadow-sm", className)}>
-      <div className="mb-4 flex items-start justify-between gap-4">
-        <div>
+    <section className={cn("rounded-card border border-divider/70 bg-surface p-3 shadow-sm sm:p-4", className)}>
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+        <div className="min-w-0">
           <h2 className="text-sm font-bold text-text-primary">{title}</h2>
           {description && (
             <p className="mt-0.5 text-xs text-text-muted">{description}</p>
           )}
         </div>
-        {action}
+        {action ? <div className="shrink-0">{action}</div> : null}
       </div>
       {children}
     </section>

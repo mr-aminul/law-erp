@@ -76,7 +76,7 @@ export function MultiSelectDropdown({
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          "flex min-h-10 min-w-[140px] items-center justify-between gap-2 rounded-input border bg-white px-3 text-sm font-medium text-text-primary outline-none ring-0 transition-colors focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0",
+          "flex min-h-10 min-w-0 w-full items-center justify-between gap-2 rounded-input border bg-white px-3 text-sm font-medium text-text-primary outline-none ring-0 transition-colors focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 md:min-w-[140px] md:w-auto",
           hasSelection
             ? "border-[var(--color-theme)] shadow-[0_0_0_2px_color-mix(in_srgb,var(--color-theme)_22%,transparent)]"
             : "border-divider",
@@ -105,7 +105,7 @@ export function MultiSelectDropdown({
         <div
           role="listbox"
           aria-multiselectable
-          className="absolute left-0 top-full z-50 mt-1 min-w-full overflow-hidden rounded-input border border-divider bg-white py-1 shadow-lg"
+          className="absolute left-0 top-full z-50 mt-1 w-max min-w-full overflow-hidden rounded-input border border-divider bg-white py-1 shadow-lg"
         >
           {options.map((option) => {
             const isSelected = value.includes(option.value);
@@ -117,7 +117,7 @@ export function MultiSelectDropdown({
                 aria-selected={isSelected}
                 onClick={() => toggleOption(option.value)}
                 className={cn(
-                  "flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm text-text-primary transition-colors hover:bg-cream-card",
+                  "flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm text-text-primary transition-colors hover:bg-[#eceef1]",
                   isSelected && "bg-cream-card"
                 )}
               >
@@ -130,7 +130,7 @@ export function MultiSelectDropdown({
                 >
                   {isSelected ? <Check className="h-3 w-3" /> : null}
                 </span>
-                <span className={cn(isSelected && "font-semibold")}>
+                <span className={cn("whitespace-nowrap", isSelected && "font-semibold")}>
                   {option.label}
                 </span>
               </button>

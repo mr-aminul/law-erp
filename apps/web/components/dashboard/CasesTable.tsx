@@ -39,9 +39,8 @@ export function CasesTable() {
       <Table>
         <TableHeader>
           <TableHead className="w-10">Sr</TableHead>
-          <TableHead>Case ID</TableHead>
-          <TableHead>Matter</TableHead>
           <TableHead>Client</TableHead>
+          <TableHead>Title</TableHead>
           <TableHead>Lawyer</TableHead>
           <TableHead>Status</TableHead>
         </TableHeader>
@@ -49,9 +48,10 @@ export function CasesTable() {
           {filtered.map((c, i) => (
             <TableRow key={c.id} onClick={() => router.push(`/cases/${c.id}`)}>
               <TableCell className="text-text-muted">{i + 1}</TableCell>
-              <TableCell className="font-semibold">{c.caseId}</TableCell>
-              <TableCell className="max-w-[200px] truncate">{c.matter}</TableCell>
               <TableCell>{c.clientName}</TableCell>
+              <TableCell className="max-w-[240px] truncate font-medium">
+                {c.matter}
+              </TableCell>
               <TableCell className="text-text-sec">
                 {c.assignedLawyers[0]}
               </TableCell>

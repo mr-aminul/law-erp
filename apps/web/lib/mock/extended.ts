@@ -335,6 +335,23 @@ export const mockCaseComments: CaseComment[] = [
   },
 ];
 
+export const mockServiceComments: CaseComment[] = [
+  {
+    id: "sc1",
+    caseId: "1",
+    author: "Adv. Rahima Khan",
+    content: "First draft of opinion circulated for partner review.",
+    createdAt: "2026-05-22T11:00:00",
+  },
+  {
+    id: "sc2",
+    caseId: "1",
+    author: "Farhana Begum",
+    content: "Pulled title deeds from client vault — attached to Documents.",
+    createdAt: "2026-05-25T14:30:00",
+  },
+];
+
 export const mockCommunications: Communication[] = [
   {
     id: "cm1",
@@ -382,6 +399,15 @@ export const mockMilestones: CaseMilestone[] = [
   { id: "m5", title: "Judgment", completed: false, dueDate: "2026-09-01" },
 ];
 
+// ponytail: service milestones until services API exists
+export const mockServiceMilestones: CaseMilestone[] = [
+  { id: "sm1", title: "Brief received", completed: true, dueDate: "2026-05-10" },
+  { id: "sm2", title: "First draft prepared", completed: true, dueDate: "2026-05-22" },
+  { id: "sm3", title: "Internal review", completed: false, dueDate: "2026-06-05" },
+  { id: "sm4", title: "Client feedback", completed: false, dueDate: "2026-06-12" },
+  { id: "sm5", title: "Final delivery", completed: false, dueDate: "2026-06-20" },
+];
+
 export const mockCaseNotes: CaseNote[] = [
   {
     id: "n1",
@@ -398,6 +424,25 @@ export const mockCaseNotes: CaseNote[] = [
     content: "INTERNAL: Evaluate appeal strategy if writ is dismissed at admission stage.",
     isMemo: true,
     createdAt: "2026-05-22",
+  },
+];
+
+export const mockServiceNotes: CaseNote[] = [
+  {
+    id: "sn1",
+    caseId: "1",
+    author: "Adv. Rahima Khan",
+    content: "Client asked for risk matrix covering RAJUK and title defects.",
+    isMemo: false,
+    createdAt: "2026-05-12",
+  },
+  {
+    id: "sn2",
+    caseId: "1",
+    author: "Adv. Rahima Khan",
+    content: "INTERNAL: Cross-check with prior Gulshan Block C opinion before circulating.",
+    isMemo: true,
+    createdAt: "2026-05-28",
   },
 ];
 
@@ -485,7 +530,7 @@ export const mockAuditLog: AuditEntry[] = [
     id: "al1",
     user: "Adv. Rahima Khan",
     action: "Updated case status",
-    resource: "UK-2024-0142",
+    resource: "K4M9P2",
     timestamp: "2026-06-03T10:15:00",
     ip: "103.24.1.45",
   },

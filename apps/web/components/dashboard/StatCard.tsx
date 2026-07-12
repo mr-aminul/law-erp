@@ -53,7 +53,7 @@ export function StatCard({
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-text-sec">{title}</p>
-          <p className="text-2xl font-bold leading-tight text-text-primary">
+          <p className="truncate text-2xl font-bold leading-tight text-text-primary">
             {primaryValue}
           </p>
           <p className="mt-0.5 text-xs text-text-muted">{primaryLabel}</p>

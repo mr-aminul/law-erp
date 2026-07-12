@@ -4,13 +4,16 @@ import { NotificationPanel } from "@/components/notifications/NotificationPanel"
 import { useAppStore } from "@/lib/store/appStore";
 import { useNotificationStore } from "@/lib/store/notificationStore";
 import { mockNotifications } from "@/lib/mock/notifications";
+import { cn } from "@/lib/utils/cn";
 import type { AppNotification, NotificationTab } from "@/types/notification";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import { useIsDesktop } from "@/lib/hooks/useIsDesktop";
 
 export function NotificationDrawer() {
   const router = useRouter();
+  const isDesktop = useIsDesktop();
   const [filter, setFilter] = useState<NotificationTab>("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -71,15 +74,15 @@ export function NotificationDrawer() {
 
   if (!drawerOpen) return null;
 
-  const overlayLeft = sidebarCollapsed
-    ? "calc(var(--shell-margin) + var(--sidebar-width-collapsed))"
-    : "calc(var(--shell-margin) + var(--sidebar-width))";
+  const desktopOverlayLeft = sidebarCollapsed
+    ? "calc(var(--sidebar-width-collapsed) + var(--shell-margin) * 2)"
+    : "calc(var(--sidebar-width) + var(--shell-margin) * 2)";
 
   const drawer = (
     <div className="fixed inset-0 z-[110]" role="presentation">
       <div
-        className="absolute bottom-0 right-0 top-0 bg-sidebar/35 backdrop-blur-[3px]"
-        style={{ left: overlayLeft }}
+        className="absolute inset-0 bg-sidebar/35 backdrop-blur-[3px] lg:bottom-0 lg:right-0 lg:top-0 lg:inset-x-auto"
+        style={isDesktop ? { left: desktopOverlayLeft } : undefined}
         onClick={closeDrawer}
         aria-hidden
       />
@@ -87,14 +90,22 @@ export function NotificationDrawer() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="notification-drawer-title"
-        className="fixed z-[111] flex w-[min(400px,calc(100vw-var(--shell-margin)*2-80px))] flex-col overflow-hidden rounded-panel border border-[var(--color-theme)] bg-white shadow-[0_24px_48px_rgba(26,43,35,0.12)] transition-[left] duration-200 ease-in-out"
-        style={{
-          left: sidebarCollapsed
-            ? "calc(var(--shell-margin) + var(--sidebar-width-collapsed) + 8px)"
-            : "calc(var(--shell-margin) + var(--sidebar-width) + 8px)",
-          top: "var(--shell-margin)",
-          height: "calc(100vh - calc(var(--shell-margin) * 2))",
-        }}
+        className={cn(
+          "fixed z-[111] flex flex-col overflow-hidden rounded-panel border border-[var(--color-theme)] bg-white shadow-[0_24px_48px_rgba(26,43,35,0.12)]",
+          "inset-[var(--shell-margin)] w-auto",
+          "lg:inset-auto lg:w-[min(400px,calc(100vw-var(--shell-margin)*2-80px))]"
+        )}
+        style={
+          isDesktop
+            ? {
+                left: sidebarCollapsed
+                  ? "calc(var(--sidebar-width-collapsed) + var(--shell-margin) * 2 + 8px)"
+                  : "calc(var(--sidebar-width) + var(--shell-margin) * 2 + 8px)",
+                top: "var(--shell-margin)",
+                height: "calc(100dvh - calc(var(--shell-margin) * 2))",
+              }
+            : undefined
+        }
       >
         <NotificationPanel
           titleId="notification-drawer-title"

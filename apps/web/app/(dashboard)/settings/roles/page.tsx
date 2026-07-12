@@ -24,7 +24,7 @@ export default function RolesPage() {
       <SubNav items={settingsSubNav} />
       <PageSection title="Role-Based Access Control">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[40rem] text-sm">
             <thead>
               <tr className="border-b border-divider text-left text-xs text-text-muted">
                 <th className="py-2 pr-4">Role</th>

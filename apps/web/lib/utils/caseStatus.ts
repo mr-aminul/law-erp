@@ -36,14 +36,14 @@ export function getStatusLabel(status: CaseStatus): string {
 export function getStatusColorClasses(status: CaseStatus): string {
   switch (status) {
     case "Completed":
-      return "border border-status-completed/20 bg-status-completed-surface text-status-completed";
+      return "border border-status-completed/45 bg-status-completed-surface text-status-completed";
     case "In-Progress":
-      return "border border-status-progress/20 bg-status-progress-surface text-status-progress";
+      return "border border-status-progress/45 bg-status-progress-surface text-status-progress";
     case "Pending":
-      return "border border-status-pending/20 bg-status-pending-surface text-status-pending";
+      return "border border-status-pending/45 bg-status-pending-surface text-status-pending";
     case "On-Hold":
-      return "border border-status-hold/20 bg-status-hold-surface text-status-hold";
+      return "border border-status-hold/45 bg-status-hold-surface text-status-hold";
     default:
-      return "border border-divider/40 bg-cream-card text-text-primary";
+      return "border border-divider bg-cream-card text-text-primary";
   }
 }

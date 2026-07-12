@@ -2,6 +2,7 @@
 
 import { SubNav } from "@/components/layout/SubNav";
 import { Button } from "@/components/ui/Button";
+import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
 import {
   Table,
@@ -34,9 +35,14 @@ export default function TimeTrackingPage() {
   return (
     <div className="space-y-4">
       <SubNav items={billingSubNav} />
-      <div className="flex justify-end">
-        <Button><Plus className="mr-1.5 h-4 w-4" />Log Hours</Button>
-      </div>
+      <ListToolbar
+        actions={
+          <Button>
+            <Plus className="mr-1.5 h-4 w-4" />
+            Log Hours
+          </Button>
+        }
+      />
 
       <PageSection title="Billable Hours Log">
         <Table compact>
@@ -66,7 +72,7 @@ export default function TimeTrackingPage() {
       </PageSection>
 
       <PageSection title="Weekly Summary by Lawyer">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {byLawyer.map(([lawyer, data]) => (
             <div key={lawyer} className="rounded-card border border-divider/60 p-3">
               <p className="text-sm font-semibold">{lawyer}</p>

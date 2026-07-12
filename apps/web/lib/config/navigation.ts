@@ -1,6 +1,14 @@
 export const mainNav = [
   { href: "/", label: "Dashboard", icon: "LayoutDashboard" },
-  { href: "/cases", label: "Matters", icon: "Briefcase" },
+  {
+    href: "/cases",
+    label: "Matters",
+    icon: "Folder",
+    children: [
+      { href: "/cases", label: "Cases", icon: "Briefcase" },
+      { href: "/cases/services", label: "Services", icon: "Handshake" },
+    ],
+  },
   { href: "/clients", label: "Clients", icon: "Users" },
   { href: "/calendar", label: "Calendar", icon: "Calendar" },
   { href: "/documents", label: "Documents", icon: "FileText" },

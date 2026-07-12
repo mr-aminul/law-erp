@@ -19,14 +19,15 @@ export function Table({
   return (
     <div
       className={cn(
-        "overflow-x-auto outline-none focus:outline-none",
-        isRounded && "overflow-hidden rounded-lg",
+        /* overflow-x-auto must win over overflow-hidden so tables scroll on narrow screens */
+        "overflow-x-auto overscroll-x-contain outline-none focus:outline-none",
+        isRounded && "rounded-lg",
         className
       )}
     >
       <table
         className={cn(
-          "w-full table-auto border-separate border-spacing-0 text-xs",
+          "w-full border-separate border-spacing-0 text-xs",
           isRounded &&
             "[&_thead_th:first-child]:rounded-tl-lg [&_thead_th:last-child]:rounded-tr-lg",
           rounded === "full" &&
@@ -51,7 +52,7 @@ export function TableHeader({ children }: { children: React.ReactNode }) {
 }
 
 export function TableBody({ children }: { children: React.ReactNode }) {
-  return <tbody className="divide-y divide-divider/40">{children}</tbody>;
+  return <tbody>{children}</tbody>;
 }
 
 export function TableRow({
@@ -67,7 +68,7 @@ export function TableRow({
     <tr
       onClick={onClick}
       className={cn(
-        "transition-colors duration-150 hover:bg-cream-card",
+        "transition-colors duration-150 hover:bg-gray-100",
         onClick && "group cursor-pointer",
         className
       )}
@@ -90,7 +91,7 @@ export function TableHead({
     <th
       colSpan={colSpan}
       className={cn(
-        "border-r border-white/15 px-4 py-2.5 font-bold last:border-r-0",
+        "border-r border-white/15 px-3 py-2 font-bold last:border-r-0",
         className
       )}
     >
@@ -109,7 +110,7 @@ export function TableCell({
   return (
     <td
       className={cn(
-        "border-r border-divider/40 px-4 py-3 text-xs text-text-primary last:border-r-0",
+        "border-b border-r border-divider px-3 py-1.5 text-xs text-text-primary last:border-r-0",
         className
       )}
     >

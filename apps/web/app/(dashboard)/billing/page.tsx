@@ -19,14 +19,14 @@ export default function BillingPage() {
     <div className="space-y-4">
       <SubNav items={billingSubNav} />
 
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid-stats">
         <StatCard title="Invoiced" icon={Receipt} accent="blue" primaryValue={formatCurrency(totalInvoiced)} primaryLabel="Total billed" metrics={[{ label: "Invoices", value: mockInvoices.length }]} />
         <StatCard title="Collected" icon={Wallet} accent="green" primaryValue={formatCurrency(collected)} primaryLabel="Payments received" metrics={[{ label: "Receipts", value: mockPayments.length, highlight: true }]} />
         <StatCard title="Outstanding" icon={TrendingUp} accent="amber" primaryValue={formatCurrency(outstanding)} primaryLabel="Awaiting payment" metrics={[{ label: "Overdue", value: formatCurrency(overdue), highlight: true }]} />
         <StatCard title="Expenses" icon={CreditCard} accent="sidebar" primaryValue={formatCurrency(totalExpenses)} primaryLabel="Case expenses logged" metrics={[{ label: "Entries", value: mockExpenses.length }]} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid-pair">
         <PageSection title="Recent Invoices">
           <div className="space-y-2">
             {mockInvoices.slice(0, 4).map((inv) => (

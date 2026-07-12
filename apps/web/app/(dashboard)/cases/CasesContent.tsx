@@ -5,8 +5,8 @@ import { CaseStatusSelect } from "@/components/cases/CaseStatusSelect";
 import { NewCaseForm } from "@/components/cases/NewCaseForm";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
+import { ListToolbar } from "@/components/ui/ListToolbar";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
-import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Pagination } from "@/components/ui/Pagination";
 import {
@@ -22,7 +22,7 @@ import { CASE_STATUSES } from "@/lib/utils/caseStatus";
 import { formatDate } from "@/lib/utils/formatDate";
 import { clampPage, getPageSlice } from "@/lib/utils/pagination";
 import type { CaseStatus } from "@/types/case";
-import { MoreHorizontal, Plus, Search } from "lucide-react";
+import { MoreHorizontal, Plus } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -127,64 +127,73 @@ export default function CasesContent() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-end gap-3">
-        <MultiSelectDropdown
-          label="Status"
-          options={statusOptions}
-          value={statusFilters}
-          placeholder="All Statuses"
-          onChange={(values) => {
-            setStatusFilters(values);
-            setPage(1);
-          }}
-        />
-        <MultiSelectDropdown
-          label="Case Type"
-          options={typeOptions}
-          value={typeFilters}
-          placeholder="All Types"
-          onChange={(values) => {
-            setTypeFilters(values);
-            setPage(1);
-          }}
-        />
-        <MultiSelectDropdown
-          label="Lawyer"
-          options={lawyerOptions}
-          value={lawyerFilters}
-          placeholder="All Lawyers"
-          showChips
-          onChange={(values) => {
-            setLawyerFilters(values);
-            setPage(1);
-          }}
-        />
-        <div className="ml-auto flex items-center gap-3">
-          <div className="relative w-full min-w-[240px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-            <Input
-              placeholder="Search matters, clients, case ID..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
+      <ListToolbar
+        activeFilterCount={
+          statusFilters.length + typeFilters.length + lawyerFilters.length
+        }
+        onClearFilters={() => {
+          setStatusFilters([]);
+          setTypeFilters([]);
+          setLawyerFilters([]);
+          setPage(1);
+        }}
+        filters={
+          <>
+            <MultiSelectDropdown
+              label="Status"
+              options={statusOptions}
+              value={statusFilters}
+              placeholder="All Statuses"
+              onChange={(values) => {
+                setStatusFilters(values);
                 setPage(1);
               }}
-              className="pl-9"
             />
-          </div>
-          <Button type="button" className="h-10" onClick={openNewCaseModal}>
+            <MultiSelectDropdown
+              label="Case Type"
+              options={typeOptions}
+              value={typeFilters}
+              placeholder="All Types"
+              onChange={(values) => {
+                setTypeFilters(values);
+                setPage(1);
+              }}
+            />
+            <MultiSelectDropdown
+              label="Lawyer"
+              options={lawyerOptions}
+              value={lawyerFilters}
+              placeholder="All Lawyers"
+              showChips
+              onChange={(values) => {
+                setLawyerFilters(values);
+                setPage(1);
+              }}
+            />
+          </>
+        }
+        search={{
+          value: search,
+          onChange: (value) => {
+            setSearch(value);
+            setPage(1);
+          },
+          placeholder: "Search titles, clients...",
+        }}
+        actions={
+          <Button type="button" onClick={openNewCaseModal}>
             <Plus className="mr-1.5 h-4 w-4" />
-            New Matter
+            New Case
           </Button>
-        </div>
-      </div>
+        }
+      />
 
-      <Card className="overflow-hidden border border-divider/60 py-0 shadow-sm ring-0">
+      <Card className="overflow-hidden border border-divider py-0 shadow-sm ring-0">
         <CardContent className="p-0">
         <Table rounded="top">
           <TableHeader>
-            <TableHead className="w-0 whitespace-nowrap">Case ID</TableHead>
             <TableHead>Client</TableHead>
+            <TableHead>Title</TableHead>
             <TableHead className="w-0 whitespace-nowrap">Type</TableHead>
             <TableHead className="w-0 whitespace-nowrap">Status</TableHead>
             <TableHead>Assigned Lawyer</TableHead>
@@ -198,9 +207,6 @@ export default function CasesContent() {
                 key={c.id}
                 onClick={() => router.push(`/cases/${c.id}`)}
               >
-                <TableCell className="w-0 whitespace-nowrap font-medium tabular-nums">
-                  {c.caseId}
-                </TableCell>
                 <TableCell>
                   <Link
                     href={`/clients/${c.clientId}`}
@@ -210,6 +216,7 @@ export default function CasesContent() {
                     {c.clientName}
                   </Link>
                 </TableCell>
+                <TableCell className="font-medium">{c.matter}</TableCell>
                 <TableCell className="w-0 whitespace-nowrap">{c.type}</TableCell>
                 <TableCell className="w-0 whitespace-nowrap">
                   <CaseStatusSelect
@@ -243,7 +250,7 @@ export default function CasesContent() {
 
         {filtered.length === 0 && (
           <p className="py-12 text-center text-sm text-text-primary">
-            No matters match your filters.
+            No cases match your filters.
           </p>
         )}
 
@@ -252,10 +259,10 @@ export default function CasesContent() {
           totalPages={totalPages}
           totalItems={filtered.length}
           pageSize={pageSize}
-          itemLabel="matters"
+          itemLabel="cases"
           onPageChange={setPage}
           onPageSizeChange={handlePageSizeChange}
-          className="mt-0 rounded-b-lg border-divider/40 px-4 py-2"
+          className="mt-0 rounded-b-lg border-divider px-4 py-2"
         />
         </CardContent>
       </Card>
@@ -263,7 +270,7 @@ export default function CasesContent() {
       <Modal
         open={newCaseOpen}
         onClose={closeNewCaseModal}
-        title="New Matter"
+        title="New Case"
         className="max-w-2xl"
       >
         <NewCaseForm onSubmit={handleCreateCase} onCancel={closeNewCaseModal} />

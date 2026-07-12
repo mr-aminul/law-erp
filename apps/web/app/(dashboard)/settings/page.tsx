@@ -18,7 +18,7 @@ export default function SettingsPage() {
       <SubNav items={settingsSubNav} />
 
       <PageSection title="Firm Profile" description="Bar Council registration, address, and branch offices.">
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid-pair">
           <FormField label="Firm Name"><Input defaultValue={firm.name} /></FormField>
           <FormField label="Bar Council Reg."><Input defaultValue={firm.barCouncilReg} /></FormField>
           <FormField label="Phone"><Input defaultValue={firm.phone} /></FormField>

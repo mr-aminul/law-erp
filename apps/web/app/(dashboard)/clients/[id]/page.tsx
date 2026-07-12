@@ -49,9 +49,9 @@ export default function ClientDetailPage({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start justify-between rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-3 rounded-card border border-divider/70 bg-surface p-3 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-4">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-lg font-bold text-text-primary">{client.name}</h2>
             <Badge variant={client.status === "Active" ? "green" : "muted"}>
               {client.status}
@@ -70,7 +70,7 @@ export default function ClientDetailPage({
 
       {tab === "overview" && (
         <PageSection title="Profile">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid-fields-3">
             <DetailField label="Email" value={client.email ?? "—"} />
             <DetailField label="Phone" value={client.phone ?? "—"} />
             <DetailField label="NID / Reg. No." value={client.nid ?? client.registrationNo ?? "—"} />
@@ -97,16 +97,14 @@ export default function ClientDetailPage({
         <PageSection title="Linked Cases">
           <Table compact>
             <TableHeader>
-              <TableHead>Case ID</TableHead>
-              <TableHead>Matter</TableHead>
+              <TableHead>Title</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Status</TableHead>
             </TableHeader>
             <TableBody>
               {cases.map((c) => (
                 <TableRow key={c.id} onClick={() => router.push(`/cases/${c.id}`)}>
-                  <TableCell className="font-semibold">{c.caseId}</TableCell>
-                  <TableCell>{c.matter}</TableCell>
+                  <TableCell className="font-medium">{c.matter}</TableCell>
                   <TableCell className="text-text-sec">{c.type}</TableCell>
                   <TableCell><CaseStatusBadge status={c.status} /></TableCell>
                 </TableRow>

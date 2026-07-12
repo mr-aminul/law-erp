@@ -174,7 +174,10 @@ export function Pagination({
       <div className="flex flex-wrap items-center gap-1.5 text-xs text-text-primary">
         {onPageSizeChange && (
           <div className="mr-0.5 flex items-center gap-1 border-r border-divider pr-2">
-            <label htmlFor={pageSizeSelectId} className="text-xs text-text-muted">
+            <label
+              htmlFor={pageSizeSelectId}
+              className="hidden text-xs text-text-muted sm:inline"
+            >
               Items per page
             </label>
             <Dropdown

@@ -4,6 +4,7 @@ import { SubNav } from "@/components/layout/SubNav";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Dropdown } from "@/components/ui/Dropdown";
+import { ListToolbar } from "@/components/ui/ListToolbar";
 import {
   Table,
   TableBody,
@@ -34,21 +35,30 @@ export default function InvoicesPage() {
   return (
     <div className="space-y-4">
       <SubNav items={billingSubNav} />
-      <div className="flex items-center justify-between">
-        <Dropdown
-          label="Status"
-          options={[
-            { value: "all", label: "All" },
-            { value: "Draft", label: "Draft" },
-            { value: "Sent", label: "Sent" },
-            { value: "Paid", label: "Paid" },
-            { value: "Overdue", label: "Overdue" },
-          ]}
-          value={status}
-          onChange={setStatus}
-        />
-        <Button><Plus className="mr-1.5 h-4 w-4" />Generate Invoice</Button>
-      </div>
+      <ListToolbar
+        activeFilterCount={status !== "all" ? 1 : 0}
+        onClearFilters={() => setStatus("all")}
+        filters={
+          <Dropdown
+            label="Status"
+            options={[
+              { value: "all", label: "All" },
+              { value: "Draft", label: "Draft" },
+              { value: "Sent", label: "Sent" },
+              { value: "Paid", label: "Paid" },
+              { value: "Overdue", label: "Overdue" },
+            ]}
+            value={status}
+            onChange={setStatus}
+          />
+        }
+        actions={
+          <Button>
+            <Plus className="mr-1.5 h-4 w-4" />
+            Generate Invoice
+          </Button>
+        }
+      />
       <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
         <Table compact>
           <TableHeader>

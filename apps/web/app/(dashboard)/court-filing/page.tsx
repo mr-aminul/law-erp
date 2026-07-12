@@ -3,6 +3,7 @@
 import { SubNav } from "@/components/layout/SubNav";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
 import {
   Table,
@@ -27,9 +28,13 @@ export default function CourtFilingPage() {
   return (
     <div className="space-y-4">
       <SubNav items={courtFilingSubNav} />
-      <div className="flex justify-end">
-        <Link href="/court-filing/new"><Button size="sm">Log New Filing</Button></Link>
-      </div>
+      <ListToolbar
+        actions={
+          <Link href="/court-filing/new">
+            <Button>Log New Filing</Button>
+          </Link>
+        }
+      />
       <PageSection title="Filing Registry" description="Submission log with cause list refs, process server, and summons tracking.">
         <Table compact>
           <TableHeader>

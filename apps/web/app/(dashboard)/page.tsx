@@ -19,7 +19,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid-stats">
         <StatCard
           title="Hearings"
           icon={Gavel}
@@ -73,8 +73,8 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-[1fr_280px] gap-4">
-        <div className="space-y-4">
+      <div className="grid-split">
+        <div className="min-w-0 space-y-4">
           <Card>
             <CardHeader>
               <CardTitle className="text-sm font-bold text-text-primary">
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid-pair">
             <Card>
               <CardHeader>
                 <CardTitle className="text-sm font-bold text-text-primary">

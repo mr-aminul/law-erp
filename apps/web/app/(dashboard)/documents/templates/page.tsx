@@ -2,6 +2,7 @@
 
 import { SubNav } from "@/components/layout/SubNav";
 import { Button } from "@/components/ui/Button";
+import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
 import { documentsSubNav } from "@/lib/config/navigation";
 import { mockDocuments } from "@/lib/mock";
@@ -14,12 +15,20 @@ export default function DocumentTemplatesPage() {
     <div className="space-y-4">
       <SubNav items={documentsSubNav} />
 
+      <ListToolbar
+        actions={
+          <Button>
+            <Plus className="mr-1.5 h-4 w-4" />
+            New Template
+          </Button>
+        }
+      />
+
       <PageSection
         title="Template Library"
         description="Writ Petition, Vakalatnama, Legal Notice, Affidavit, MOA — Bangla + English support."
-        action={<Button size="sm"><Plus className="mr-1.5 h-4 w-4" />New Template</Button>}
       >
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid-pair gap-3">
           {templates.map((t) => (
             <div key={t.id} className="rounded-card border border-divider/60 p-4">
               <div className="flex items-start gap-3">
@@ -28,10 +37,12 @@ export default function DocumentTemplatesPage() {
                 </div>
                 <div>
                   <p className="font-semibold">{t.name}</p>
-                  <p className="text-xs text-text-muted">{t.category} · {t.language}</p>
+                  <p className="text-xs text-text-muted">
+                    {t.category} · {t.language}
+                  </p>
                   <div className="mt-2 flex gap-2">
-                    <Button size="sm" variant="outline">Use Template</Button>
-                    <Button size="sm" variant="ghost">Preview</Button>
+                    <Button variant="outline">Use Template</Button>
+                    <Button variant="ghost">Preview</Button>
                   </div>
                 </div>
               </div>

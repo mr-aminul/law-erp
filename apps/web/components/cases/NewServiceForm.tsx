@@ -8,30 +8,21 @@ import { Modal } from "@/components/ui/Modal";
 import { UserSearchPicker } from "@/components/ui/UserSearchPicker";
 import { mockClients, mockStaff } from "@/lib/mock";
 import { CASE_STATUSES } from "@/lib/utils/caseStatus";
-import type { CaseType } from "@/types/case";
+import { SERVICE_TYPES, type ServiceType } from "@/types/service";
 import { useState } from "react";
-
-const DEFAULT_CASE_TYPES: CaseType[] = [
-  "Civil",
-  "Criminal",
-  "Family",
-  "Corporate",
-  "Labour",
-  "Property",
-];
 
 const CREATE_CLIENT_VALUE = "__create_client__";
 const CREATE_TYPE_VALUE = "__create_type__";
 
-interface NewCaseFormProps {
+interface NewServiceFormProps {
   onSubmit: () => void;
   onCancel: () => void;
 }
 
-export function NewCaseForm({ onSubmit, onCancel }: NewCaseFormProps) {
+export function NewServiceForm({ onSubmit, onCancel }: NewServiceFormProps) {
   const [clientSelection, setClientSelection] = useState("");
   const [newClientOpen, setNewClientOpen] = useState(false);
-  const [typeSelection, setTypeSelection] = useState("Civil");
+  const [typeSelection, setTypeSelection] = useState<string>("Legal opinions");
   const [customType, setCustomType] = useState("");
   const [assignedLawyerIds, setAssignedLawyerIds] = useState<string[]>([]);
 
@@ -84,13 +75,13 @@ export function NewCaseForm({ onSubmit, onCancel }: NewCaseFormProps) {
             </Select>
           </FormField>
 
-          <FormField label="Case Type" required>
+          <FormField label="Service Type" required>
             <Select
               required={typeSelection !== CREATE_TYPE_VALUE}
               value={typeSelection}
               onChange={(e) => handleTypeChange(e.target.value)}
             >
-              {DEFAULT_CASE_TYPES.map((t) => (
+              {SERVICE_TYPES.map((t: ServiceType) => (
                 <option key={t} value={t}>
                   {t}
                 </option>
@@ -100,53 +91,29 @@ export function NewCaseForm({ onSubmit, onCancel }: NewCaseFormProps) {
           </FormField>
 
           {typeSelection === CREATE_TYPE_VALUE && (
-            <FormField label="New Case Type" required>
+            <FormField label="New Service Type" required>
               <Input
                 required
                 value={customType}
                 onChange={(e) => setCustomType(e.target.value)}
-                placeholder="e.g. Tax, Immigration"
+                placeholder="e.g. Trademark filing"
               />
             </FormField>
           )}
 
           <div className="col-span-2">
             <FormField label="Title" required>
-              <Input required placeholder="e.g. Land dispute — Gulshan Block C" />
+              <Input required placeholder="e.g. Legal opinion — land acquisition risk" />
             </FormField>
           </div>
 
           <div className="col-span-2">
             <FormField label="Description">
-              <Textarea placeholder="Optional details about the case" />
+              <Textarea placeholder="Optional details about the service" />
             </FormField>
           </div>
 
-          <FormField label="Court Level" required>
-            <Select required defaultValue="District Court">
-              {["Supreme Court", "High Court Division", "District Court", "Tribunal"].map(
-                (c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                )
-              )}
-            </Select>
-          </FormField>
-
-          <FormField label="Court Name" required>
-            <Input required placeholder="e.g. 1st Court of Joint District Judge, Dhaka" />
-          </FormField>
-
-          <FormField label="Case Number">
-            <Input placeholder="Court-assigned number" />
-          </FormField>
-
-          <FormField label="First Hearing Date">
-            <Input type="date" />
-          </FormField>
-
-          <FormField label="Deadline">
+          <FormField label="Due Date">
             <Input type="date" />
           </FormField>
 
@@ -177,14 +144,6 @@ export function NewCaseForm({ onSubmit, onCancel }: NewCaseFormProps) {
               />
             </FormField>
           </div>
-
-          <FormField label="Opposite Party">
-            <Input placeholder="Name of opposing party" />
-          </FormField>
-
-          <FormField label="Opposing Counsel">
-            <Input placeholder="Advocate name" />
-          </FormField>
         </div>
 
         <div className="flex justify-end gap-3 border-t border-divider pt-4">
@@ -192,7 +151,7 @@ export function NewCaseForm({ onSubmit, onCancel }: NewCaseFormProps) {
             Cancel
           </Button>
           <Button type="submit" disabled={assignedLawyerIds.length === 0}>
-            Create Case
+            Create Service
           </Button>
         </div>
       </form>

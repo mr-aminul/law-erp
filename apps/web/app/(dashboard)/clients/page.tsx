@@ -1,9 +1,11 @@
 "use client";
 
+import { NewClientForm } from "@/components/clients/NewClientForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Dropdown } from "@/components/ui/Dropdown";
-import { Input } from "@/components/ui/Input";
+import { ListToolbar } from "@/components/ui/ListToolbar";
+import { Modal } from "@/components/ui/Modal";
 import {
   Table,
   TableBody,
@@ -14,16 +16,21 @@ import {
 } from "@/components/ui/Table";
 import { mockClients } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
-import { Plus, Search, ShieldCheck } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { Plus, ShieldCheck } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
-export default function ClientsPage() {
+function ClientsContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [newClientOpen, setNewClientOpen] = useState(false);
+
+  useEffect(() => {
+    setNewClientOpen(searchParams.get("new") === "1");
+  }, [searchParams]);
 
   const filtered = useMemo(() => {
     return mockClients.filter((c) => {
@@ -38,51 +45,74 @@ export default function ClientsPage() {
     });
   }, [search, typeFilter, statusFilter]);
 
+  function openNewClientModal() {
+    setNewClientOpen(true);
+    if (searchParams.get("new") !== "1") {
+      router.replace("/clients?new=1", { scroll: false });
+    }
+  }
+
+  function closeNewClientModal() {
+    setNewClientOpen(false);
+    if (searchParams.get("new")) {
+      router.replace("/clients");
+    }
+  }
+
+  function handleCreateClient() {
+    closeNewClientModal();
+    router.push("/clients/1");
+  }
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <div className="relative max-w-md flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-          <Input
-            placeholder="Search clients..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        <Link href="/clients/new">
-          <Button>
+      <ListToolbar
+        activeFilterCount={
+          (typeFilter !== "all" ? 1 : 0) + (statusFilter !== "all" ? 1 : 0)
+        }
+        onClearFilters={() => {
+          setTypeFilter("all");
+          setStatusFilter("all");
+        }}
+        filters={
+          <>
+            <Dropdown
+              label="Type"
+              options={[
+                { value: "all", label: "All Types" },
+                { value: "Individual", label: "Individual" },
+                { value: "Corporate", label: "Corporate" },
+                { value: "NGO", label: "NGO" },
+              ]}
+              value={typeFilter}
+              onChange={setTypeFilter}
+            />
+            <Dropdown
+              label="Status"
+              options={[
+                { value: "all", label: "All" },
+                { value: "Active", label: "Active" },
+                { value: "Inactive", label: "Inactive" },
+              ]}
+              value={statusFilter}
+              onChange={setStatusFilter}
+            />
+          </>
+        }
+        search={{
+          value: search,
+          onChange: setSearch,
+          placeholder: "Search clients...",
+        }}
+        actions={
+          <Button type="button" onClick={openNewClientModal}>
             <Plus className="mr-1.5 h-4 w-4" />
             New Client
           </Button>
-        </Link>
-      </div>
+        }
+      />
 
-      <div className="flex gap-3">
-        <Dropdown
-          label="Type"
-          options={[
-            { value: "all", label: "All Types" },
-            { value: "Individual", label: "Individual" },
-            { value: "Corporate", label: "Corporate" },
-            { value: "NGO", label: "NGO" },
-          ]}
-          value={typeFilter}
-          onChange={setTypeFilter}
-        />
-        <Dropdown
-          label="Status"
-          options={[
-            { value: "all", label: "All" },
-            { value: "Active", label: "Active" },
-            { value: "Inactive", label: "Inactive" },
-          ]}
-          value={statusFilter}
-          onChange={setStatusFilter}
-        />
-      </div>
-
-      <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
+      <div className="overflow-hidden rounded-card border border-divider/70 bg-surface shadow-sm">
         <Table>
           <TableHeader>
             <TableHead>Client ID</TableHead>
@@ -120,6 +150,23 @@ export default function ClientsPage() {
           </TableBody>
         </Table>
       </div>
+
+      <Modal
+        open={newClientOpen}
+        onClose={closeNewClientModal}
+        title="New Client"
+        className="max-w-2xl"
+      >
+        <NewClientForm onSubmit={handleCreateClient} onCancel={closeNewClientModal} />
+      </Modal>
     </div>
+  );
+}
+
+export default function ClientsPage() {
+  return (
+    <Suspense fallback={null}>
+      <ClientsContent />
+    </Suspense>
   );
 }

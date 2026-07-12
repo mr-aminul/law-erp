@@ -40,6 +40,7 @@ export function AssignedLawyers({ lawyers }: AssignedLawyersProps) {
             key={lawyer}
             name={details.name}
             initials={details.initials}
+            compactOnMobile
           />
         );
       })}

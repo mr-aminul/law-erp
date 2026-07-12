@@ -2,14 +2,30 @@
 
 import { Shell } from "./Shell";
 import { usePathname } from "next/navigation";
+import {
+  BarChart3,
+  Briefcase,
+  Calendar,
+  CreditCard,
+  FileText,
+  Gavel,
+  Handshake,
+  LayoutDashboard,
+  MessageSquare,
+  Scale,
+  Settings,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 
 function getPageTitle(pathname: string): string {
   const titles: [RegExp | string, string][] = [
     ["/", "Dashboard"],
-    ["/cases/new", "New Matter"],
+    ["/cases/new", "New Case"],
+    [/^\/cases\/services\/[^/]+$/, "Service Detail"],
+    ["/cases/services", "Services"],
     [/^\/cases\/[^/]+$/, "Case Detail"],
-    ["/cases", "Matters"],
-    ["/clients/new", "New Client"],
+    ["/cases", "Cases"],
     [/^\/clients\/[^/]+$/, "Client Detail"],
     ["/clients", "Clients"],
     ["/calendar", "Calendar"],
@@ -44,7 +60,28 @@ function getPageTitle(pathname: string): string {
   return "UKIL.ai";
 }
 
+function getPageIcon(pathname: string): LucideIcon {
+  // Match sidebar icons — most specific paths first
+  if (pathname.startsWith("/cases/services")) return Handshake;
+  if (pathname.startsWith("/cases")) return Briefcase;
+  if (pathname.startsWith("/clients")) return Users;
+  if (pathname.startsWith("/calendar")) return Calendar;
+  if (pathname.startsWith("/documents")) return FileText;
+  if (pathname.startsWith("/billing")) return CreditCard;
+  if (pathname.startsWith("/staff")) return Scale;
+  if (pathname.startsWith("/court-filing")) return Gavel;
+  if (pathname.startsWith("/reports")) return BarChart3;
+  if (pathname.startsWith("/communications")) return MessageSquare;
+  if (pathname.startsWith("/settings")) return Settings;
+  if (pathname === "/") return LayoutDashboard;
+  return LayoutDashboard;
+}
+
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  return <Shell title={getPageTitle(pathname)}>{children}</Shell>;
+  return (
+    <Shell title={getPageTitle(pathname)} icon={getPageIcon(pathname)}>
+      {children}
+    </Shell>
+  );
 }

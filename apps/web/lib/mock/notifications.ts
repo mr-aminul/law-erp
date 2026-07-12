@@ -51,14 +51,14 @@ export const mockNotifications: AppNotification[] = [
     kind: "team",
     category: "message",
     title: "New internal note",
-    body: "left a comment on Case UK-2024-018.",
+    body: "left a comment on Case R7N2X8.",
     href: "/communications",
     createdAt: "2026-07-07T11:05:00.000Z",
     actorName: "Adv. Tanvir Ahmed",
     actorInitials: "TA",
     matterChip: {
-      label: "UK-2024-018 — Contract Review",
-      initial: "U",
+      label: "R7N2X8 — Contract Review",
+      initial: "R",
       tone: "slate",
     },
   },
@@ -151,7 +151,7 @@ export const mockNotifications: AppNotification[] = [
     createdAt: "2026-07-04T10:00:00.000Z",
     systemVariant: "alert",
     detail:
-      "Reply submission for Case UK-2024-022 is due on 11 Jul. Assign a lawyer or extend the deadline before the court closes.",
+      "Reply submission for Case H3Q8W1 is due on 11 Jul. Assign a lawyer or extend the deadline before the court closes.",
     actionLabel: "Review filing",
   },
   {

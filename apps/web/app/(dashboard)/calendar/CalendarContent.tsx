@@ -2,6 +2,7 @@
 
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
 import { Tabs } from "@/components/ui/Tabs";
 import { mockHearings } from "@/lib/mock";
@@ -34,24 +35,29 @@ export default function CalendarContent() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <Tabs
-          tabs={[
-            { id: "list", label: "List View" },
-            { id: "week", label: "Week View" },
-            { id: "month", label: "Month View" },
-          ]}
-          activeTab={view}
-          onChange={setView}
-        />
-        <Button size="sm">
-          <Plus className="mr-1.5 h-4 w-4" />
-          Add Hearing
-        </Button>
-      </div>
+      <ListToolbar
+        collapseFiltersOnMobile={false}
+        filters={
+          <Tabs
+            tabs={[
+              { id: "list", label: "List View" },
+              { id: "week", label: "Week View" },
+              { id: "month", label: "Month View" },
+            ]}
+            activeTab={view}
+            onChange={setView}
+          />
+        }
+        actions={
+          <Button>
+            <Plus className="mr-1.5 h-4 w-4" />
+            Add Hearing
+          </Button>
+        }
+      />
 
-      <div className="grid grid-cols-[1fr_280px] gap-4">
-        <div className="space-y-4">
+      <div className="grid-split">
+        <div className="min-w-0 space-y-4">
           <PageSection title="Today's Hearings" description={`${todayHearings.length} scheduled for ${formatDate(today)}`}>
             {todayHearings.length === 0 ? (
               <p className="text-sm text-text-muted">No hearings today.</p>
@@ -73,7 +79,7 @@ export default function CalendarContent() {
           </PageSection>
         </div>
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <PageSection title="Upcoming — 7 Days">
             <div className="space-y-2">
               {upcoming.map((h) => (

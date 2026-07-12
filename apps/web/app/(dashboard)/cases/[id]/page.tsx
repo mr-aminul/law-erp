@@ -59,19 +59,19 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
   return (
     <div className="space-y-4">
       <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
-        <div className="flex items-start justify-between gap-4">
-          <div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-bold">{caseData.caseId}</h2>
+              <h2 className="text-lg font-bold">{caseData.matter}</h2>
               <CaseStatusBadge status={caseData.status} />
               <Badge variant="blue">{caseData.stage}</Badge>
             </div>
-            <p className="mt-1 text-sm text-text-sec">{caseData.matter}</p>
+            <p className="mt-1 text-xs tabular-nums text-text-muted">{caseData.caseId}</p>
             <p className="mt-0.5 text-xs text-text-muted">
               {caseData.clientName} · {caseData.type} · {caseData.courtName}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Link href={`/calendar?case=${caseData.id}`}>
               <Button variant="secondary" size="sm">Schedule Hearing</Button>
             </Link>
@@ -93,7 +93,7 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
 
       {tab === "overview" && (
         <PageSection title="Case Overview">
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid-fields-3">
             <DetailField label="Case Number" value={caseData.caseNumber ?? "—"} />
             <DetailField label="Cause List Ref" value={caseData.causeListRef ?? "—"} />
             <DetailField label="Next Hearing" value={caseData.nextHearing ? formatDate(caseData.nextHearing) : "—"} />
@@ -112,18 +112,18 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
 
       {tab === "pipeline" && (
         <PageSection title="Case Stage Pipeline">
-          <div className="mb-6 flex items-center gap-1">
+          <div className="mb-6 flex items-center gap-1 overflow-x-auto overscroll-x-contain pb-1">
             {stages.map((stage, i) => {
               const currentIdx = stages.indexOf(caseData.stage);
               const done = i <= currentIdx;
               return (
-                <div key={stage} className="flex flex-1 items-center">
+                <div key={stage} className="flex min-w-[4.5rem] flex-1 items-center">
                   <div className={`flex flex-col items-center ${done ? "text-green" : "text-text-muted"}`}>
                     {done ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
-                    <span className="mt-1 text-[10px] font-semibold">{stage}</span>
+                    <span className="mt-1 text-center text-[10px] font-semibold">{stage}</span>
                   </div>
                   {i < stages.length - 1 && (
-                    <div className={`mx-1 h-0.5 flex-1 ${i < currentIdx ? "bg-green" : "bg-divider"}`} />
+                    <div className={`mx-1 h-0.5 min-w-4 flex-1 ${i < currentIdx ? "bg-green" : "bg-divider"}`} />
                   )}
                 </div>
               );

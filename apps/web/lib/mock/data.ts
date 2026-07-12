@@ -1,6 +1,7 @@
 import type { Case, CaseStatus } from "@/types/case";
 import type { Client } from "@/types/client";
 import type { Invoice } from "@/types/invoice";
+import type { Service } from "@/types/service";
 import type { Staff } from "@/types/staff";
 import { chartColors } from "@/lib/theme/chart-colors";
 
@@ -148,7 +149,7 @@ const caseDefaults = {
 export const mockCases: Case[] = [
   {
     id: "1",
-    caseId: "UK-2024-0142",
+    caseId: "K4M9P2",
     matter: "Land dispute — Gulshan Block C",
     clientId: "1",
     clientName: "Bashundhara Group",
@@ -168,7 +169,7 @@ export const mockCases: Case[] = [
   },
   {
     id: "2",
-    caseId: "UK-2024-0198",
+    caseId: "R7N2X8",
     matter: "Contract breach — supply agreement",
     clientId: "3",
     clientName: "Square Pharmaceuticals",
@@ -186,7 +187,7 @@ export const mockCases: Case[] = [
   },
   {
     id: "3",
-    caseId: "UK-2025-0031",
+    caseId: "H3Q8W1",
     matter: "Divorce petition — mutual consent",
     clientId: "2",
     clientName: "Mohammad Ali",
@@ -203,7 +204,7 @@ export const mockCases: Case[] = [
   },
   {
     id: "4",
-    caseId: "UK-2023-0087",
+    caseId: "T5J6L4",
     matter: "Cheque dishonour — Section 138",
     clientId: "3",
     clientName: "Square Pharmaceuticals",
@@ -221,7 +222,7 @@ export const mockCases: Case[] = [
   },
   {
     id: "5",
-    caseId: "UK-2024-0256",
+    caseId: "V2C9D7",
     matter: "Labour tribunal — wrongful termination",
     clientId: "1",
     clientName: "Bashundhara Group",
@@ -238,7 +239,7 @@ export const mockCases: Case[] = [
   },
   {
     id: "6",
-    caseId: "UK-2025-0044",
+    caseId: "M8F1A3",
     matter: "Civil suit — recovery of dues",
     clientId: "2",
     clientName: "Mohammad Ali",
@@ -256,7 +257,7 @@ export const mockCases: Case[] = [
   },
   {
     id: "7",
-    caseId: "UK-2024-0310",
+    caseId: "P6B4Y9",
     matter: "Arbitration — construction contract",
     clientId: "1",
     clientName: "Bashundhara Group",
@@ -272,7 +273,7 @@ export const mockCases: Case[] = [
   },
   {
     id: "8",
-    caseId: "UK-2025-0055",
+    caseId: "Z1K7E2",
     matter: "Property transfer — Rajshahi",
     clientId: "4",
     clientName: "Rashida Akter",
@@ -288,13 +289,144 @@ export const mockCases: Case[] = [
   },
 ];
 
+// ponytail: non-court matters — same lifecycle as cases, different types
+export const mockServices: Service[] = [
+  {
+    id: "1",
+    serviceId: "S4K9M2",
+    matter: "Legal opinion — land acquisition risk",
+    clientId: "1",
+    clientName: "Bashundhara Group",
+    type: "Legal opinions",
+    status: "In-Progress",
+    stage: "Drafting",
+    assignedLawyers: ["Adv. Rahima Khan"],
+    dueDate: "2026-06-20",
+    description: "Opinion on acquisition risk for Gulshan Block parcels under RAJUK zoning.",
+    createdAt: "2026-05-10",
+    updatedAt: "2026-06-01",
+  },
+  {
+    id: "2",
+    serviceId: "S7N2X8",
+    matter: "Supply contract review — API vendors",
+    clientId: "3",
+    clientName: "Square Pharmaceuticals",
+    type: "Contracts",
+    status: "Pending",
+    stage: "Intake",
+    assignedLawyers: ["Adv. Nusrat Jahan"],
+    dueDate: "2026-06-15",
+    createdAt: "2026-05-22",
+    updatedAt: "2026-05-28",
+  },
+  {
+    id: "3",
+    serviceId: "S3Q8W1",
+    matter: "Shareholders agreement — Series A",
+    clientId: "1",
+    clientName: "Bashundhara Group",
+    type: "Agreements",
+    status: "In-Progress",
+    stage: "Review",
+    assignedLawyers: ["Adv. Rahima Khan", "Adv. Tanvir Ahmed"],
+    dueDate: "2026-07-01",
+    createdAt: "2026-05-01",
+    updatedAt: "2026-06-05",
+  },
+  {
+    id: "4",
+    serviceId: "S5J6L4",
+    matter: "Due diligence — acquisition target",
+    clientId: "3",
+    clientName: "Square Pharmaceuticals",
+    type: "Due diligence",
+    status: "Completed",
+    stage: "Closed",
+    assignedLawyers: ["Adv. Tanvir Ahmed", "Farhana Begum"],
+    dueDate: "2026-04-30",
+    createdAt: "2026-03-15",
+    updatedAt: "2026-04-28",
+  },
+  {
+    id: "5",
+    serviceId: "S2C9D7",
+    matter: "Private limited company incorporation",
+    clientId: "2",
+    clientName: "Mohammad Ali",
+    type: "Company registration",
+    status: "Pending",
+    stage: "Intake",
+    assignedLawyers: ["Adv. Nusrat Jahan"],
+    dueDate: "2026-06-25",
+    createdAt: "2026-06-02",
+    updatedAt: "2026-06-02",
+  },
+  {
+    id: "6",
+    serviceId: "S8F1A3",
+    matter: "Legal notice — unpaid invoices",
+    clientId: "2",
+    clientName: "Mohammad Ali",
+    type: "Notices",
+    status: "Completed",
+    stage: "Closed",
+    assignedLawyers: ["Adv. Tanvir Ahmed"],
+    dueDate: "2026-05-20",
+    createdAt: "2026-05-05",
+    updatedAt: "2026-05-18",
+  },
+  {
+    id: "7",
+    serviceId: "S6B4Y9",
+    matter: "Employment handbook policies",
+    clientId: "1",
+    clientName: "Bashundhara Group",
+    type: "Legal drafting",
+    status: "On-Hold",
+    stage: "Drafting",
+    assignedLawyers: ["Adv. Nusrat Jahan"],
+    dueDate: "2026-07-15",
+    createdAt: "2026-05-28",
+    updatedAt: "2026-06-08",
+  },
+  {
+    id: "8",
+    serviceId: "S1K7E2",
+    matter: "RJSC annual compliance filing",
+    clientId: "4",
+    clientName: "Rashida Akter",
+    type: "Compliance work",
+    status: "In-Progress",
+    stage: "Delivery",
+    assignedLawyers: ["Farhana Begum"],
+    dueDate: "2026-06-30",
+    createdAt: "2026-06-01",
+    updatedAt: "2026-06-10",
+  },
+  {
+    id: "9",
+    serviceId: "S9P3H5",
+    matter: "Board resolution pack — Q2",
+    clientId: "3",
+    clientName: "Square Pharmaceuticals",
+    type: "Documentation",
+    status: "Pending",
+    stage: "Intake",
+    assignedLawyers: ["Adv. Rahima Khan"],
+    dueDate: "2026-06-18",
+    createdAt: "2026-06-08",
+    updatedAt: "2026-06-08",
+  },
+];
+
 export const mockInvoices: Invoice[] = [
   {
     id: "1",
     invoiceNumber: "INV-2026-042",
     clientId: "1",
     clientName: "Bashundhara Group",
-    caseId: "UK-2024-0142",
+    caseId: "K4M9P2",
     caseName: "Land dispute — Gulshan Block C",
     amount: 125000,
     status: "Sent",
@@ -306,7 +438,7 @@ export const mockInvoices: Invoice[] = [
     invoiceNumber: "INV-2026-038",
     clientId: "3",
     clientName: "Square Pharmaceuticals",
-    caseId: "UK-2024-0198",
+    caseId: "R7N2X8",
     caseName: "Contract breach — supply agreement",
     amount: 85000,
     status: "Paid",
@@ -318,7 +450,7 @@ export const mockInvoices: Invoice[] = [
     invoiceNumber: "INV-2026-045",
     clientId: "2",
     clientName: "Mohammad Ali",
-    caseId: "UK-2025-0031",
+    caseId: "H3Q8W1",
     caseName: "Divorce petition",
     amount: 45000,
     status: "Overdue",
@@ -330,7 +462,7 @@ export const mockInvoices: Invoice[] = [
     invoiceNumber: "INV-2026-050",
     clientId: "1",
     clientName: "Bashundhara Group",
-    caseId: "UK-2024-0256",
+    caseId: "V2C9D7",
     caseName: "Labour tribunal",
     amount: 95000,
     status: "Draft",
@@ -399,6 +531,10 @@ export function filterCasesByStatus(
 
 export function getCaseById(id: string): Case | undefined {
   return mockCases.find((c) => c.id === id);
+}
+
+export function getServiceById(id: string): Service | undefined {
+  return mockServices.find((s) => s.id === id);
 }
 
 export function getClientById(id: string): Client | undefined {

@@ -21,7 +21,7 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
   const [menuStyle, setMenuStyle] = useState<{
     top: number;
     left: number;
-    width: number;
+    minWidth: number;
   } | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -37,7 +37,7 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
     setPlacement(openUp ? "top" : "bottom");
     setMenuStyle({
       left: rect.left,
-      width: rect.width,
+      minWidth: rect.width,
       top: openUp ? rect.top - menuHeight - 6 : rect.bottom + 6,
     });
   }, [open]);
@@ -63,7 +63,7 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
       setPlacement(openUp ? "top" : "bottom");
       setMenuStyle({
         left: rect.left,
-        width: rect.width,
+        minWidth: rect.width,
         top: openUp ? rect.top - menuHeight - 6 : rect.bottom + 6,
       });
     }
@@ -88,11 +88,12 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
           position: "fixed",
           top: menuStyle.top,
           left: menuStyle.left,
-          width: menuStyle.width,
+          minWidth: menuStyle.minWidth,
+          width: "max-content",
           zIndex: 50,
         }}
         className={cn(
-          "overflow-hidden rounded-lg border border-divider/40 bg-white shadow-lg",
+          "w-max overflow-hidden rounded-lg border border-divider bg-white shadow-lg",
           placement === "top" ? "origin-bottom" : "origin-top"
         )}
       >
@@ -107,7 +108,7 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
               setOpen(false);
             }}
             className={cn(
-              "block w-full px-3 py-2 text-left text-xs text-text-primary transition-colors hover:bg-cream-card",
+              "block w-full whitespace-nowrap px-3 py-2 text-left text-xs text-text-primary transition-colors hover:bg-[#eceef1]",
               option === status && "bg-cream-card font-semibold"
             )}
           >

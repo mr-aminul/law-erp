@@ -3,6 +3,7 @@
 import { SubNav } from "@/components/layout/SubNav";
 import { Badge } from "@/components/ui/Badge";
 import { Dropdown } from "@/components/ui/Dropdown";
+import { ListToolbar } from "@/components/ui/ListToolbar";
 import {
   Table,
   TableBody,
@@ -27,17 +28,31 @@ export default function StaffPage() {
   return (
     <div className="space-y-4">
       <SubNav items={staffSubNav} />
-      <Dropdown
-        label="Role"
-        options={[
-          { value: "all", label: "All Roles" },
-          ...["Partner", "Advocate", "Associate", "Junior Associate", "Paralegal", "Clerk", "Admin"].map((r) => ({
-            value: r,
-            label: r,
-          })),
-        ]}
-        value={role}
-        onChange={setRole}
+      <ListToolbar
+        activeFilterCount={role !== "all" ? 1 : 0}
+        onClearFilters={() => setRole("all")}
+        filters={
+          <Dropdown
+            label="Role"
+            options={[
+              { value: "all", label: "All Roles" },
+              ...[
+                "Partner",
+                "Advocate",
+                "Associate",
+                "Junior Associate",
+                "Paralegal",
+                "Clerk",
+                "Admin",
+              ].map((r) => ({
+                value: r,
+                label: r,
+              })),
+            ]}
+            value={role}
+            onChange={setRole}
+          />
+        }
       />
       <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
         <Table compact>

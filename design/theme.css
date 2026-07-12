@@ -50,10 +50,10 @@
   --color-status-on-hold: #6b7585;
   --color-status-on-hold-surface: #f2f4f7;
 
-  /* Neutrals — surfaces & chrome (not derived from theme) */
-  --color-cream: #f5f0e6;
-  --color-cream-card: #faf7f0;
+  /* Neutrals — white + green accents (no beige) */
+  --color-cream: var(--color-white);
+  --color-cream-card: var(--color-theme-subtle);
   --color-white: #ffffff;
-  --color-divider: #e4ddd0;
-  --color-muted-bg: #f3f0ea;
+  --color-divider: color-mix(in srgb, var(--color-theme) 32%, white);
+  --color-muted-bg: var(--color-theme-subtle);
 }

@@ -3,6 +3,7 @@ import { MonthlyCasesChart } from "@/components/dashboard/MonthlyCasesChart";
 import { StatusDonut } from "@/components/dashboard/StatusDonut";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
 import {
   Table,
@@ -34,12 +35,22 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end gap-2">
-        <Button variant="secondary" size="sm"><Download className="mr-1.5 h-4 w-4" />Export CSV</Button>
-        <Button variant="secondary" size="sm"><Download className="mr-1.5 h-4 w-4" />Export PDF</Button>
-      </div>
+      <ListToolbar
+        actions={
+          <>
+            <Button variant="secondary">
+              <Download className="mr-1.5 h-4 w-4" />
+              Export CSV
+            </Button>
+            <Button variant="secondary">
+              <Download className="mr-1.5 h-4 w-4" />
+              Export PDF
+            </Button>
+          </>
+        }
+      />
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid-pair">
         <PageSection title="Active Cases by Practice Area">
           <div className="space-y-2">
             {byPractice.map(([area, count]) => (
@@ -69,7 +80,7 @@ export default function ReportsPage() {
         </PageSection>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid-pair">
         <PageSection title="Case Status Distribution">
           <StatusDonut />
         </PageSection>
@@ -82,7 +93,7 @@ export default function ReportsPage() {
         <FYTable />
       </PageSection>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid-pair">
         <PageSection title="Upcoming Hearings (Next 7 Days)">
           <div className="space-y-2">
             {upcomingHearings.map((h) => (
@@ -117,7 +128,7 @@ export default function ReportsPage() {
       </div>
 
       <PageSection title="Monthly Revenue Summary">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div className="rounded-card bg-green-light p-4 text-center">
             <p className="text-2xl font-bold text-green">{formatCurrency(1845000)}</p>
             <p className="text-xs text-text-sec">Invoiced (May)</p>
