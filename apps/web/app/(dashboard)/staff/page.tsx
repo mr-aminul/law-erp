@@ -1,6 +1,5 @@
 "use client";
 
-import { SubNav } from "@/components/layout/SubNav";
 import { Badge } from "@/components/ui/Badge";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { ListToolbar } from "@/components/ui/ListToolbar";
@@ -12,7 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
-import { staffSubNav } from "@/lib/config/navigation";
 import { mockStaff } from "@/lib/mock";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -27,7 +25,6 @@ export default function StaffPage() {
 
   return (
     <div className="space-y-4">
-      <SubNav items={staffSubNav} />
       <ListToolbar
         activeFilterCount={role !== "all" ? 1 : 0}
         onClearFilters={() => setRole("all")}

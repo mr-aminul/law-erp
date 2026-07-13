@@ -1,11 +1,9 @@
 "use client";
 
-import { SubNav } from "@/components/layout/SubNav";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
-import { staffSubNav } from "@/lib/config/navigation";
 import { mockAttendance, mockStaff } from "@/lib/mock";
 import { useState } from "react";
 
@@ -14,7 +12,6 @@ export default function AttendancePage() {
 
   return (
     <div className="space-y-4">
-      <SubNav items={staffSubNav} />
       <ListToolbar
         filters={
           <div>

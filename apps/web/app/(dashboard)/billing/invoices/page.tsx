@@ -1,6 +1,5 @@
 "use client";
 
-import { SubNav } from "@/components/layout/SubNav";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Dropdown } from "@/components/ui/Dropdown";
@@ -13,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
-import { billingSubNav } from "@/lib/config/navigation";
 import { mockInvoices } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate } from "@/lib/utils/formatDate";
@@ -34,7 +32,6 @@ export default function InvoicesPage() {
 
   return (
     <div className="space-y-4">
-      <SubNav items={billingSubNav} />
       <ListToolbar
         activeFilterCount={status !== "all" ? 1 : 0}
         onClearFilters={() => setStatus("all")}

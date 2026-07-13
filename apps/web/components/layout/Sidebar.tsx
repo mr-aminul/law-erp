@@ -114,7 +114,10 @@ function CollapsedFlyout({
   useLayoutEffect(() => {
     if (!open || !triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
-    setPos({ top: rect.top, left: rect.right + 8 });
+    setPos({
+      top: rect.top + rect.height / 2,
+      left: rect.right + 8,
+    });
   }, [open]);
 
   useEffect(() => {
@@ -142,13 +145,12 @@ function CollapsedFlyout({
   return (
     <div ref={triggerRef} onMouseEnter={show} onMouseLeave={hide}>
       {href ? (
-        <Link href={href} title={label} className={triggerClass}>
+        <Link href={href} className={triggerClass}>
           <Icon className="h-4 w-4 shrink-0" />
         </Link>
       ) : (
         <button
           type="button"
-          title={label}
           aria-expanded={open}
           aria-haspopup="menu"
           onClick={() => setOpen((v) => !v)}
@@ -167,14 +169,18 @@ function CollapsedFlyout({
             onMouseEnter={hasMenu ? show : undefined}
             onMouseLeave={hasMenu ? hide : undefined}
             className={cn(
-              "fixed z-50 rounded-md border border-gray-200 bg-white shadow-[0_4px_16px_rgba(0,0,0,0.1)]",
+              "fixed z-[120] -translate-y-1/2 rounded-md border border-active-nav bg-active-nav shadow-[0_4px_16px_rgba(0,0,0,0.1)]",
               hasMenu ? "min-w-[160px] py-0.5" : "px-2.5 py-1.5"
             )}
             style={{ top: pos.top, left: pos.left }}
           >
+            <span
+              aria-hidden
+              className="pointer-events-none absolute right-full top-1/2 -translate-y-1/2 border-y-[6px] border-r-[6px] border-y-transparent border-r-active-nav"
+            />
             {hasMenu ? (
               <>
-                <p className="border-b border-gray-200 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-black">
+                <p className="border-b border-white/15 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/70">
                   {label}
                 </p>
                 <div className="flex flex-col gap-px p-1">
@@ -187,8 +193,8 @@ function CollapsedFlyout({
                       className={cn(
                         "flex items-center gap-2 rounded px-2 py-1.5 text-[12px] font-medium transition-colors",
                         isChildActive(pathname, childHref)
-                          ? "bg-muted text-foreground"
-                          : "text-foreground/80 hover:bg-muted hover:text-foreground"
+                          ? "bg-[color-mix(in_srgb,var(--color-active-nav)_60%,var(--color-sidebar))] text-white"
+                          : "text-white/80 hover:bg-white/10 hover:text-white"
                       )}
                     >
                       <ChildIcon className="h-3.5 w-3.5 shrink-0 opacity-70" />
@@ -198,7 +204,7 @@ function CollapsedFlyout({
                 </div>
               </>
             ) : (
-              <p className="whitespace-nowrap text-[12px] font-medium text-foreground">
+              <p className="whitespace-nowrap text-[12px] font-medium text-white">
                 {label}
               </p>
             )}

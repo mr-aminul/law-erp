@@ -1,10 +1,8 @@
 "use client";
 
-import { SubNav } from "@/components/layout/SubNav";
 import { Button } from "@/components/ui/Button";
 import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
-import { documentsSubNav } from "@/lib/config/navigation";
 import { mockDocuments } from "@/lib/mock";
 import { FileText, Plus } from "lucide-react";
 
@@ -13,8 +11,6 @@ export default function DocumentTemplatesPage() {
 
   return (
     <div className="space-y-4">
-      <SubNav items={documentsSubNav} />
-
       <ListToolbar
         actions={
           <Button>

@@ -1,12 +1,10 @@
 "use client";
 
-import { SubNav } from "@/components/layout/SubNav";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Dropdown } from "@/components/ui/Dropdown";
 import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
-import { documentsSubNav } from "@/lib/config/navigation";
 import { mockDocuments } from "@/lib/mock";
 import { formatDate } from "@/lib/utils/formatDate";
 import { FileText, Upload } from "lucide-react";
@@ -28,8 +26,6 @@ export default function DocumentsPage() {
 
   return (
     <div className="space-y-4">
-      <SubNav items={documentsSubNav} />
-
       <ListToolbar
         activeFilterCount={category !== "all" ? 1 : 0}
         onClearFilters={() => setCategory("all")}

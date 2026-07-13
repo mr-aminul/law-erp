@@ -1,8 +1,6 @@
-import { SubNav } from "@/components/layout/SubNav";
 import { Badge } from "@/components/ui/Badge";
 import { PageSection } from "@/components/ui/PageSection";
 import { StatCard } from "@/components/dashboard/StatCard";
-import { billingSubNav } from "@/lib/config/navigation";
 import { mockExpenses, mockInvoices, mockPayments } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { CreditCard, Receipt, TrendingUp, Wallet } from "lucide-react";
@@ -17,8 +15,6 @@ export default function BillingPage() {
 
   return (
     <div className="space-y-4">
-      <SubNav items={billingSubNav} />
-
       <div className="grid-stats">
         <StatCard title="Invoiced" icon={Receipt} accent="blue" primaryValue={formatCurrency(totalInvoiced)} primaryLabel="Total billed" metrics={[{ label: "Invoices", value: mockInvoices.length }]} />
         <StatCard title="Collected" icon={Wallet} accent="green" primaryValue={formatCurrency(collected)} primaryLabel="Payments received" metrics={[{ label: "Receipts", value: mockPayments.length, highlight: true }]} />

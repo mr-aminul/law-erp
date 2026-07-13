@@ -1,6 +1,5 @@
 "use client";
 
-import { SubNav } from "@/components/layout/SubNav";
 import { Button } from "@/components/ui/Button";
 import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
@@ -12,7 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
-import { staffSubNav } from "@/lib/config/navigation";
 import { mockCompensation } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate } from "@/lib/utils/formatDate";
@@ -20,7 +18,6 @@ import { formatDate } from "@/lib/utils/formatDate";
 export default function CompensationPage() {
   return (
     <div className="space-y-4">
-      <SubNav items={staffSubNav} />
       <ListToolbar actions={<Button>Run Payroll</Button>} />
       <PageSection title="Payroll Records" description="BDT salary with TDS deduction — May 2026 cycle.">
         <Table compact>

@@ -1,6 +1,5 @@
 "use client";
 
-import { SubNav } from "@/components/layout/SubNav";
 import { Button } from "@/components/ui/Button";
 import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
@@ -12,7 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
-import { billingSubNav } from "@/lib/config/navigation";
 import { mockTimeEntries } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate } from "@/lib/utils/formatDate";
@@ -34,7 +32,6 @@ export default function TimeTrackingPage() {
 
   return (
     <div className="space-y-4">
-      <SubNav items={billingSubNav} />
       <ListToolbar
         actions={
           <Button>

@@ -11,7 +11,8 @@ interface NotificationBellProps {
 }
 
 export function NotificationBell({ collapsed = false }: NotificationBellProps) {
-  const openDrawer = useNotificationStore((s) => s.openDrawer);
+  const drawerOpen = useNotificationStore((s) => s.drawerOpen);
+  const toggleDrawer = useNotificationStore((s) => s.toggleDrawer);
   const readIds = useNotificationStore((s) => s.readIds);
   const dismissedIds = useNotificationStore((s) => s.dismissedIds);
 
@@ -28,7 +29,8 @@ export function NotificationBell({ collapsed = false }: NotificationBellProps) {
   return (
     <button
       type="button"
-      onClick={openDrawer}
+      onClick={toggleDrawer}
+      aria-expanded={drawerOpen}
       title={
         unreadCount > 0
           ? `${unreadCount} unread notifications`
@@ -44,12 +46,14 @@ export function NotificationBell({ collapsed = false }: NotificationBellProps) {
           : "Notifications"
       }
     >
-      <Bell className="h-4 w-4" />
-      {unreadCount > 0 && (
-        <span className="absolute right-1.5 top-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-red px-0.5 text-[9px] font-bold leading-none text-white ring-2 ring-sidebar">
-          {unreadCount > 9 ? "9+" : unreadCount}
-        </span>
-      )}
+      <span className="relative inline-flex">
+        <Bell className="h-4 w-4" />
+        {unreadCount > 0 && (
+          <span className="absolute -right-1.5 -top-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-red px-0.5 text-[9px] font-bold leading-none text-white ring-2 ring-sidebar">
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </span>
+        )}
+      </span>
     </button>
   );
 }

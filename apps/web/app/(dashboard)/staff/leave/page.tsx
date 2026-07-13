@@ -1,16 +1,13 @@
 "use client";
 
-import { SubNav } from "@/components/layout/SubNav";
 import { Badge } from "@/components/ui/Badge";
 import { PageSection } from "@/components/ui/PageSection";
-import { staffSubNav } from "@/lib/config/navigation";
 import { mockLeaveRequests } from "@/lib/mock";
 import { formatDate } from "@/lib/utils/formatDate";
 
 export default function LeavePage() {
   return (
     <div className="space-y-4">
-      <SubNav items={staffSubNav} />
       <PageSection title="Leave Management" description="Bangladesh Labour Law compliant leave tracking.">
         <div className="space-y-2">
           {mockLeaveRequests.map((lr) => (
