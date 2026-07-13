@@ -44,11 +44,6 @@ export const settingsSubNav = [
   { href: "/settings/audit", label: "Audit Log" },
 ];
 
-export const courtFilingSubNav = [
-  { href: "/court-filing", label: "Registry" },
-  { href: "/court-filing/new", label: "New Filing" },
-];
-
 export const communicationsSubNav = [
   { href: "/communications", label: "All" },
   { href: "/communications?tab=internal", label: "Internal" },

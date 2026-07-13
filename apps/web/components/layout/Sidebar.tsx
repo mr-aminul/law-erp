@@ -352,26 +352,43 @@ export function Sidebar() {
             const groupActive = isMattersPath(pathname);
             return (
               <div key={href} className="flex flex-col gap-0.5">
-                <button
-                  type="button"
-                  onClick={() => setMattersOpen((open) => !open)}
+                <div
                   className={cn(
-                    "flex w-full items-center gap-2.5 rounded-input px-3 py-2 text-[13px] font-semibold transition-colors",
+                    "flex w-full items-center rounded-input transition-colors",
                     groupActive
-                      ? "bg-white/10 text-white"
+                      ? "bg-active-nav text-white"
                       : "text-white/70 hover:bg-white/10 hover:text-white"
                   )}
-                  aria-expanded={mattersOpen}
                 >
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span className="min-w-0 flex-1 truncate text-left">{label}</span>
-                  <ChevronDown
+                  <Link
+                    href={href}
+                    onClick={() => {
+                      setMattersOpen(true);
+                      handleNavClick();
+                    }}
+                    className="flex min-w-0 flex-1 items-center gap-2.5 rounded-input px-3 py-2 text-[13px] font-semibold"
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    <span className="truncate text-left">{label}</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setMattersOpen((open) => !open)}
                     className={cn(
-                      "h-3.5 w-3.5 shrink-0 transition-transform",
-                      mattersOpen ? "rotate-0" : "-rotate-90"
+                      "mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-input transition-colors",
+                      groupActive ? "hover:bg-white/15" : "hover:bg-white/10"
                     )}
-                  />
-                </button>
+                    aria-expanded={mattersOpen}
+                    aria-label={mattersOpen ? `Collapse ${label}` : `Expand ${label}`}
+                  >
+                    <ChevronDown
+                      className={cn(
+                        "h-3.5 w-3.5 shrink-0 transition-transform",
+                        mattersOpen ? "rotate-0" : "-rotate-90"
+                      )}
+                    />
+                  </button>
+                </div>
                 {mattersOpen && (
                   <div className="ml-4 flex flex-col gap-0.5 border-l border-white/10 pl-2">
                     {children.map(
@@ -383,7 +400,7 @@ export function Sidebar() {
                           className={cn(
                             "flex items-center gap-2.5 rounded-input px-3 py-1.5 text-[13px] font-semibold transition-colors",
                             isChildActive(pathname, childHref)
-                              ? "bg-active-nav text-white"
+                              ? "bg-[color-mix(in_srgb,var(--color-active-nav)_60%,transparent)] text-white"
                               : "text-white/60 hover:bg-white/10 hover:text-white"
                           )}
                         >

@@ -3,7 +3,6 @@ import { MonthlyCasesChart } from "@/components/dashboard/MonthlyCasesChart";
 import { StatusDonut } from "@/components/dashboard/StatusDonut";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
 import {
   Table,
@@ -35,9 +34,10 @@ export default function ReportsPage() {
 
   return (
     <div className="space-y-4">
-      <ListToolbar
-        actions={
-          <>
+      <PageSection
+        title="Monthly Revenue Summary"
+        action={
+          <div className="flex gap-2">
             <Button variant="secondary">
               <Download className="mr-1.5 h-4 w-4" />
               Export CSV
@@ -46,9 +46,24 @@ export default function ReportsPage() {
               <Download className="mr-1.5 h-4 w-4" />
               Export PDF
             </Button>
-          </>
+          </div>
         }
-      />
+      >
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="rounded-card bg-green-light p-4 text-center">
+            <p className="text-2xl font-bold text-green">{formatCurrency(1845000)}</p>
+            <p className="text-xs text-text-sec">Invoiced (May)</p>
+          </div>
+          <div className="rounded-card bg-blue-light p-4 text-center">
+            <p className="text-2xl font-bold text-blue">{formatCurrency(1420000)}</p>
+            <p className="text-xs text-text-sec">Collected (May)</p>
+          </div>
+          <div className="rounded-card bg-amber-light p-4 text-center">
+            <p className="text-2xl font-bold text-amber">{formatCurrency(425000)}</p>
+            <p className="text-xs text-text-sec">Outstanding</p>
+          </div>
+        </div>
+      </PageSection>
 
       <div className="grid-pair">
         <PageSection title="Active Cases by Practice Area">
@@ -126,23 +141,6 @@ export default function ReportsPage() {
           )}
         </PageSection>
       </div>
-
-      <PageSection title="Monthly Revenue Summary">
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div className="rounded-card bg-green-light p-4 text-center">
-            <p className="text-2xl font-bold text-green">{formatCurrency(1845000)}</p>
-            <p className="text-xs text-text-sec">Invoiced (May)</p>
-          </div>
-          <div className="rounded-card bg-blue-light p-4 text-center">
-            <p className="text-2xl font-bold text-blue">{formatCurrency(1420000)}</p>
-            <p className="text-xs text-text-sec">Collected (May)</p>
-          </div>
-          <div className="rounded-card bg-amber-light p-4 text-center">
-            <p className="text-2xl font-bold text-amber">{formatCurrency(425000)}</p>
-            <p className="text-xs text-text-sec">Outstanding</p>
-          </div>
-        </div>
-      </PageSection>
     </div>
   );
 }

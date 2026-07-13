@@ -41,7 +41,6 @@ function getPageTitle(pathname: string): string {
     ["/staff/compensation", "Payroll"],
     [/^\/staff\/[^/]+$/, "Staff Profile"],
     ["/staff", "Staff"],
-    ["/court-filing/new", "New Filing"],
     ["/court-filing", "Court Filing"],
     ["/reports", "Reports & Analytics"],
     ["/communications", "Communications"],
