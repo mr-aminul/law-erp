@@ -70,7 +70,7 @@ export function NewClientForm({ onSubmit, onCancel }: NewClientFormProps) {
           <p className="mt-0.5 text-xs text-text-muted">
             Run conflict check against existing clients and opposing parties.
           </p>
-          <label className="mt-3 flex items-start gap-3 rounded-card border border-divider bg-cream-card p-4">
+          <label className="mt-3 flex items-start gap-3 rounded-card border border-gray-200 bg-cream-card p-4">
             <input
               type="checkbox"
               checked={coiChecked}
@@ -95,7 +95,7 @@ export function NewClientForm({ onSubmit, onCancel }: NewClientFormProps) {
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 border-t border-divider pt-4">
+      <div className="flex justify-end gap-3 border-t border-gray-200 pt-4">
         <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel
         </Button>

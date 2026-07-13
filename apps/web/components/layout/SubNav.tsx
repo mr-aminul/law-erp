@@ -1,7 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils/cn";
-import Link from "next/link";
+import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { usePathname } from "next/navigation";
 
 interface SubNavItem {
@@ -35,27 +34,17 @@ export function SubNav({ items, className }: SubNavProps) {
     );
   }
 
+  const active = items.find(isActive) ?? items[0];
+
   return (
-    <nav
-      className={cn(
-        "flex gap-1 overflow-x-auto overscroll-x-contain rounded-input border border-divider/70 bg-surface p-1",
-        className
-      )}
-    >
-      {items.map((item) => (
-        <Link
-          key={item.href}
-          href={item.href}
-          className={cn(
-            "shrink-0 rounded-input px-3 py-1.5 text-sm font-semibold transition-colors",
-            isActive(item)
-              ? "bg-active-nav text-white"
-              : "text-text-sec hover:bg-cream-card hover:text-text-primary"
-          )}
-        >
-          {item.label}
-        </Link>
-      ))}
-    </nav>
+    <SegmentedControl
+      items={items.map((item) => ({
+        id: item.href,
+        label: item.label,
+        href: item.href,
+      }))}
+      value={active?.href ?? ""}
+      className={className}
+    />
   );
 }

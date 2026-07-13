@@ -76,7 +76,7 @@ export default function DocumentsPage() {
           {docs.map((doc) => (
             <div
               key={doc.id}
-              className="flex items-center gap-3 rounded-card border border-divider/60 px-3 py-2.5 hover:bg-cream-card"
+              className="flex items-center gap-3 rounded-card border border-gray-200 px-3 py-2.5 hover:bg-cream-card"
             >
               <div className="flex h-9 w-9 items-center justify-center rounded-input bg-blue-light text-blue">
                 <FileText className="h-4 w-4" />

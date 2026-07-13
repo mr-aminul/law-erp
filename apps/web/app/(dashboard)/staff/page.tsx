@@ -54,8 +54,7 @@ export default function StaffPage() {
           />
         }
       />
-      <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
-        <Table compact>
+      <Table compact>
           <TableHeader>
             <TableHead>Name</TableHead>
             <TableHead>Role</TableHead>
@@ -81,7 +80,6 @@ export default function StaffPage() {
             ))}
           </TableBody>
         </Table>
-      </div>
     </div>
   );
 }

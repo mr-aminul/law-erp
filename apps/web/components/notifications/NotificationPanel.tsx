@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
+import { useSlickScrollbar } from "@/lib/hooks/useSlickScrollbar";
+import { Tabs } from "@/components/ui/Tabs";
 
 export const notificationTabs: { id: NotificationTab; label: string }[] = [
   { id: "all", label: "All" },
@@ -46,7 +48,7 @@ const systemIconMeta: Record<
 
 function MatterChip({ chip }: { chip: NotificationMatterChip }) {
   return (
-    <span className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-md border border-divider/70 bg-cream-card/80 px-2 py-1 text-[11px] font-medium text-text-primary">
+    <span className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-md border border-gray-200 bg-gray-50 px-2 py-1 text-[11px] font-medium text-text-primary shadow-none">
       <span
         className={cn(
           "flex h-4 w-4 shrink-0 items-center justify-center rounded text-[8px] font-bold text-white",
@@ -74,8 +76,8 @@ function TeamNotificationCard({
       type="button"
       onClick={onOpen}
       className={cn(
-        "w-full rounded-xl border bg-white p-3 text-left transition-colors hover:border-divider",
-        unread ? "border-divider shadow-sm" : "border-divider/70"
+        "w-full rounded-xl border bg-white p-3 text-left transition-colors hover:border-gray-300",
+        unread ? "border-gray-300" : "border-gray-200"
       )}
     >
       <div className="flex gap-3">
@@ -116,8 +118,8 @@ function FirmNotificationCard({
       type="button"
       onClick={onOpen}
       className={cn(
-        "w-full rounded-xl border bg-white p-3 text-left transition-colors hover:border-divider",
-        unread ? "border-divider shadow-sm" : "border-divider/70"
+        "w-full rounded-xl border bg-white p-3 text-left transition-colors hover:border-gray-300",
+        unread ? "border-gray-300" : "border-gray-200"
       )}
     >
       <div className="flex gap-3">
@@ -183,7 +185,7 @@ function SystemNotificationCard({
     <div
       className={cn(
         "overflow-hidden rounded-xl border bg-white transition-colors",
-        unread ? "border-divider shadow-sm" : "border-divider/70"
+        unread ? "border-gray-300" : "border-gray-200"
       )}
     >
       <div className="flex items-center gap-2 px-3 py-2.5">
@@ -228,7 +230,7 @@ function SystemNotificationCard({
       </div>
 
       {expanded && (
-        <div className="border-t border-divider/70 px-3 py-3">
+        <div className="border-t border-gray-200 px-3 py-3">
           <p className="text-sm leading-relaxed text-text-muted">
             {notification.detail ?? notification.body}
           </p>
@@ -236,7 +238,7 @@ function SystemNotificationCard({
             <button
               type="button"
               onClick={onOpen}
-              className="mt-3 rounded-lg border border-divider px-3 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-cream-card"
+              className="mt-3 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-cream-card"
             >
               {notification.actionLabel}
             </button>
@@ -369,10 +371,12 @@ export function NotificationPanel({
   const { tabCounts, getFilteredNotifications } =
     useNotificationLists(dismissedIds);
   const notifications = getFilteredNotifications(filter);
-  const activeTabIndex = Math.max(
-    0,
-    notificationTabs.findIndex((tab) => tab.id === filter)
-  );
+  const {
+    scrollRef: listScrollRef,
+    onScroll: handleListScroll,
+    scrollbarClassName,
+    scrollbarOverlay,
+  } = useSlickScrollbar();
 
   return (
     <div className={cn("flex flex-col overflow-hidden bg-white", className)}>
@@ -398,44 +402,29 @@ export function NotificationPanel({
       </div>
 
       <div className="px-4 pb-3">
-        <div className="relative flex rounded-xl bg-green-light p-1">
-          <div
-            aria-hidden
-            className="absolute bottom-1 top-1 rounded-input bg-active-nav shadow-sm transition-transform duration-300 ease-out"
-            style={{
-              width: `calc((100% - 0.5rem) / ${notificationTabs.length})`,
-              transform: `translateX(calc(${activeTabIndex} * 100%))`,
-            }}
-          />
-          {notificationTabs.map((tab) => {
-            const isActive = filter === tab.id;
-
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => onFilterChange(tab.id)}
-                className={cn(
-                  "relative z-10 flex flex-1 items-center justify-center gap-1 rounded-input px-2 py-1.5 text-[11px] font-semibold transition-colors duration-300",
-                  isActive ? "text-white" : "text-green hover:text-active-nav"
-                )}
-              >
-                <span>{tab.label}</span>
-                <span
-                  className={cn(
-                    "tabular-nums",
-                    isActive ? "text-white/80" : "text-green/60"
-                  )}
-                >
-                  {tabCounts[tab.id]}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+        <Tabs
+          size="sm"
+          fill
+          activeTab={filter}
+          onChange={(id) => onFilterChange(id as NotificationTab)}
+          tabs={notificationTabs.map((tab) => ({
+            id: tab.id,
+            label: tab.label,
+            badge: tabCounts[tab.id],
+          }))}
+        />
       </div>
 
-      <div className={cn("overflow-y-auto px-4 pb-3", listClassName)}>
+      <div
+        ref={listScrollRef}
+        onScroll={handleListScroll}
+        className={cn(
+          "overflow-y-auto px-4 pb-3",
+          scrollbarClassName,
+          listClassName
+        )}
+      >
+        {scrollbarOverlay}
         {notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-4 py-10 text-center">
             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-cream-card">
@@ -465,7 +454,7 @@ export function NotificationPanel({
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-3 border-t border-divider/70 px-4 py-3">
+      <div className="flex items-center justify-between gap-3 border-t border-gray-200 px-4 py-3">
         <button
           type="button"
           onClick={onMarkAllRead}
@@ -478,14 +467,14 @@ export function NotificationPanel({
           <button
             type="button"
             onClick={onCenterClick}
-            className="rounded-lg border border-divider px-3 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-cream-card"
+            className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-cream-card"
           >
             Go to notification center
           </button>
         ) : (
           <Link
             href={centerHref}
-            className="rounded-lg border border-divider px-3 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-cream-card"
+            className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-cream-card"
           >
             Go to notification center
           </Link>

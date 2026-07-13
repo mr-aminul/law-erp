@@ -34,7 +34,7 @@ export default function SettingsPage() {
       <PageSection title="Users" description="Managing Partner → Associate → Clerk role hierarchy.">
         <div className="space-y-2">
           {mockSystemUsers.map((u) => (
-            <div key={u.id} className="flex items-center justify-between rounded-card border border-divider/60 px-3 py-2">
+            <div key={u.id} className="flex items-center justify-between rounded-card border border-gray-200 px-3 py-2">
               <div>
                 <p className="text-sm font-semibold">{u.name}</p>
                 <p className="text-xs text-text-muted">{u.email}</p>

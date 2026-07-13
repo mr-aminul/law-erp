@@ -167,14 +167,14 @@ function CollapsedFlyout({
             onMouseEnter={hasMenu ? show : undefined}
             onMouseLeave={hasMenu ? hide : undefined}
             className={cn(
-              "fixed z-50 rounded-md border border-border bg-white shadow-[0_4px_16px_rgba(0,0,0,0.1)]",
+              "fixed z-50 rounded-md border border-gray-200 bg-white shadow-[0_4px_16px_rgba(0,0,0,0.1)]",
               hasMenu ? "min-w-[160px] py-0.5" : "px-2.5 py-1.5"
             )}
             style={{ top: pos.top, left: pos.left }}
           >
             {hasMenu ? (
               <>
-                <p className="border-b border-border px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-black">
+                <p className="border-b border-gray-200 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-black">
                   {label}
                 </p>
                 <div className="flex flex-col gap-px p-1">

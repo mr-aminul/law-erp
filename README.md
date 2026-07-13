@@ -19,7 +19,7 @@ make dev
 
 | Service | URL |
 |---------|-----|
-| Web | http://localhost:3000 |
+| Web | http://localhost:3847 |
 | API | http://localhost:8080/graphql |
 | GraphiQL (dev) | http://localhost:8080/ |
 | Health | http://localhost:8080/health |

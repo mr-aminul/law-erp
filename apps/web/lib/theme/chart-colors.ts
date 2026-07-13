@@ -5,5 +5,5 @@ export const chartColors = {
   amber: "var(--color-amber)",
   textSec: "var(--color-text-sec)",
   textMuted: "var(--color-text-muted)",
-  divider: "var(--color-divider)",
+  divider: "#e5e7eb",
 } as const;

@@ -26,7 +26,7 @@ export default function RolesPage() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[40rem] text-sm">
             <thead>
-              <tr className="border-b border-divider text-left text-xs text-text-muted">
+              <tr className="border-b border-gray-200 text-left text-xs text-text-muted">
                 <th className="py-2 pr-4">Role</th>
                 {permissions.map((p) => (
                   <th key={p} className="px-2 py-2 text-center">{p}</th>
@@ -35,7 +35,7 @@ export default function RolesPage() {
             </thead>
             <tbody>
               {roles.map((role) => (
-                <tr key={role} className="border-b border-divider/60">
+                <tr key={role} className="border-b border-gray-200">
                   <td className="py-2 pr-4 font-semibold">{role}</td>
                   {roleMatrix[role].map((allowed, i) => (
                     <td key={permissions[i]} className="px-2 py-2 text-center">

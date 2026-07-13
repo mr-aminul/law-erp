@@ -43,7 +43,7 @@ export function UserChip({
       title={name}
       aria-label={name}
       className={cn(
-        "inline-flex items-center gap-1 rounded-full border border-divider bg-cream-card py-0.5 pl-0.5 text-xs",
+        "inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 py-0.5 pl-0.5 text-xs shadow-none",
         compactOnMobile ? "pr-0.5 sm:pr-1.5" : "pr-1.5"
       )}
     >

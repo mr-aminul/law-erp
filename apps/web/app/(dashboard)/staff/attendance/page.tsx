@@ -37,7 +37,7 @@ export default function AttendancePage() {
           {mockStaff.map((s) => {
             const record = mockAttendance.find((a) => a.staffId === s.id && a.date === date);
             return (
-              <div key={s.id} className="flex items-center justify-between rounded-card border border-divider/60 px-3 py-2">
+              <div key={s.id} className="flex items-center justify-between rounded-card border border-gray-200 px-3 py-2">
                 <span className="text-sm font-semibold">{s.name}</span>
                 <div className="flex gap-2">
                   {(["Present", "Absent", "Late", "Leave"] as const).map((status) => (
@@ -47,7 +47,7 @@ export default function AttendancePage() {
                       className={`rounded-badge px-2.5 py-1 text-xs font-semibold ${
                         record?.status === status
                           ? "bg-active-nav text-white"
-                          : "bg-cream-card text-text-sec hover:bg-divider/30"
+                          : "bg-cream-card text-text-sec hover:bg-gray-100"
                       }`}
                     >
                       {status}

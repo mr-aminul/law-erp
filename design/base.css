@@ -1,12 +1,8 @@
 /**
  * Shared base styles for Law ERP apps.
+ * Default border-color lives in apps/web globals `@layer base`
+ * so Tailwind `border-*` utilities can override it.
  */
-
-*,
-*::before,
-*::after {
-  border-color: var(--color-divider);
-}
 
 html {
   -webkit-text-size-adjust: 100%;

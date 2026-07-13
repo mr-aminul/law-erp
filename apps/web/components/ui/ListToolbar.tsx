@@ -195,8 +195,8 @@ export function ListToolbar({
                 className={cn(
                   "relative flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-input border px-3 text-sm font-semibold transition-colors",
                   filtersOpen || hasActiveFilters
-                    ? "border-[var(--color-theme)] bg-theme-subtle text-theme"
-                    : "border-divider bg-white text-text-primary hover:bg-cream-card"
+                    ? "border-gray-300 bg-gray-100 text-text-primary"
+                    : "border-gray-200 bg-white text-text-primary hover:bg-cream-card"
                 )}
                 aria-expanded={filtersOpen}
                 aria-controls={panelId}
@@ -220,7 +220,7 @@ export function ListToolbar({
           {canCollapse && filtersOpen ? (
             <div
               id={panelId}
-              className="mt-3 flex flex-col gap-3 rounded-card border border-divider/70 bg-surface p-3 [&>*]:w-full"
+              className="mt-3 flex flex-col gap-3 rounded-card border border-gray-200 bg-surface p-3 [&>*]:w-full"
             >
               <div className="flex items-center justify-between gap-2">
                 <p className="text-xs font-bold uppercase tracking-wide text-text-muted">

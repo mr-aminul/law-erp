@@ -70,7 +70,7 @@ export default function ServiceDetailPage({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-card border border-divider bg-surface p-4 shadow-sm">
+      <div className="rounded-card border border-gray-200 bg-surface p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -97,7 +97,7 @@ export default function ServiceDetailPage({
           {service.assignedLawyers.map((lawyer) => (
             <span
               key={lawyer}
-              className="rounded-badge bg-green-light px-2.5 py-1 text-xs font-semibold text-green"
+              className="rounded-badge border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-green shadow-none"
             >
               {lawyer}
             </span>
@@ -162,7 +162,7 @@ export default function ServiceDetailPage({
                   </div>
                   {i < stages.length - 1 && (
                     <div
-                      className={`mx-1 h-0.5 min-w-4 flex-1 ${i < currentIdx ? "bg-green" : "bg-divider"}`}
+                      className={`mx-1 h-0.5 min-w-4 flex-1 ${i < currentIdx ? "bg-green" : "bg-gray-200"}`}
                     />
                   )}
                 </div>
@@ -176,7 +176,7 @@ export default function ServiceDetailPage({
             {mockServiceMilestones.map((m) => (
               <label
                 key={m.id}
-                className="flex items-center gap-3 rounded-card border border-divider px-3 py-2"
+                className="flex items-center gap-3 rounded-card border border-gray-200 px-3 py-2"
               >
                 <input type="checkbox" defaultChecked={m.completed} />
                 <span
@@ -256,7 +256,7 @@ export default function ServiceDetailPage({
               {notes.map((n) => (
                 <div
                   key={n.id}
-                  className={`rounded-card border p-3 ${n.isMemo ? "border-amber/30 bg-amber-light/30" : "border-divider"}`}
+                  className={`rounded-card border p-3 ${n.isMemo ? "border-amber/30 bg-amber-light/30" : "border-gray-200"}`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-semibold">{n.author}</span>
@@ -372,7 +372,7 @@ export default function ServiceDetailPage({
               {comments.map((c) => (
                 <div
                   key={c.id}
-                  className="rounded-card border border-divider bg-cream-card p-3"
+                  className="rounded-card border border-gray-200 bg-cream-card p-3"
                 >
                   <div className="flex justify-between">
                     <span className="text-sm font-semibold">{c.author}</span>

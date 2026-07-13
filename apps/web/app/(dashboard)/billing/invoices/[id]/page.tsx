@@ -17,7 +17,7 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 rounded-card border border-divider/70 bg-surface p-3 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-4">
+      <div className="flex flex-col gap-3 rounded-card border border-gray-200 bg-surface p-3 sm:flex-row sm:items-start sm:justify-between sm:p-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-lg font-bold">{invoice.invoiceNumber}</h2>
@@ -50,7 +50,7 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
         ) : (
           <div className="space-y-2">
             {payments.map((p) => (
-              <div key={p.id} className="flex justify-between rounded-card border border-divider/60 px-3 py-2">
+              <div key={p.id} className="flex justify-between rounded-card border border-gray-200 px-3 py-2">
                 <div>
                   <p className="text-sm font-semibold">{formatCurrency(p.amount)}</p>
                   <p className="text-xs text-text-muted">{p.method} · Ref: {p.reference}</p>

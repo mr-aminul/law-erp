@@ -54,6 +54,6 @@
   --color-cream: var(--color-white);
   --color-cream-card: var(--color-theme-subtle);
   --color-white: #ffffff;
-  --color-divider: color-mix(in srgb, var(--color-theme) 32%, white);
+  --color-divider: #e5e7eb;
   --color-muted-bg: var(--color-theme-subtle);
 }

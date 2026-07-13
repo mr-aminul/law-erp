@@ -48,7 +48,7 @@ function PageButton({
       className={cn(
         "flex h-6 min-w-6 items-center justify-center rounded-lg px-1.5 text-xs font-semibold transition-colors",
         active
-          ? "bg-green text-white shadow-sm"
+          ? "bg-primary text-primary-foreground shadow-sm"
           : "text-text-primary hover:bg-cream-card",
         disabled && "pointer-events-none opacity-40"
       )}
@@ -76,7 +76,7 @@ function IconButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "flex h-6 w-6 items-center justify-center rounded-lg border border-divider bg-white text-xs text-text-primary transition-colors hover:bg-cream-card",
+        "flex h-6 w-6 items-center justify-center rounded-lg border border-gray-200 bg-white text-xs text-text-primary transition-colors hover:bg-cream-card",
         disabled && "pointer-events-none opacity-40"
       )}
     >
@@ -137,7 +137,7 @@ export function Pagination({
   return (
     <div
       className={cn(
-        "mt-4 flex flex-col gap-2 border-t border-divider py-2 sm:flex-row sm:items-center sm:justify-between",
+        "mt-4 flex flex-col gap-2 py-2 sm:flex-row sm:items-center sm:justify-between",
         className
       )}
     >
@@ -173,7 +173,7 @@ export function Pagination({
 
       <div className="flex flex-wrap items-center gap-1.5 text-xs text-text-primary">
         {onPageSizeChange && (
-          <div className="mr-0.5 flex items-center gap-1 border-r border-divider pr-2">
+          <div className="mr-0.5 flex items-center gap-1 border-r border-gray-200 pr-2">
             <label
               htmlFor={pageSizeSelectId}
               className="hidden text-xs text-text-muted sm:inline"
@@ -273,12 +273,12 @@ export function Pagination({
               value={jumpValue}
               disabled={isEmpty}
               onChange={(e) => setJumpValue(e.target.value)}
-              className="h-6 w-12 rounded-lg border border-divider bg-white px-1.5 text-center text-xs text-text-primary focus:border-green focus:outline-none focus:ring-2 focus:ring-green/20 disabled:opacity-40"
+              className="h-6 w-12 rounded-lg border border-gray-200 bg-white px-1.5 text-center text-xs text-text-primary focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 disabled:opacity-40"
             />
             <button
               type="submit"
               disabled={isEmpty}
-              className="h-6 rounded-lg border border-divider bg-white px-2 text-xs font-semibold text-text-primary transition-colors hover:bg-cream-card disabled:opacity-40"
+              className="h-6 rounded-lg border border-gray-200 bg-white px-2 text-xs font-semibold text-text-primary transition-colors hover:bg-cream-card disabled:opacity-40"
             >
               Go
             </button>

@@ -6,10 +6,18 @@
 @import "../../../design/tokens.css";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "../../../design/base.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "../../../design/base.css";
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-divider);
+  }
+}
 
 @layer base {
   .dark {
@@ -88,5 +96,16 @@
 
   .grid-pair {
     @apply grid grid-cols-1 gap-4 md:grid-cols-2;
+  }
+
+  /* Native scrollbar hidden — floating thumb comes from useSlickScrollbar */
+  .scrollbar-slick {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-slick::-webkit-scrollbar {
+    width: 0;
+    height: 0;
   }
 }

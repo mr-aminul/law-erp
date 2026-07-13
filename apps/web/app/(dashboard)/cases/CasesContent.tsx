@@ -4,7 +4,6 @@ import { AssignedLawyers } from "@/components/cases/AssignedLawyers";
 import { CaseStatusSelect } from "@/components/cases/CaseStatusSelect";
 import { NewCaseForm } from "@/components/cases/NewCaseForm";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
 import { ListToolbar } from "@/components/ui/ListToolbar";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 import { Modal } from "@/components/ui/Modal";
@@ -188,84 +187,79 @@ export default function CasesContent() {
         }
       />
 
-      <Card className="overflow-hidden border border-divider py-0 shadow-sm ring-0">
-        <CardContent className="p-0">
-        <Table rounded="top">
-          <TableHeader>
-            <TableHead>Client</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead className="w-0 whitespace-nowrap">Type</TableHead>
-            <TableHead className="w-0 whitespace-nowrap">Status</TableHead>
-            <TableHead>Assigned Lawyer</TableHead>
-            <TableHead className="w-0 whitespace-nowrap">Next Hearing</TableHead>
-            <TableHead className="w-0 whitespace-nowrap">Created</TableHead>
-            <TableHead className="w-0 whitespace-nowrap" />
-          </TableHeader>
-          <TableBody>
-            {paginated.map((c) => (
-              <TableRow
-                key={c.id}
-                onClick={() => router.push(`/cases/${c.id}`)}
-              >
-                <TableCell>
-                  <Link
-                    href={`/clients/${c.clientId}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="font-medium text-text-primary transition-colors hover:underline"
-                  >
-                    {c.clientName}
-                  </Link>
-                </TableCell>
-                <TableCell className="font-medium">{c.matter}</TableCell>
-                <TableCell className="w-0 whitespace-nowrap">{c.type}</TableCell>
-                <TableCell className="w-0 whitespace-nowrap">
-                  <CaseStatusSelect
-                    status={c.status}
-                    onChange={(status) => updateCaseStatus(c.id, status)}
-                  />
-                </TableCell>
-                <TableCell>
-                  <AssignedLawyers lawyers={c.assignedLawyers} />
-                </TableCell>
-                <TableCell className="w-0 whitespace-nowrap tabular-nums">
-                  {c.nextHearing ? formatDate(c.nextHearing) : "—"}
-                </TableCell>
-                <TableCell className="w-0 whitespace-nowrap tabular-nums">
-                  {formatDate(c.createdAt)}
-                </TableCell>
-                <TableCell className="w-0 whitespace-nowrap">
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <button
-                      type="button"
-                      className="rounded-input p-1.5 text-text-primary transition-all hover:bg-cream-card group-hover:opacity-80"
+      <Table>
+            <TableHeader>
+              <TableHead>Client</TableHead>
+              <TableHead>Title</TableHead>
+              <TableHead className="w-0 whitespace-nowrap">Type</TableHead>
+              <TableHead className="w-0 whitespace-nowrap">Status</TableHead>
+              <TableHead>Assigned Lawyer</TableHead>
+              <TableHead className="w-0 whitespace-nowrap">Next Hearing</TableHead>
+              <TableHead className="w-0 whitespace-nowrap">Created</TableHead>
+              <TableHead className="w-0 whitespace-nowrap" />
+            </TableHeader>
+            <TableBody>
+              {paginated.map((c) => (
+                <TableRow
+                  key={c.id}
+                  onClick={() => router.push(`/cases/${c.id}`)}
+                >
+                  <TableCell>
+                    <Link
+                      href={`/clients/${c.clientId}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="font-medium text-text-primary transition-colors hover:underline"
                     >
-                      <MoreHorizontal className="h-4 w-4" />
-                    </button>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+                      {c.clientName}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="font-medium">{c.matter}</TableCell>
+                  <TableCell className="w-0 whitespace-nowrap">{c.type}</TableCell>
+                  <TableCell className="w-0 whitespace-nowrap">
+                    <CaseStatusSelect
+                      status={c.status}
+                      onChange={(status) => updateCaseStatus(c.id, status)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <AssignedLawyers lawyers={c.assignedLawyers} />
+                  </TableCell>
+                  <TableCell className="w-0 whitespace-nowrap tabular-nums">
+                    {c.nextHearing ? formatDate(c.nextHearing) : "—"}
+                  </TableCell>
+                  <TableCell className="w-0 whitespace-nowrap tabular-nums">
+                    {formatDate(c.createdAt)}
+                  </TableCell>
+                  <TableCell className="w-0 whitespace-nowrap">
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        className="rounded-input p-1.5 text-text-primary transition-all hover:bg-cream-card group-hover:opacity-80"
+                      >
+                        <MoreHorizontal className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
 
-        {filtered.length === 0 && (
-          <p className="py-12 text-center text-sm text-text-primary">
-            No cases match your filters.
-          </p>
-        )}
+          {filtered.length === 0 && (
+            <p className="py-12 text-center text-sm text-text-primary">
+              No cases match your filters.
+            </p>
+          )}
 
-        <Pagination
-          page={page}
-          totalPages={totalPages}
-          totalItems={filtered.length}
-          pageSize={pageSize}
-          itemLabel="cases"
-          onPageChange={setPage}
-          onPageSizeChange={handlePageSizeChange}
-          className="mt-0 rounded-b-lg border-divider px-4 py-2"
-        />
-        </CardContent>
-      </Card>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        totalItems={filtered.length}
+        pageSize={pageSize}
+        itemLabel="cases"
+        onPageChange={setPage}
+        onPageSizeChange={handlePageSizeChange}
+      />
 
       <Modal
         open={newCaseOpen}

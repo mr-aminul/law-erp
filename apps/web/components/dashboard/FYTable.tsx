@@ -13,28 +13,28 @@ export function FYTable() {
     <Table compact>
       <TableHeader>
         <TableHead>Period</TableHead>
-        <TableHead colSpan={2} className="text-center border-l border-divider">
+        <TableHead colSpan={2} className="text-center border-l border-gray-200">
           FY 2023
         </TableHead>
-        <TableHead colSpan={2} className="text-center border-l border-divider">
+        <TableHead colSpan={2} className="text-center border-l border-gray-200">
           FY 2024
         </TableHead>
-        <TableHead colSpan={2} className="text-center border-l border-divider">
+        <TableHead colSpan={2} className="text-center border-l border-gray-200">
           FY 2025
         </TableHead>
       </TableHeader>
       <tbody>
-        <tr className="border-b border-divider text-[11px] text-text-muted">
+        <tr className="border-b border-gray-200 text-[11px] text-text-muted">
           <td className="px-3 py-1" />
-          <td className="border-l border-divider px-3 py-1 text-center">
+          <td className="border-l border-gray-200 px-3 py-1 text-center">
             Pending
           </td>
           <td className="px-3 py-1 text-center">Completed</td>
-          <td className="border-l border-divider px-3 py-1 text-center">
+          <td className="border-l border-gray-200 px-3 py-1 text-center">
             Pending
           </td>
           <td className="px-3 py-1 text-center">Completed</td>
-          <td className="border-l border-divider px-3 py-1 text-center">
+          <td className="border-l border-gray-200 px-3 py-1 text-center">
             Pending
           </td>
           <td className="px-3 py-1 text-center">Completed</td>
@@ -44,19 +44,19 @@ export function FYTable() {
         {fyCaseReport.map((row) => (
           <TableRow key={row.period}>
             <TableCell className="font-semibold">{row.period}</TableCell>
-            <TableCell className="text-center border-l border-divider text-amber">
+            <TableCell className="text-center border-l border-gray-200 text-amber">
               {row.fy2023.pending}
             </TableCell>
             <TableCell className="text-center text-green">
               {row.fy2023.completed}
             </TableCell>
-            <TableCell className="text-center border-l border-divider text-amber">
+            <TableCell className="text-center border-l border-gray-200 text-amber">
               {row.fy2024.pending}
             </TableCell>
             <TableCell className="text-center text-green">
               {row.fy2024.completed}
             </TableCell>
-            <TableCell className="text-center border-l border-divider text-amber">
+            <TableCell className="text-center border-l border-gray-200 text-amber">
               {row.fy2025.pending}
             </TableCell>
             <TableCell className="text-center text-green">

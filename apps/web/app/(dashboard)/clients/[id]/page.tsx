@@ -49,7 +49,7 @@ export default function ClientDetailPage({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col gap-3 rounded-card border border-divider/70 bg-surface p-3 shadow-sm sm:flex-row sm:items-start sm:justify-between sm:p-4">
+      <div className="flex flex-col gap-3 rounded-card border border-gray-200 bg-surface p-3 sm:flex-row sm:items-start sm:justify-between sm:p-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="text-lg font-bold text-text-primary">{client.name}</h2>
@@ -150,7 +150,7 @@ export default function ClientDetailPage({
               <p className="text-sm text-text-muted">No contact logs yet.</p>
             ) : (
               contacts.map((log) => (
-                <div key={log.id} className="rounded-card border border-divider/60 bg-cream-card p-3">
+                <div key={log.id} className="rounded-card border border-gray-200 bg-cream-card p-3">
                   <div className="flex items-center justify-between">
                     <Badge variant="blue">{log.type}</Badge>
                     <span className="text-xs text-text-muted">{formatDate(log.loggedAt)}</span>
@@ -169,7 +169,7 @@ export default function ClientDetailPage({
         <PageSection title="KYC Document Vault">
           <div className="space-y-2">
             {(client.kycDocuments ?? []).map((doc) => (
-              <div key={doc.id} className="flex items-center justify-between rounded-card border border-divider/60 px-3 py-2">
+              <div key={doc.id} className="flex items-center justify-between rounded-card border border-gray-200 px-3 py-2">
                 <div>
                   <p className="text-sm font-semibold">{doc.type}</p>
                   {doc.expiryDate && (

@@ -21,12 +21,12 @@ export function Topbar({ title, icon: Icon, subtitle }: TopbarProps) {
   }, [subtitle]);
 
   return (
-    <header className="shrink-0 border-b border-divider bg-[#f4f5f6] px-3 py-2.5 sm:px-4 sm:py-3">
+    <header className="shrink-0 border-b border-gray-200 bg-[#f4f5f6] px-3 py-2.5 sm:px-4 sm:py-3">
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         <button
           type="button"
           onClick={toggleMobileNav}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-input border border-divider bg-white text-text-primary transition-colors hover:bg-cream-card lg:hidden"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-input border border-gray-200 bg-white text-text-primary transition-colors hover:bg-cream-card lg:hidden"
           aria-label="Open navigation"
         >
           <Menu className="h-4 w-4" />
@@ -39,7 +39,7 @@ export function Topbar({ title, icon: Icon, subtitle }: TopbarProps) {
           </h1>
           <ApiStatusBadge />
           {dateLabel ? (
-            <span className="hidden text-sm text-text-muted sm:inline">
+            <span className="ml-auto hidden text-sm text-text-muted sm:inline">
               {dateLabel}
             </span>
           ) : null}

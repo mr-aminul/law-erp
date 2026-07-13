@@ -1,5 +1,6 @@
 "use client";
 
+import { useSlickScrollbar } from "@/lib/hooks/useSlickScrollbar";
 import { cn } from "@/lib/utils/cn";
 import { X } from "lucide-react";
 import { useEffect } from "react";
@@ -26,6 +27,9 @@ export function Modal({
   className,
   layer = 0,
 }: ModalProps) {
+  const { scrollRef, onScroll, scrollbarClassName, scrollbarOverlay } =
+    useSlickScrollbar();
+
   useEffect(() => {
     if (!open) return;
     openModalLayers.push(layer);
@@ -61,14 +65,18 @@ export function Modal({
         aria-hidden
       />
       <div
+        ref={scrollRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
+        onScroll={onScroll}
         className={cn(
-          "relative z-10 max-h-[min(90dvh,90vh)] w-full max-w-lg overflow-y-auto rounded-card border border-divider bg-white p-4 shadow-xl sm:p-5",
+          "relative z-10 max-h-[min(90dvh,90vh)] w-full max-w-lg overflow-y-auto rounded-card border border-gray-200 bg-white p-4 sm:p-5",
+          scrollbarClassName,
           className
         )}
       >
+        {scrollbarOverlay}
         <div className="mb-4 flex items-start justify-between gap-3">
           <h3 id="modal-title" className="min-w-0 text-base font-bold text-text-primary">
             {title}

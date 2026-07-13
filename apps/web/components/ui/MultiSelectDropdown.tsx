@@ -78,8 +78,8 @@ export function MultiSelectDropdown({
         className={cn(
           "flex min-h-10 min-w-0 w-full items-center justify-between gap-2 rounded-input border bg-white px-3 text-sm font-medium text-text-primary outline-none ring-0 transition-colors focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 md:min-w-[140px] md:w-auto",
           hasSelection
-            ? "border-[var(--color-theme)] shadow-[0_0_0_2px_color-mix(in_srgb,var(--color-theme)_22%,transparent)]"
-            : "border-divider",
+            ? "border-gray-300"
+            : "border-gray-200",
           showChips && selectedOptions.length > 0 ? "h-auto py-1.5" : "h-10"
         )}
         aria-haspopup="listbox"
@@ -105,7 +105,7 @@ export function MultiSelectDropdown({
         <div
           role="listbox"
           aria-multiselectable
-          className="absolute left-0 top-full z-50 mt-1 w-max min-w-full overflow-hidden rounded-input border border-divider bg-white py-1 shadow-lg"
+          className="absolute left-0 top-full z-50 mt-1 w-max min-w-full overflow-hidden rounded-input border border-gray-200 bg-white py-1 shadow-lg"
         >
           {options.map((option) => {
             const isSelected = value.includes(option.value);
@@ -123,7 +123,7 @@ export function MultiSelectDropdown({
               >
                 <span
                   className={cn(
-                    "flex h-4 w-4 shrink-0 items-center justify-center rounded border border-divider bg-white",
+                    "flex h-4 w-4 shrink-0 items-center justify-center rounded border border-gray-200 bg-white",
                     isSelected &&
                       "border-[var(--color-theme)] bg-[var(--color-theme)] text-white"
                   )}

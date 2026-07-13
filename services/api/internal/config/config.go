@@ -20,7 +20,7 @@ func Load() Config {
 
 	origins := os.Getenv("CORS_ORIGINS")
 	if origins == "" {
-		origins = "http://localhost:3000,http://localhost:3001"
+		origins = "http://localhost:3847,http://localhost:3000,http://localhost:3001"
 	}
 
 	env := os.Getenv("APP_ENV")

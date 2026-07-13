@@ -16,7 +16,7 @@ export function PageSection({
   className,
 }: PageSectionProps) {
   return (
-    <section className={cn("rounded-card border border-divider/70 bg-surface p-3 shadow-sm sm:p-4", className)}>
+    <section className={cn("rounded-card border border-gray-200 bg-surface p-3 sm:p-4", className)}>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0">
           <h2 className="text-sm font-bold text-text-primary">{title}</h2>

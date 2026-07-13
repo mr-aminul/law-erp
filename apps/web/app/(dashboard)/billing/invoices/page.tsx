@@ -59,36 +59,34 @@ export default function InvoicesPage() {
           </Button>
         }
       />
-      <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
-        <Table compact>
-          <TableHeader>
-            <TableHead>Invoice #</TableHead>
-            <TableHead>Client</TableHead>
-            <TableHead>Case</TableHead>
-            <TableHead>Amount</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Due Date</TableHead>
-            <TableHead />
-          </TableHeader>
-          <TableBody>
-            {filtered.map((inv) => (
-              <TableRow key={inv.id} onClick={() => router.push(`/billing/invoices/${inv.id}`)}>
-                <TableCell className="font-semibold">{inv.invoiceNumber}</TableCell>
-                <TableCell>{inv.clientName}</TableCell>
-                <TableCell className="max-w-[180px] truncate text-text-sec">{inv.caseName}</TableCell>
-                <TableCell>{formatCurrency(inv.amount)}</TableCell>
-                <TableCell><Badge variant={statusVariant(inv.status)}>{inv.status}</Badge></TableCell>
-                <TableCell className="text-text-muted">{formatDate(inv.dueDate)}</TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="sm" onClick={(e) => e.stopPropagation()}>
-                    <FileDown className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <Table compact>
+        <TableHeader>
+          <TableHead>Invoice #</TableHead>
+          <TableHead>Client</TableHead>
+          <TableHead>Case</TableHead>
+          <TableHead>Amount</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Due Date</TableHead>
+          <TableHead />
+        </TableHeader>
+        <TableBody>
+          {filtered.map((inv) => (
+            <TableRow key={inv.id} onClick={() => router.push(`/billing/invoices/${inv.id}`)}>
+              <TableCell className="font-semibold">{inv.invoiceNumber}</TableCell>
+              <TableCell>{inv.clientName}</TableCell>
+              <TableCell className="max-w-[180px] truncate text-text-sec">{inv.caseName}</TableCell>
+              <TableCell>{formatCurrency(inv.amount)}</TableCell>
+              <TableCell><Badge variant={statusVariant(inv.status)}>{inv.status}</Badge></TableCell>
+              <TableCell className="text-text-muted">{formatDate(inv.dueDate)}</TableCell>
+              <TableCell>
+                <Button variant="ghost" size="sm" onClick={(e) => e.stopPropagation()}>
+                  <FileDown className="h-4 w-4" />
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }

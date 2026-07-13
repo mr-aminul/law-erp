@@ -93,11 +93,11 @@ export function UserSearchPicker({
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          className="h-10 w-full rounded-input border border-divider bg-white py-2 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-green focus:outline-none focus:ring-2 focus:ring-green/20"
+          className="h-10 w-full rounded-input border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-text-primary placeholder:text-text-muted focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200"
         />
 
         {open && query.trim().length > 0 && (
-          <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-input border border-divider bg-white shadow-lg">
+          <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-input border border-gray-200 bg-white shadow-lg">
             {results.length > 0 ? (
               <ul className="max-h-48 overflow-y-auto py-1">
                 {results.map((user) => (

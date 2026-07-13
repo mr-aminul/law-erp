@@ -74,15 +74,10 @@ export function NotificationDrawer() {
 
   if (!drawerOpen) return null;
 
-  const desktopOverlayLeft = sidebarCollapsed
-    ? "calc(var(--sidebar-width-collapsed) + var(--shell-margin) * 2)"
-    : "calc(var(--sidebar-width) + var(--shell-margin) * 2)";
-
   const drawer = (
-    <div className="fixed inset-0 z-[110]" role="presentation">
+    <>
       <div
-        className="absolute inset-0 bg-sidebar/35 backdrop-blur-[3px] lg:bottom-0 lg:right-0 lg:top-0 lg:inset-x-auto"
-        style={isDesktop ? { left: desktopOverlayLeft } : undefined}
+        className="fixed inset-0 z-[35] bg-sidebar/35 backdrop-blur-[3px]"
         onClick={closeDrawer}
         aria-hidden
       />
@@ -91,7 +86,7 @@ export function NotificationDrawer() {
         aria-modal="true"
         aria-labelledby="notification-drawer-title"
         className={cn(
-          "fixed z-[111] flex flex-col overflow-hidden rounded-panel border border-[var(--color-theme)] bg-white shadow-[0_24px_48px_rgba(26,43,35,0.12)]",
+          "fixed z-[111] flex flex-col overflow-hidden rounded-panel border border-gray-300 bg-white",
           "inset-[var(--shell-margin)] w-auto",
           "lg:inset-auto lg:w-[min(400px,calc(100vw-var(--shell-margin)*2-80px))]"
         )}
@@ -128,7 +123,7 @@ export function NotificationDrawer() {
           onCenterClick={handleOpenCenter}
         />
       </aside>
-    </div>
+    </>
   );
 
   return typeof document !== "undefined"

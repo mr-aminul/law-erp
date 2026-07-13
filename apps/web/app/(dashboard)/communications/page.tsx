@@ -49,7 +49,7 @@ export default function CommunicationsPage() {
         <PageSection title="Internal Case Threads">
           <div className="space-y-3">
             {mockCaseComments.map((c) => (
-              <div key={c.id} className="rounded-card border border-divider/60 bg-cream-card p-3">
+              <div key={c.id} className="rounded-card border border-gray-200 bg-cream-card p-3">
                 <div className="flex items-center gap-2">
                   <MessageSquare className="h-4 w-4 text-green" />
                   <span className="text-sm font-semibold">{c.author}</span>
@@ -64,7 +64,7 @@ export default function CommunicationsPage() {
         <PageSection title="Communications Log">
           <div className="space-y-2">
             {comms.map((c) => (
-              <div key={c.id} className="flex items-start gap-3 rounded-card border border-divider/60 px-3 py-3">
+              <div key={c.id} className="flex items-start gap-3 rounded-card border border-gray-200 px-3 py-3">
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-input bg-blue-light text-blue">
                   <Mail className="h-4 w-4" />
                 </div>
@@ -92,7 +92,7 @@ export default function CommunicationsPage() {
       <PageSection title="Client Contact Log">
         <div className="space-y-2">
           {mockContactLogs.map((log) => (
-            <div key={log.id} className="flex justify-between rounded-card border border-divider/60 px-3 py-2 text-sm">
+            <div key={log.id} className="flex justify-between rounded-card border border-gray-200 px-3 py-2 text-sm">
               <div>
                 <span className="font-semibold">{log.clientName}</span>
                 <span className="mx-2 text-text-muted">·</span>

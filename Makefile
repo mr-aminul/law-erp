@@ -1,11 +1,11 @@
 .PHONY: dev dev-web dev-api install tidy test-api db-up migrate-up migrate-down gqlgen
 
 dev:
-	@echo "Starting Go API (8080) and Next.js (3000)..."
+	@echo "Starting Go API (8080) and Next.js (3847)..."
 	@$(MAKE) -j2 dev-api dev-web
 
 dev-web:
-	cd apps/web && npm run dev
+	cd apps/web && PORT=3847 npm run dev
 
 dev-api:
 	cd services/api && go run ./cmd/server

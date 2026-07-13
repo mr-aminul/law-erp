@@ -30,7 +30,7 @@ export default function BillingPage() {
         <PageSection title="Recent Invoices">
           <div className="space-y-2">
             {mockInvoices.slice(0, 4).map((inv) => (
-              <Link key={inv.id} href={`/billing/invoices/${inv.id}`} className="flex items-center justify-between rounded-card border border-divider/60 px-3 py-2 hover:bg-cream-card">
+              <Link key={inv.id} href={`/billing/invoices/${inv.id}`} className="flex items-center justify-between rounded-card border border-gray-200 px-3 py-2 hover:bg-cream-card">
                 <div>
                   <p className="text-sm font-semibold">{inv.invoiceNumber}</p>
                   <p className="text-xs text-text-muted">{inv.clientName}</p>

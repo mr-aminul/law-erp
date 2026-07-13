@@ -122,7 +122,7 @@ export function Dropdown({
           <>
             <span
               className={cn(
-                "flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border border-divider bg-white",
+                "flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border border-gray-200 bg-white",
                 isSelected &&
                   "border-[var(--color-theme)] bg-[var(--color-theme)] text-white"
               )}
@@ -155,7 +155,7 @@ export function Dropdown({
           : undefined
       }
       className={cn(
-        "w-max border border-divider bg-white shadow-lg",
+        "w-max border border-gray-200 bg-white shadow-lg",
         isSmall ? "rounded-lg py-1" : "overflow-hidden rounded-input",
         usePortal ? "" : "absolute right-0 top-full z-50 mt-1 min-w-full overflow-hidden"
       )}
@@ -179,7 +179,7 @@ export function Dropdown({
         aria-haspopup="listbox"
         aria-expanded={open}
         className={cn(
-          "flex items-center justify-between gap-2 border border-divider bg-white text-text-primary transition-colors focus:border-green focus:outline-none focus:ring-2 focus:ring-green/20 disabled:opacity-40",
+          "flex items-center justify-between gap-2 border border-gray-200 bg-white text-text-primary transition-colors focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 disabled:opacity-40",
           isSmall
             ? "h-6 min-w-[2.75rem] rounded-lg px-2 text-xs font-semibold"
             : "h-10 min-w-0 w-full max-w-full rounded-input px-3 text-sm font-medium md:min-w-[140px] md:w-auto"

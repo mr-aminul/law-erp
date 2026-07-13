@@ -25,7 +25,7 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
 
   return (
     <div className="space-y-4">
-      <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
+      <div className="rounded-card border border-gray-200 bg-surface p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sidebar text-lg font-bold text-white">
             {staff.initials}
@@ -71,7 +71,7 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
                 key={c.id}
                 type="button"
                 onClick={() => router.push(`/cases/${c.id}`)}
-                className="flex w-full justify-between rounded-card border border-divider/60 px-3 py-2 text-left hover:bg-cream-card"
+                className="flex w-full justify-between rounded-card border border-gray-200 px-3 py-2 text-left hover:bg-cream-card"
               >
                 <span className="text-sm font-semibold">{c.caseId} — {c.matter}</span>
                 <Badge variant="blue">{c.status}</Badge>

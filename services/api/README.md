@@ -60,7 +60,7 @@ query Dashboard {
 | Variable | Default |
 |----------|---------|
 | `PORT` | `8080` |
-| `CORS_ORIGINS` | `http://localhost:3000,...` |
+| `CORS_ORIGINS` | `http://localhost:3847,...` |
 | `GRAPHQL_PLAYGROUND` | `true` in dev |
 
 ## Data governance

@@ -38,7 +38,7 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-card border border-divider/60 bg-white p-4",
+        "flex flex-col rounded-card border border-gray-200 bg-white p-4",
         className
       )}
     >
@@ -61,7 +61,7 @@ export function StatCard({
       </div>
 
       {metrics.length > 0 && (
-        <div className="mt-4 flex gap-4 border-t border-divider/60 pt-3">
+        <div className="mt-4 flex gap-4 border-t border-gray-200 pt-3">
           {metrics.map((metric) => (
             <div key={metric.label} className="min-w-0 flex-1">
               <p className="text-xs text-text-muted">{metric.label}</p>

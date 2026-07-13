@@ -97,7 +97,7 @@ export default function ReportsPage() {
         <PageSection title="Upcoming Hearings (Next 7 Days)">
           <div className="space-y-2">
             {upcomingHearings.map((h) => (
-              <div key={h.id} className="flex justify-between rounded-card border border-divider/60 px-3 py-2 text-sm">
+              <div key={h.id} className="flex justify-between rounded-card border border-gray-200 px-3 py-2 text-sm">
                 <span className="truncate">{h.caseName}</span>
                 <span className="shrink-0 text-text-muted">{formatDate(h.date)}</span>
               </div>

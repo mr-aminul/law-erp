@@ -14,7 +14,7 @@ export default function LeavePage() {
       <PageSection title="Leave Management" description="Bangladesh Labour Law compliant leave tracking.">
         <div className="space-y-2">
           {mockLeaveRequests.map((lr) => (
-            <div key={lr.id} className="flex items-center justify-between rounded-card border border-divider/60 px-3 py-3">
+            <div key={lr.id} className="flex items-center justify-between rounded-card border border-gray-200 px-3 py-3">
               <div>
                 <p className="text-sm font-semibold">{lr.staffName}</p>
                 <p className="text-xs text-text-muted">

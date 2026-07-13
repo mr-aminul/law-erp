@@ -58,7 +58,7 @@ export function UploadDocumentForm({ onSubmit, onCancel }: UploadDocumentFormPro
         <Input required type="file" accept=".pdf,.doc,.docx,.jpg,.png" />
       </FormField>
 
-      <div className="flex justify-end gap-3 border-t border-divider pt-4">
+      <div className="flex justify-end gap-3 border-t border-gray-200 pt-4">
         <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel
         </Button>

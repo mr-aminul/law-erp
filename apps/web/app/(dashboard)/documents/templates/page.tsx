@@ -30,7 +30,7 @@ export default function DocumentTemplatesPage() {
       >
         <div className="grid-pair gap-3">
           {templates.map((t) => (
-            <div key={t.id} className="rounded-card border border-divider/60 p-4">
+            <div key={t.id} className="rounded-card border border-gray-200 p-4">
               <div className="flex items-start gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-input bg-green-light text-green">
                   <FileText className="h-5 w-5" />

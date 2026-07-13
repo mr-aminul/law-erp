@@ -18,7 +18,7 @@ Copy env:
 cp .env.example .env.local
 ```
 
-Open http://localhost:3000 (requires Go API on :8080 for the status badge).
+Open http://localhost:3847 (requires Go API on :8080 for the status badge).
 
 ## Shared design
 

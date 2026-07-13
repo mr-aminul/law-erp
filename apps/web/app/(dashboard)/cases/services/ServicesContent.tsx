@@ -4,7 +4,6 @@ import { AssignedLawyers } from "@/components/cases/AssignedLawyers";
 import { CaseStatusSelect } from "@/components/cases/CaseStatusSelect";
 import { NewServiceForm } from "@/components/cases/NewServiceForm";
 import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
 import { ListToolbar } from "@/components/ui/ListToolbar";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 import { Modal } from "@/components/ui/Modal";
@@ -182,9 +181,7 @@ export default function ServicesContent() {
         }
       />
 
-      <Card className="overflow-hidden border border-divider py-0 shadow-sm ring-0">
-        <CardContent className="p-0">
-          <Table rounded="top">
+      <Table>
             <TableHeader>
               <TableHead>Client</TableHead>
               <TableHead>Title</TableHead>
@@ -248,18 +245,15 @@ export default function ServicesContent() {
             </p>
           )}
 
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            totalItems={filtered.length}
-            pageSize={pageSize}
-            itemLabel="services"
-            onPageChange={setPage}
-            onPageSizeChange={handlePageSizeChange}
-            className="mt-0 rounded-b-lg border-divider px-4 py-2"
-          />
-        </CardContent>
-      </Card>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        totalItems={filtered.length}
+        pageSize={pageSize}
+        itemLabel="services"
+        onPageChange={setPage}
+        onPageSizeChange={handlePageSizeChange}
+      />
 
       <Modal
         open={newServiceOpen}

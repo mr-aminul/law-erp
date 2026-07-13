@@ -112,44 +112,42 @@ function ClientsContent() {
         }
       />
 
-      <div className="overflow-hidden rounded-card border border-divider/70 bg-surface shadow-sm">
-        <Table>
-          <TableHeader>
-            <TableHead>Client ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Active Cases</TableHead>
-            <TableHead>Total Billed</TableHead>
-            <TableHead>COI</TableHead>
-            <TableHead>Status</TableHead>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((c) => (
-              <TableRow key={c.id} onClick={() => router.push(`/clients/${c.id}`)}>
-                <TableCell className="font-semibold">{c.clientId}</TableCell>
-                <TableCell>{c.name}</TableCell>
-                <TableCell className="text-text-sec">{c.type}</TableCell>
-                <TableCell>{c.activeCases}</TableCell>
-                <TableCell>{formatCurrency(c.totalBilled)}</TableCell>
-                <TableCell>
-                  {c.conflictChecked ? (
-                    <span className="inline-flex items-center gap-1 text-xs text-green">
-                      <ShieldCheck className="h-3.5 w-3.5" /> Cleared
-                    </span>
-                  ) : (
-                    <Badge variant="amber">Pending</Badge>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={c.status === "Active" ? "green" : "muted"}>
-                    {c.status}
-                  </Badge>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+      <Table>
+        <TableHeader>
+          <TableHead>Client ID</TableHead>
+          <TableHead>Name</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Active Cases</TableHead>
+          <TableHead>Total Billed</TableHead>
+          <TableHead>COI</TableHead>
+          <TableHead>Status</TableHead>
+        </TableHeader>
+        <TableBody>
+          {filtered.map((c) => (
+            <TableRow key={c.id} onClick={() => router.push(`/clients/${c.id}`)}>
+              <TableCell className="font-semibold">{c.clientId}</TableCell>
+              <TableCell>{c.name}</TableCell>
+              <TableCell className="text-text-sec">{c.type}</TableCell>
+              <TableCell>{c.activeCases}</TableCell>
+              <TableCell>{formatCurrency(c.totalBilled)}</TableCell>
+              <TableCell>
+                {c.conflictChecked ? (
+                  <span className="inline-flex items-center gap-1 text-xs text-green">
+                    <ShieldCheck className="h-3.5 w-3.5" /> Cleared
+                  </span>
+                ) : (
+                  <Badge variant="amber">Pending</Badge>
+                )}
+              </TableCell>
+              <TableCell>
+                <Badge variant={c.status === "Active" ? "green" : "muted"}>
+                  {c.status}
+                </Badge>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
       <Modal
         open={newClientOpen}

@@ -58,7 +58,7 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-card border border-divider/70 bg-surface p-4 shadow-sm">
+      <div className="rounded-card border border-gray-200 bg-surface p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -82,7 +82,7 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
         </div>
         <div className="mt-4 flex flex-wrap gap-2">
           {caseData.assignedLawyers.map((l) => (
-            <span key={l} className="rounded-badge bg-green-light px-2.5 py-1 text-xs font-semibold text-green">
+            <span key={l} className="rounded-badge border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-green shadow-none">
               {l}
             </span>
           ))}
@@ -123,7 +123,7 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
                     <span className="mt-1 text-center text-[10px] font-semibold">{stage}</span>
                   </div>
                   {i < stages.length - 1 && (
-                    <div className={`mx-1 h-0.5 min-w-4 flex-1 ${i < currentIdx ? "bg-green" : "bg-divider"}`} />
+                    <div className={`mx-1 h-0.5 min-w-4 flex-1 ${i < currentIdx ? "bg-green" : "bg-gray-200"}`} />
                   )}
                 </div>
               );
@@ -132,7 +132,7 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
           <h3 className="mb-3 text-xs font-bold uppercase text-text-muted">Milestones</h3>
           <div className="space-y-2">
             {mockMilestones.map((m) => (
-              <label key={m.id} className="flex items-center gap-3 rounded-card border border-divider/60 px-3 py-2">
+              <label key={m.id} className="flex items-center gap-3 rounded-card border border-gray-200 px-3 py-2">
                 <input type="checkbox" defaultChecked={m.completed} />
                 <span className={`flex-1 text-sm ${m.completed ? "text-text-muted line-through" : "font-medium"}`}>
                   {m.title}
@@ -191,7 +191,7 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
         <PageSection title="Notes & Internal Memos" action={<Button size="sm">Add Note</Button>}>
           <div className="space-y-3">
             {notes.map((n) => (
-              <div key={n.id} className={`rounded-card border p-3 ${n.isMemo ? "border-amber/30 bg-amber-light/30" : "border-divider/60"}`}>
+              <div key={n.id} className={`rounded-card border p-3 ${n.isMemo ? "border-amber/30 bg-amber-light/30" : "border-gray-200"}`}>
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold">{n.author}</span>
                   <div className="flex items-center gap-2">
@@ -253,7 +253,7 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
         <PageSection title="Internal Case Thread" action={<Button size="sm">Post Comment</Button>}>
           <div className="space-y-3">
             {comments.map((c) => (
-              <div key={c.id} className="rounded-card border border-divider/60 bg-cream-card p-3">
+              <div key={c.id} className="rounded-card border border-gray-200 bg-cream-card p-3">
                 <div className="flex justify-between">
                   <span className="text-sm font-semibold">{c.author}</span>
                   <span className="text-xs text-text-muted">{formatDate(c.createdAt)}</span>

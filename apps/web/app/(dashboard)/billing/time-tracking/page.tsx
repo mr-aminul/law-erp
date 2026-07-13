@@ -74,7 +74,7 @@ export default function TimeTrackingPage() {
       <PageSection title="Weekly Summary by Lawyer">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {byLawyer.map(([lawyer, data]) => (
-            <div key={lawyer} className="rounded-card border border-divider/60 p-3">
+            <div key={lawyer} className="rounded-card border border-gray-200 p-3">
               <p className="text-sm font-semibold">{lawyer}</p>
               <p className="mt-1 text-lg font-bold text-green">{data.hours}h</p>
               <p className="text-xs text-text-muted">{formatCurrency(data.amount)} billable</p>

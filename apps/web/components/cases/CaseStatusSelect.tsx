@@ -93,7 +93,7 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
           zIndex: 50,
         }}
         className={cn(
-          "w-max overflow-hidden rounded-lg border border-divider bg-white shadow-lg",
+          "w-max overflow-hidden rounded-lg border border-gray-200 bg-white shadow-lg",
           placement === "top" ? "origin-bottom" : "origin-top"
         )}
       >
@@ -128,7 +128,7 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          "flex h-7 w-max max-w-full items-center justify-between gap-2 rounded-lg px-2.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-green/20",
+          "flex h-7 w-max max-w-full items-center justify-between gap-2 rounded-lg px-2.5 text-xs font-medium shadow-none transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200",
           getStatusColorClasses(status)
         )}
         aria-label={`Status: ${status}. Click to change.`}

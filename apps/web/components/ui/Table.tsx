@@ -4,7 +4,6 @@ interface TableProps {
   children: React.ReactNode;
   className?: string;
   compact?: boolean;
-  /** Use "top" when pagination or another footer sits below the table */
   rounded?: "full" | "top" | "none";
 }
 
@@ -20,14 +19,14 @@ export function Table({
     <div
       className={cn(
         /* overflow-x-auto must win over overflow-hidden so tables scroll on narrow screens */
-        "overflow-x-auto overscroll-x-contain outline-none focus:outline-none",
+        "overflow-x-auto overscroll-x-contain border border-gray-200 outline-none focus:outline-none",
         isRounded && "rounded-lg",
         className
       )}
     >
       <table
         className={cn(
-          "w-full border-separate border-spacing-0 text-xs",
+          "w-full border-separate border-spacing-0 text-xs [&_tbody_tr:last-child_td]:border-b-0",
           isRounded &&
             "[&_thead_th:first-child]:rounded-tl-lg [&_thead_th:last-child]:rounded-tr-lg",
           rounded === "full" &&
@@ -110,7 +109,7 @@ export function TableCell({
   return (
     <td
       className={cn(
-        "border-b border-r border-divider px-3 py-1.5 text-xs text-text-primary last:border-r-0",
+        "border-b border-r border-gray-200 px-3 py-1.5 text-xs text-text-primary last:border-r-0",
         className
       )}
     >

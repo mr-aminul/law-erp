@@ -9,7 +9,7 @@ export const Select = forwardRef<
     <select
       ref={ref}
       className={cn(
-        "h-10 w-full rounded-input border border-divider bg-surface px-3 text-sm text-text-primary focus:border-green focus:outline-none focus:ring-2 focus:ring-green/20",
+        "h-10 w-full rounded-input border border-gray-200 bg-surface px-3 text-sm text-text-primary focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200",
         className
       )}
       {...props}
@@ -29,7 +29,7 @@ export const Textarea = forwardRef<
     <textarea
       ref={ref}
       className={cn(
-        "min-h-[96px] w-full rounded-input border border-divider bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-green focus:outline-none focus:ring-2 focus:ring-green/20",
+        "min-h-[96px] w-full rounded-input border border-gray-200 bg-surface px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200",
         className
       )}
       {...props}
