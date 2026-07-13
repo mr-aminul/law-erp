@@ -1,3 +1,4 @@
+import { Select } from "@/components/ui/Select";
 import { cn } from "@/lib/utils/cn";
 
 interface PageSectionProps {
@@ -69,18 +70,76 @@ export function EmptyState({ title, description, action }: EmptyStateProps) {
   );
 }
 
+interface DetailFieldOption {
+  value: string;
+  label: string;
+}
+
 interface DetailFieldProps {
   label: string;
   value: React.ReactNode;
+  /** When set with onChange, renders an underline editor instead of plain text. */
+  editing?: boolean;
+  editValue?: string;
+  onChange?: (value: string) => void;
+  /** text (default), date, email, tel, number, or select when options are provided */
+  inputType?: "text" | "date" | "email" | "tel" | "number";
+  options?: DetailFieldOption[];
+  /** Custom editor (e.g. status chip select). Takes precedence over input/select. */
+  editSlot?: React.ReactNode;
+  error?: string | null;
 }
 
-export function DetailField({ label, value }: DetailFieldProps) {
+const underlineClass =
+  "mt-0.5 w-full border-0 border-b border-gray-300 bg-transparent py-0.5 text-sm font-medium text-text-primary outline-none focus:border-text-primary";
+
+export function DetailField({
+  label,
+  value,
+  editing,
+  editValue,
+  onChange,
+  inputType = "text",
+  options,
+  editSlot,
+  error,
+}: DetailFieldProps) {
+  const isEditable = Boolean(editing && (editSlot || onChange));
+
   return (
     <div>
       <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
         {label}
       </p>
-      <p className="mt-0.5 text-sm font-medium text-text-primary">{value}</p>
+      {isEditable && editSlot ? (
+        <div className="mt-0.5">{editSlot}</div>
+      ) : isEditable && options ? (
+        <Select
+          variant="underline"
+          value={editValue ?? ""}
+          onChange={(e) => onChange?.(e.target.value)}
+        >
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </Select>
+      ) : isEditable ? (
+        <input
+          type={inputType}
+          value={editValue ?? ""}
+          onChange={(e) => onChange?.(e.target.value)}
+          aria-invalid={Boolean(error) || undefined}
+          className={cn(
+            underlineClass,
+            error && "border-red focus:border-red"
+          )}
+        />
+      ) : (
+        <p className="mt-0.5 text-sm font-medium text-text-primary">{value}</p>
+      )}
+      {error ? <p className="mt-1 text-xs text-red">{error}</p> : null}
     </div>
   );
 }

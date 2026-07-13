@@ -3,15 +3,34 @@
 import { SubNav } from "@/components/layout/SubNav";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { DetailField, PageSection } from "@/components/ui/PageSection";
 import { FormField } from "@/components/ui/Form";
 import { Input } from "@/components/ui/Input";
+import { DetailField, PageSection } from "@/components/ui/PageSection";
 import { settingsSubNav } from "@/lib/config/navigation";
 import { mockFirmProfile, mockSystemUsers } from "@/lib/mock";
+import { emailError, phoneError } from "@/lib/utils/validateContact";
 import { Download } from "lucide-react";
+import { useState } from "react";
 
 export default function SettingsPage() {
   const firm = mockFirmProfile;
+  const [phone, setPhone] = useState(firm.phone);
+  const [email, setEmail] = useState(firm.email);
+  const [phoneErr, setPhoneErr] = useState<string | null>(null);
+  const [emailErr, setEmailErr] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  function handleSave() {
+    const nextEmail = emailError(email);
+    const nextPhone = phoneError(phone);
+    setEmailErr(nextEmail);
+    setPhoneErr(nextPhone);
+    if (nextEmail || nextPhone) {
+      setSaved(false);
+      return;
+    }
+    setSaved(true);
+  }
 
   return (
     <div className="space-y-4">
@@ -21,14 +40,45 @@ export default function SettingsPage() {
         <div className="grid-pair">
           <FormField label="Firm Name"><Input defaultValue={firm.name} /></FormField>
           <FormField label="Bar Council Reg."><Input defaultValue={firm.barCouncilReg} /></FormField>
-          <FormField label="Phone"><Input defaultValue={firm.phone} /></FormField>
-          <FormField label="Email"><Input defaultValue={firm.email} /></FormField>
+          <FormField label="Phone" error={phoneErr}>
+            <Input
+              type="tel"
+              value={phone}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                setSaved(false);
+                if (phoneErr) setPhoneErr(phoneError(e.target.value));
+              }}
+              onBlur={() => setPhoneErr(phoneError(phone))}
+              aria-invalid={Boolean(phoneErr) || undefined}
+            />
+          </FormField>
+          <FormField label="Email" error={emailErr}>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                setSaved(false);
+                if (emailErr) setEmailErr(emailError(e.target.value));
+              }}
+              onBlur={() => setEmailErr(emailError(email))}
+              aria-invalid={Boolean(emailErr) || undefined}
+            />
+          </FormField>
           <div className="col-span-2">
             <FormField label="Address"><Input defaultValue={firm.address} /></FormField>
           </div>
           <DetailField label="Branches" value={firm.branches.join(", ")} />
         </div>
-        <Button size="sm" className="mt-4">Save Changes</Button>
+        <div className="mt-4 flex items-center gap-3">
+          <Button size="sm" type="button" onClick={handleSave}>
+            Save Changes
+          </Button>
+          {saved ? (
+            <p className="text-xs text-green">Saved</p>
+          ) : null}
+        </div>
       </PageSection>
 
       <PageSection title="Users" description="Managing Partner → Associate → Clerk role hierarchy.">

@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/Button";
 import { FormField, Select, Textarea } from "@/components/ui/Form";
 import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
-import { UserSearchPicker } from "@/components/ui/UserSearchPicker";
+import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
+import { UserChip } from "@/components/ui/UserChip";
 import { mockClients, mockStaff } from "@/lib/mock";
 import { CASE_STATUSES } from "@/lib/utils/caseStatus";
 import { SERVICE_TYPES, type ServiceType } from "@/types/service";
@@ -129,19 +130,43 @@ export function NewServiceForm({ onSubmit, onCancel }: NewServiceFormProps) {
 
           <div className="col-span-2">
             <FormField label="Assign Lawyers" required>
-              <UserSearchPicker
-                users={lawyers.map((s) => ({
-                  id: s.id,
-                  name: s.name,
-                  role: s.role,
-                  initials: s.initials,
-                  email: s.email,
-                }))}
-                selectedIds={assignedLawyerIds}
-                onChange={setAssignedLawyerIds}
-                placeholder="Search lawyers by name, role, or email…"
-                hint="Type to search firm users — select at least one lawyer"
-              />
+              <div className="flex flex-wrap items-center gap-2">
+                {assignedLawyerIds.map((id) => {
+                  const lawyer = lawyers.find((s) => s.id === id);
+                  if (!lawyer) return null;
+                  return (
+                    <UserChip
+                      key={id}
+                      name={lawyer.name}
+                      initials={lawyer.initials}
+                      onRemove={() =>
+                        setAssignedLawyerIds((prev) =>
+                          prev.filter((lawyerId) => lawyerId !== id)
+                        )
+                      }
+                    />
+                  );
+                })}
+                <MultiSelectDropdown
+                  variant="chip"
+                  searchable
+                  searchPlaceholder="Search lawyers…"
+                  placeholder="Assignee"
+                  options={lawyers.map((s) => ({
+                    value: s.id,
+                    label: s.name,
+                    initials: s.initials,
+                    description: s.email ? `${s.role} · ${s.email}` : s.role,
+                  }))}
+                  value={assignedLawyerIds}
+                  onChange={setAssignedLawyerIds}
+                />
+              </div>
+              {assignedLawyerIds.length === 0 ? (
+                <p className="mt-1.5 text-xs text-text-muted">
+                  Select at least one lawyer
+                </p>
+              ) : null}
             </FormField>
           </div>
         </div>

@@ -1,10 +1,14 @@
 "use client";
 
+import { AssignedLawyers } from "@/components/cases/AssignedLawyers";
 import { CaseStatusBadge } from "@/components/cases/CaseStatusBadge";
+import { CaseStatusSelect } from "@/components/cases/CaseStatusSelect";
 import { UploadDocumentForm } from "@/components/cases/UploadDocumentForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Textarea } from "@/components/ui/Form";
 import { Modal } from "@/components/ui/Modal";
+import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 import { DetailField, PageSection } from "@/components/ui/PageSection";
 import { Tabs } from "@/components/ui/Tabs";
 import {
@@ -15,19 +19,26 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
+import { UserChip } from "@/components/ui/UserChip";
 import {
   getServiceById,
+  mockClients,
   mockDocuments,
   mockExpenses,
   mockInvoices,
   mockServiceComments,
   mockServiceMilestones,
   mockServiceNotes,
+  mockStaff,
 } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
-import { formatDate } from "@/lib/utils/formatDate";
-import type { ServiceStage } from "@/types/service";
-import { CheckCircle2, Circle } from "lucide-react";
+import { formatDate, toDateInputValue } from "@/lib/utils/formatDate";
+import {
+  SERVICE_TYPES,
+  type ServiceStage,
+  type ServiceType,
+} from "@/types/service";
+import { CheckCircle2, Circle, Pencil } from "lucide-react";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -40,6 +51,14 @@ const stages: ServiceStage[] = [
   "Closed",
 ];
 
+function lawyerIdsFromNames(names: string[]) {
+  return mockStaff.filter((s) => names.includes(s.name)).map((s) => s.id);
+}
+
+function namesFromLawyerIds(ids: string[]) {
+  return mockStaff.filter((s) => ids.includes(s.id)).map((s) => s.name);
+}
+
 export default function ServiceDetailPage({
   params,
 }: {
@@ -49,6 +68,17 @@ export default function ServiceDetailPage({
   const service = getServiceById(params.id);
   const [tab, setTab] = useState("overview");
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState({
+    matter: "",
+    clientId: "",
+    type: "",
+    dueDate: "",
+    stage: "",
+    status: "",
+    description: "",
+    lawyerIds: [] as string[],
+  });
 
   if (!service) notFound();
 
@@ -58,6 +88,20 @@ export default function ServiceDetailPage({
   const expenses = mockExpenses.filter((e) => e.caseId === service.id);
   const notes = mockServiceNotes.filter((n) => n.caseId === service.id);
   const comments = mockServiceComments.filter((c) => c.caseId === service.id);
+  const lawyers = mockStaff.filter((s) => s.role !== "Admin");
+  const activeClients = mockClients.filter((c) => c.status === "Active");
+
+  const displayClientId = draft.clientId || service.clientId;
+  const displayClientName =
+    activeClients.find((c) => c.id === displayClientId)?.name ??
+    service.clientName;
+  const displayLawyers = editing
+    ? namesFromLawyerIds(draft.lawyerIds)
+    : draft.lawyerIds.length > 0
+      ? namesFromLawyerIds(draft.lawyerIds)
+      : service.assignedLawyers;
+  const displayStatus = (draft.status || service.status) as typeof service.status;
+  const displayDueDate = draft.dueDate || service.dueDate;
 
   const tabs = [
     { id: "overview", label: "Overview" },
@@ -68,22 +112,60 @@ export default function ServiceDetailPage({
     { id: "thread", label: "Team Thread" },
   ];
 
+  function startEditing() {
+    setDraft({
+      matter: service!.matter,
+      clientId: service!.clientId,
+      type: service!.type,
+      dueDate: toDateInputValue(service!.dueDate),
+      stage: service!.stage,
+      status: service!.status,
+      description: service!.description ?? "",
+      lawyerIds: lawyerIdsFromNames(service!.assignedLawyers),
+    });
+    setEditing(true);
+  }
+
+  function patchDraft(key: keyof typeof draft, value: string | string[]) {
+    setDraft((prev) => ({ ...prev, [key]: value }));
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-card border border-gray-200 bg-surface p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-bold">{service.matter}</h2>
-              <CaseStatusBadge status={service.status} />
-              <Badge variant="blue">{service.stage}</Badge>
+              {editing ? (
+                <input
+                  type="text"
+                  value={draft.matter}
+                  onChange={(e) => patchDraft("matter", e.target.value)}
+                  className="min-w-0 flex-1 border-0 border-b border-gray-300 bg-transparent py-0.5 text-lg font-bold text-text-primary outline-none focus:border-text-primary"
+                />
+              ) : (
+                <h2 className="text-lg font-bold">{draft.matter || service.matter}</h2>
+              )}
+              <CaseStatusBadge status={displayStatus} />
+              <Badge variant="blue">{draft.stage || service.stage}</Badge>
             </div>
             <p className="mt-1 text-xs tabular-nums text-text-muted">{service.serviceId}</p>
-            <p className="mt-0.5 text-xs text-text-muted">
-              {service.clientName} · {service.type}
-            </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => (editing ? setEditing(false) : startEditing())}
+            >
+              {editing ? (
+                "Done"
+              ) : (
+                <>
+                  <Pencil className="h-4 w-4" />
+                  Edit
+                </>
+              )}
+            </Button>
             <Button
               variant="secondary"
               size="sm"
@@ -93,15 +175,44 @@ export default function ServiceDetailPage({
             </Button>
           </div>
         </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {service.assignedLawyers.map((lawyer) => (
-            <span
-              key={lawyer}
-              className="rounded-badge border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-green shadow-none"
-            >
-              {lawyer}
-            </span>
-          ))}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {editing ? (
+            <>
+              {draft.lawyerIds.map((id) => {
+                const lawyer = lawyers.find((s) => s.id === id);
+                if (!lawyer) return null;
+                return (
+                  <UserChip
+                    key={id}
+                    name={lawyer.name}
+                    initials={lawyer.initials}
+                    onRemove={() =>
+                      patchDraft(
+                        "lawyerIds",
+                        draft.lawyerIds.filter((lawyerId) => lawyerId !== id)
+                      )
+                    }
+                  />
+                );
+              })}
+              <MultiSelectDropdown
+                variant="chip"
+                searchable
+                searchPlaceholder="Search lawyers…"
+                placeholder="Assignee"
+                options={lawyers.map((s) => ({
+                  value: s.id,
+                  label: s.name,
+                  initials: s.initials,
+                  description: s.email ? `${s.role} · ${s.email}` : s.role,
+                }))}
+                value={draft.lawyerIds}
+                onChange={(ids) => patchDraft("lawyerIds", ids)}
+              />
+            </>
+          ) : (
+            <AssignedLawyers lawyers={displayLawyers} />
+          )}
         </div>
       </div>
 
@@ -110,33 +221,85 @@ export default function ServiceDetailPage({
       {tab === "overview" && (
         <PageSection title="Service Overview">
           <div className="grid-fields-3">
-            <DetailField label="Type" value={service.type} />
+            <DetailField
+              label="Client"
+              value={
+                <Link
+                  href={`/clients/${displayClientId}`}
+                  className="font-medium hover:underline"
+                >
+                  {displayClientName}
+                </Link>
+              }
+              editing={editing}
+              editValue={draft.clientId}
+              onChange={(v) => patchDraft("clientId", v)}
+              options={activeClients.map((c) => ({
+                value: c.id,
+                label: c.name,
+              }))}
+            />
+            <DetailField
+              label="Service Type"
+              value={draft.type || service.type}
+              editing={editing}
+              editValue={draft.type}
+              onChange={(v) => patchDraft("type", v)}
+              options={SERVICE_TYPES.map((t: ServiceType) => ({
+                value: t,
+                label: t,
+              }))}
+            />
             <DetailField
               label="Due Date"
-              value={service.dueDate ? formatDate(service.dueDate) : "—"}
+              value={displayDueDate ? formatDate(displayDueDate) : "—"}
+              editing={editing}
+              editValue={draft.dueDate}
+              onChange={(v) => patchDraft("dueDate", v)}
+              inputType="date"
             />
-            <DetailField label="Stage" value={service.stage} />
+            <DetailField
+              label="Status"
+              value={<CaseStatusBadge status={displayStatus} />}
+              editing={editing}
+              editSlot={
+                <CaseStatusSelect
+                  status={displayStatus}
+                  onChange={(s) => patchDraft("status", s)}
+                />
+              }
+            />
+            <DetailField
+              label="Stage"
+              value={draft.stage || service.stage}
+              editing={editing}
+              editValue={draft.stage}
+              onChange={(v) => patchDraft("stage", v)}
+              options={stages.map((s) => ({ value: s, label: s }))}
+            />
             <DetailField label="Created" value={formatDate(service.createdAt)} />
             <DetailField
               label="Last Updated"
               value={formatDate(service.updatedAt)}
             />
-            <DetailField
-              label="Client"
-              value={
-                <Link
-                  href={`/clients/${service.clientId}`}
-                  className="font-medium hover:underline"
-                >
-                  {service.clientName}
-                </Link>
-              }
-            />
-            <DetailField label="Status" value={service.status} />
           </div>
-          {service.description ? (
-            <p className="mt-4 text-sm text-text-sec">{service.description}</p>
-          ) : null}
+          <div className="mt-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+              Description
+            </p>
+            {editing ? (
+              <Textarea
+                value={draft.description}
+                onChange={(e) => patchDraft("description", e.target.value)}
+                placeholder="Optional details about the service"
+                className="mt-0.5"
+              />
+            ) : (
+              <p className="mt-0.5 min-h-[1.25rem] text-sm font-medium text-text-primary">
+                {draft.description || service.description || ""}
+              </p>
+            )}
+          </div>
         </PageSection>
       )}
 

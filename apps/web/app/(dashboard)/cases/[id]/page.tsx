@@ -1,10 +1,14 @@
 "use client";
 
+import { AssignedLawyers } from "@/components/cases/AssignedLawyers";
 import { CaseStatusBadge } from "@/components/cases/CaseStatusBadge";
+import { CaseStatusSelect } from "@/components/cases/CaseStatusSelect";
 import { UploadDocumentForm } from "@/components/cases/UploadDocumentForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Textarea } from "@/components/ui/Form";
 import { Modal } from "@/components/ui/Modal";
+import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 import { DetailField, PageSection } from "@/components/ui/PageSection";
 import { Tabs } from "@/components/ui/Tabs";
 import {
@@ -15,29 +19,78 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
+import { UserChip } from "@/components/ui/UserChip";
 import {
   getCaseById,
   mockCaseComments,
+  mockClients,
   mockDocuments,
   mockExpenses,
   mockInvoices,
   mockMilestones,
   mockCaseNotes,
+  mockStaff,
 } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
-import { formatDate } from "@/lib/utils/formatDate";
-import { CheckCircle2, Circle } from "lucide-react";
+import { formatDate, toDateInputValue } from "@/lib/utils/formatDate";
+import type { CaseType } from "@/types/case";
+import type { CourtLevel } from "@/types/hearing";
+import { CheckCircle2, Circle, Pencil } from "lucide-react";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import { useState } from "react";
 
 const stages = ["Filing", "Hearing", "Judgment", "Appeal", "Closed"];
 
+const CASE_TYPES: CaseType[] = [
+  "Civil",
+  "Criminal",
+  "Family",
+  "Corporate",
+  "Labour",
+  "Property",
+];
+
+const COURT_LEVELS: CourtLevel[] = [
+  "Supreme Court",
+  "High Court Division",
+  "District Court",
+  "Tribunal",
+];
+
+const OUTCOMES = ["Pending", "Won", "Lost", "Settled"] as const;
+
+function lawyerIdsFromNames(names: string[]) {
+  return mockStaff.filter((s) => names.includes(s.name)).map((s) => s.id);
+}
+
+function namesFromLawyerIds(ids: string[]) {
+  return mockStaff.filter((s) => ids.includes(s.id)).map((s) => s.name);
+}
+
 export default function CaseDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const caseData = getCaseById(params.id);
   const [tab, setTab] = useState("overview");
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState({
+    matter: "",
+    clientId: "",
+    type: "",
+    court: "",
+    courtName: "",
+    caseNumber: "",
+    firstHearing: "",
+    deadline: "",
+    status: "",
+    oppositeParty: "",
+    opposingCounsel: "",
+    causeListRef: "",
+    outcome: "",
+    description: "",
+    lawyerIds: [] as string[],
+  });
 
   if (!caseData) notFound();
 
@@ -46,6 +99,21 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
   const expenses = mockExpenses.filter((e) => e.caseId === caseData.id);
   const notes = mockCaseNotes.filter((n) => n.caseId === caseData.id);
   const comments = mockCaseComments.filter((c) => c.caseId === caseData.id);
+  const lawyers = mockStaff.filter((s) => s.role !== "Admin");
+  const activeClients = mockClients.filter((c) => c.status === "Active");
+
+  const displayClientId = draft.clientId || caseData.clientId;
+  const displayClientName =
+    activeClients.find((c) => c.id === displayClientId)?.name ??
+    caseData.clientName;
+  const displayLawyers = editing
+    ? namesFromLawyerIds(draft.lawyerIds)
+    : draft.lawyerIds.length > 0
+      ? namesFromLawyerIds(draft.lawyerIds)
+      : caseData.assignedLawyers;
+  const displayStatus = (draft.status || caseData.status) as typeof caseData.status;
+  const displayFirstHearing = draft.firstHearing || caseData.nextHearing;
+  const displayDeadline = draft.deadline || caseData.limitationDate;
 
   const tabs = [
     { id: "overview", label: "Overview" },
@@ -56,22 +124,67 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
     { id: "thread", label: "Team Thread" },
   ];
 
+  function startEditing() {
+    setDraft({
+      matter: caseData!.matter,
+      clientId: caseData!.clientId,
+      type: caseData!.type,
+      court: caseData!.court,
+      courtName: caseData!.courtName,
+      caseNumber: caseData!.caseNumber ?? "",
+      firstHearing: toDateInputValue(caseData!.nextHearing),
+      deadline: toDateInputValue(caseData!.limitationDate),
+      status: caseData!.status,
+      oppositeParty: caseData!.opposingParty?.name ?? "",
+      opposingCounsel: caseData!.opposingParty?.counsel ?? "",
+      causeListRef: caseData!.causeListRef ?? "",
+      outcome: caseData!.outcome ?? "Pending",
+      description: caseData!.description ?? "",
+      lawyerIds: lawyerIdsFromNames(caseData!.assignedLawyers),
+    });
+    setEditing(true);
+  }
+
+  function patchDraft(key: keyof typeof draft, value: string | string[]) {
+    setDraft((prev) => ({ ...prev, [key]: value }));
+  }
+
   return (
     <div className="space-y-4">
       <div className="rounded-card border border-gray-200 bg-surface p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-lg font-bold">{caseData.matter}</h2>
-              <CaseStatusBadge status={caseData.status} />
+              {editing ? (
+                <input
+                  type="text"
+                  value={draft.matter}
+                  onChange={(e) => patchDraft("matter", e.target.value)}
+                  className="min-w-0 flex-1 border-0 border-b border-gray-300 bg-transparent py-0.5 text-lg font-bold text-text-primary outline-none focus:border-text-primary"
+                />
+              ) : (
+                <h2 className="text-lg font-bold">{draft.matter || caseData.matter}</h2>
+              )}
+              <CaseStatusBadge status={displayStatus} />
               <Badge variant="blue">{caseData.stage}</Badge>
             </div>
             <p className="mt-1 text-xs tabular-nums text-text-muted">{caseData.caseId}</p>
-            <p className="mt-0.5 text-xs text-text-muted">
-              {caseData.clientName} · {caseData.type} · {caseData.courtName}
-            </p>
           </div>
           <div className="flex flex-wrap gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => (editing ? setEditing(false) : startEditing())}
+            >
+              {editing ? (
+                "Done"
+              ) : (
+                <>
+                  <Pencil className="h-4 w-4" />
+                  Edit
+                </>
+              )}
+            </Button>
             <Link href={`/calendar?case=${caseData.id}`}>
               <Button variant="secondary" size="sm">Schedule Hearing</Button>
             </Link>
@@ -80,12 +193,44 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
             </Button>
           </div>
         </div>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {caseData.assignedLawyers.map((l) => (
-            <span key={l} className="rounded-badge border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-semibold text-green shadow-none">
-              {l}
-            </span>
-          ))}
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {editing ? (
+            <>
+              {draft.lawyerIds.map((id) => {
+                const lawyer = lawyers.find((s) => s.id === id);
+                if (!lawyer) return null;
+                return (
+                  <UserChip
+                    key={id}
+                    name={lawyer.name}
+                    initials={lawyer.initials}
+                    onRemove={() =>
+                      patchDraft(
+                        "lawyerIds",
+                        draft.lawyerIds.filter((lawyerId) => lawyerId !== id)
+                      )
+                    }
+                  />
+                );
+              })}
+              <MultiSelectDropdown
+                variant="chip"
+                searchable
+                searchPlaceholder="Search lawyers…"
+                placeholder="Assignee"
+                options={lawyers.map((s) => ({
+                  value: s.id,
+                  label: s.name,
+                  initials: s.initials,
+                  description: s.email ? `${s.role} · ${s.email}` : s.role,
+                }))}
+                value={draft.lawyerIds}
+                onChange={(ids) => patchDraft("lawyerIds", ids)}
+              />
+            </>
+          ) : (
+            <AssignedLawyers lawyers={displayLawyers} />
+          )}
         </div>
       </div>
 
@@ -94,19 +239,130 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
       {tab === "overview" && (
         <PageSection title="Case Overview">
           <div className="grid-fields-3">
-            <DetailField label="Case Number" value={caseData.caseNumber ?? "—"} />
-            <DetailField label="Cause List Ref" value={caseData.causeListRef ?? "—"} />
-            <DetailField label="Next Hearing" value={caseData.nextHearing ? formatDate(caseData.nextHearing) : "—"} />
-            <DetailField label="Deadline" value={caseData.limitationDate ? formatDate(caseData.limitationDate) : "—"} />
+            <DetailField
+              label="Client"
+              value={
+                <Link
+                  href={`/clients/${displayClientId}`}
+                  className="font-medium hover:underline"
+                >
+                  {displayClientName}
+                </Link>
+              }
+              editing={editing}
+              editValue={draft.clientId}
+              onChange={(v) => patchDraft("clientId", v)}
+              options={activeClients.map((c) => ({
+                value: c.id,
+                label: c.name,
+              }))}
+            />
+            <DetailField
+              label="Case Type"
+              value={draft.type || caseData.type}
+              editing={editing}
+              editValue={draft.type}
+              onChange={(v) => patchDraft("type", v)}
+              options={CASE_TYPES.map((t) => ({ value: t, label: t }))}
+            />
+            <DetailField
+              label="Status"
+              value={<CaseStatusBadge status={displayStatus} />}
+              editing={editing}
+              editSlot={
+                <CaseStatusSelect
+                  status={displayStatus}
+                  onChange={(s) => patchDraft("status", s)}
+                />
+              }
+            />
+            <DetailField
+              label="Court Level"
+              value={draft.court || caseData.court}
+              editing={editing}
+              editValue={draft.court}
+              onChange={(v) => patchDraft("court", v)}
+              options={COURT_LEVELS.map((c) => ({ value: c, label: c }))}
+            />
+            <DetailField
+              label="Court Name"
+              value={draft.courtName || caseData.courtName}
+              editing={editing}
+              editValue={draft.courtName}
+              onChange={(v) => patchDraft("courtName", v)}
+            />
+            <DetailField
+              label="Case Number"
+              value={draft.caseNumber || caseData.caseNumber || "—"}
+              editing={editing}
+              editValue={draft.caseNumber}
+              onChange={(v) => patchDraft("caseNumber", v)}
+            />
+            <DetailField
+              label="First Hearing Date"
+              value={displayFirstHearing ? formatDate(displayFirstHearing) : "—"}
+              editing={editing}
+              editValue={draft.firstHearing}
+              onChange={(v) => patchDraft("firstHearing", v)}
+              inputType="date"
+            />
+            <DetailField
+              label="Deadline"
+              value={displayDeadline ? formatDate(displayDeadline) : "—"}
+              editing={editing}
+              editValue={draft.deadline}
+              onChange={(v) => patchDraft("deadline", v)}
+              inputType="date"
+            />
+            <DetailField
+              label="Opposite Party"
+              value={draft.oppositeParty || caseData.opposingParty?.name || "—"}
+              editing={editing}
+              editValue={draft.oppositeParty}
+              onChange={(v) => patchDraft("oppositeParty", v)}
+            />
+            <DetailField
+              label="Opposing Counsel"
+              value={draft.opposingCounsel || caseData.opposingParty?.counsel || "—"}
+              editing={editing}
+              editValue={draft.opposingCounsel}
+              onChange={(v) => patchDraft("opposingCounsel", v)}
+            />
+            <DetailField
+              label="Cause List Ref"
+              value={draft.causeListRef || caseData.causeListRef || "—"}
+              editing={editing}
+              editValue={draft.causeListRef}
+              onChange={(v) => patchDraft("causeListRef", v)}
+            />
+            <DetailField
+              label="Outcome"
+              value={draft.outcome || caseData.outcome || "Pending"}
+              editing={editing}
+              editValue={draft.outcome || "Pending"}
+              onChange={(v) => patchDraft("outcome", v)}
+              options={OUTCOMES.map((o) => ({ value: o, label: o }))}
+            />
             <DetailField label="Created" value={formatDate(caseData.createdAt)} />
             <DetailField label="Last Updated" value={formatDate(caseData.updatedAt)} />
-            <DetailField label="Opposite Party" value={caseData.opposingParty?.name ?? "—"} />
-            <DetailField label="Opposing Counsel" value={caseData.opposingParty?.counsel ?? "—"} />
-            <DetailField label="Outcome" value={caseData.outcome ?? "Pending"} />
           </div>
-          {caseData.description && (
-            <p className="mt-4 text-sm text-text-sec">{caseData.description}</p>
-          )}
+          <div className="mt-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+              Description
+            </p>
+            {editing ? (
+              <Textarea
+                value={draft.description}
+                onChange={(e) => patchDraft("description", e.target.value)}
+                placeholder="Optional details about the case"
+                className="mt-0.5"
+              />
+            ) : (
+              <p className="mt-0.5 min-h-[1.25rem] text-sm font-medium text-text-primary">
+                {draft.description || caseData.description || ""}
+              </p>
+            )}
+          </div>
         </PageSection>
       )}
 

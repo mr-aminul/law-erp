@@ -113,9 +113,9 @@ export function Dropdown({
           setOpen(false);
         }}
         className={cn(
-          "flex w-full items-center whitespace-nowrap text-left text-text-primary transition-colors hover:bg-[#eceef1]",
-          isSmall ? "gap-2 px-2.5 py-1.5 text-xs" : "px-3 py-2 text-sm",
-          isSelected && (isSmall ? "bg-cream-card font-semibold" : "bg-green-light font-semibold text-green")
+          "ui-dropdown-option whitespace-nowrap",
+          isSmall ? "gap-2 px-2.5 py-1.5 text-xs" : "",
+          isSelected && !isSmall && "bg-green-light text-green"
         )}
       >
         {isSmall ? (
@@ -150,14 +150,14 @@ export function Dropdown({
               left: menuStyle.left,
               minWidth: menuStyle.minWidth,
               width: "max-content",
-              zIndex: 50,
+              zIndex: 120,
             }
           : undefined
       }
       className={cn(
-        "w-max border border-gray-200 bg-white shadow-lg",
-        isSmall ? "rounded-lg py-1" : "overflow-hidden rounded-input",
-        usePortal ? "" : "absolute right-0 top-full z-50 mt-1 min-w-full overflow-hidden"
+        "ui-dropdown-menu w-max",
+        isSmall ? "rounded-lg" : "",
+        usePortal ? "" : "absolute right-0 top-full mt-1 min-w-full"
       )}
     >
       {menuItems}

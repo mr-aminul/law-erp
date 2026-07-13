@@ -6,6 +6,12 @@ export function formatDate(date: string | Date): string {
   }).format(new Date(date));
 }
 
+/** YYYY-MM-DD for `<input type="date">` — keeps calendar dates timezone-safe. */
+export function toDateInputValue(date?: string | null): string {
+  if (!date) return "";
+  return date.slice(0, 10);
+}
+
 export function formatLongDate(date: string | Date = new Date()): string {
   return new Intl.DateTimeFormat("en-GB", {
     weekday: "long",

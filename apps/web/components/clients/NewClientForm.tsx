@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { FormField, Select, Textarea } from "@/components/ui/Form";
 import { Input } from "@/components/ui/Input";
+import { emailError, phoneError } from "@/lib/utils/validateContact";
 import { useState } from "react";
 
 interface NewClientFormProps {
@@ -13,14 +14,29 @@ interface NewClientFormProps {
 
 export function NewClientForm({ onSubmit, onCancel }: NewClientFormProps) {
   const [coiChecked, setCoiChecked] = useState(false);
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [emailErr, setEmailErr] = useState<string | null>(null);
+  const [phoneErr, setPhoneErr] = useState<string | null>(null);
+  const [triedSubmit, setTriedSubmit] = useState(false);
+
+  function validate() {
+    const nextEmail = emailError(email);
+    const nextPhone = phoneError(phone);
+    setEmailErr(nextEmail);
+    setPhoneErr(nextPhone);
+    return !nextEmail && !nextPhone;
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setTriedSubmit(true);
+    if (!validate()) return;
     onSubmit();
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
       <div className="max-h-[60vh] space-y-4 overflow-y-auto pr-1">
         <div>
           <p className="text-sm font-bold text-text-primary">Client Registration</p>
@@ -51,11 +67,31 @@ export function NewClientForm({ onSubmit, onCancel }: NewClientFormProps) {
             <FormField label="Referral Source">
               <Input placeholder="How did they find the firm?" />
             </FormField>
-            <FormField label="Email">
-              <Input type="email" placeholder="client@email.com" />
+            <FormField label="Email" error={triedSubmit || emailErr ? emailErr : null}>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (triedSubmit || emailErr) setEmailErr(emailError(e.target.value));
+                }}
+                onBlur={() => setEmailErr(emailError(email))}
+                placeholder="client@email.com"
+                aria-invalid={Boolean(emailErr) || undefined}
+              />
             </FormField>
-            <FormField label="Phone">
-              <Input placeholder="+880 1XXX-XXXXXX" />
+            <FormField label="Phone" error={triedSubmit || phoneErr ? phoneErr : null}>
+              <Input
+                type="tel"
+                value={phone}
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  if (triedSubmit || phoneErr) setPhoneErr(phoneError(e.target.value));
+                }}
+                onBlur={() => setPhoneErr(phoneError(phone))}
+                placeholder="+880 1XXX-XXXXXX"
+                aria-invalid={Boolean(phoneErr) || undefined}
+              />
             </FormField>
             <div className="col-span-2">
               <FormField label="Address">

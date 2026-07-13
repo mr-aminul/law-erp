@@ -104,7 +104,7 @@ export function CalendarBoard({
     list.push(h);
     byDate.set(h.date, list);
   }
-  for (const list of byDate.values()) {
+  for (const list of Array.from(byDate.values())) {
     list.sort((a, b) => a.time.localeCompare(b.time));
   }
 

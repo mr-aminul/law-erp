@@ -12,9 +12,13 @@ export type LeaveType = "Annual" | "Sick" | "Casual" | "Maternity";
 
 export interface Staff {
   id: string;
+  employeeId?: string;
   name: string;
   initials: string;
+  /** Job designation (shown as “Designation” in UI) */
   role: StaffRole;
+  department?: string;
+  lineManager?: string;
   activeCases: number;
   attendancePercent: number;
   status: StaffStatus;

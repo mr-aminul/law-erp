@@ -1,25 +1,7 @@
 import { cn } from "@/lib/utils/cn";
-import { SelectHTMLAttributes, forwardRef } from "react";
+import { forwardRef } from "react";
 
-export const Select = forwardRef<
-  HTMLSelectElement,
-  SelectHTMLAttributes<HTMLSelectElement>
->(({ className, children, ...props }, ref) => {
-  return (
-    <select
-      ref={ref}
-      className={cn(
-        "h-10 w-full rounded-input border border-gray-200 bg-surface px-3 text-sm text-text-primary focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200",
-        className
-      )}
-      {...props}
-    >
-      {children}
-    </select>
-  );
-});
-
-Select.displayName = "Select";
+export { Select } from "@/components/ui/Select";
 
 export const Textarea = forwardRef<
   HTMLTextAreaElement,
@@ -63,11 +45,13 @@ export function FormField({
   label,
   htmlFor,
   required,
+  error,
   children,
 }: {
   label: string;
   htmlFor?: string;
   required?: boolean;
+  error?: string | null;
   children: React.ReactNode;
 }) {
   return (
@@ -76,6 +60,7 @@ export function FormField({
         {label}
       </Label>
       {children}
+      {error ? <p className="mt-1 text-xs text-red">{error}</p> : null}
     </div>
   );
 }

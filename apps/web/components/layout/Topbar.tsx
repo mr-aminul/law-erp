@@ -39,7 +39,7 @@ export function Topbar({ title, icon: Icon, subtitle }: TopbarProps) {
           </h1>
           <ApiStatusBadge />
           {dateLabel ? (
-            <span className="ml-auto hidden text-sm text-text-muted sm:inline">
+            <span className="ml-auto hidden text-xs text-text-primary sm:inline">
               {dateLabel}
             </span>
           ) : null}

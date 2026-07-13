@@ -1,21 +1,37 @@
 "use client";
 
+import { badgeVariants } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils/cn";
-import { CASE_STATUSES, getStatusColorClasses } from "@/lib/utils/caseStatus";
-import type { CaseStatus } from "@/types/case";
 import { ChevronDown } from "lucide-react";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import type { VariantProps } from "class-variance-authority";
+
+type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
 
 const MENU_ITEM_HEIGHT = 34;
 const MENU_PADDING = 8;
 
-interface CaseStatusSelectProps {
-  status: CaseStatus;
-  onChange: (status: CaseStatus) => void;
+export interface ChipStatusOption<T extends string = string> {
+  value: T;
+  label: string;
+  variant: BadgeVariant;
 }
 
-export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
+interface ChipStatusSelectProps<T extends string> {
+  value: T;
+  options: ChipStatusOption<T>[];
+  onChange: (value: T) => void;
+  ariaLabel?: string;
+}
+
+/** Colored chip dropdown — same interaction as CaseStatusSelect on tables. */
+export function ChipStatusSelect<T extends string>({
+  value,
+  options,
+  onChange,
+  ariaLabel = "Status",
+}: ChipStatusSelectProps<T>) {
   const [open, setOpen] = useState(false);
   const [placement, setPlacement] = useState<"bottom" | "top">("bottom");
   const [menuStyle, setMenuStyle] = useState<{
@@ -24,12 +40,13 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
     minWidth: number;
   } | null>(null);
   const ref = useRef<HTMLDivElement>(null);
+  const selected = options.find((o) => o.value === value) ?? options[0];
 
   useLayoutEffect(() => {
     if (!open || !ref.current) return;
 
     const rect = ref.current.getBoundingClientRect();
-    const menuHeight = CASE_STATUSES.length * MENU_ITEM_HEIGHT + MENU_PADDING;
+    const menuHeight = options.length * MENU_ITEM_HEIGHT + MENU_PADDING;
     const spaceBelow = window.innerHeight - rect.bottom;
     const spaceAbove = rect.top;
     const openUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
@@ -40,7 +57,7 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
       minWidth: rect.width,
       top: openUp ? rect.top - menuHeight - 6 : rect.bottom + 6,
     });
-  }, [open]);
+  }, [open, options.length]);
 
   useEffect(() => {
     if (!open) return;
@@ -55,7 +72,7 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
     function handleReposition() {
       if (!ref.current) return;
       const rect = ref.current.getBoundingClientRect();
-      const menuHeight = CASE_STATUSES.length * MENU_ITEM_HEIGHT + MENU_PADDING;
+      const menuHeight = options.length * MENU_ITEM_HEIGHT + MENU_PADDING;
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
       const openUp = spaceBelow < menuHeight && spaceAbove > spaceBelow;
@@ -77,7 +94,7 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
       window.removeEventListener("resize", handleReposition);
       window.removeEventListener("scroll", handleReposition, true);
     };
-  }, [open]);
+  }, [open, options.length]);
 
   const menu =
     open && menuStyle ? (
@@ -97,19 +114,21 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
           placement === "top" ? "origin-bottom" : "origin-top"
         )}
       >
-        {CASE_STATUSES.map((option) => (
+        {options.map((option) => (
           <button
-            key={option}
+            key={option.value}
             type="button"
             role="option"
-            aria-selected={option === status}
+            aria-selected={option.value === value}
             onClick={() => {
-              onChange(option);
+              onChange(option.value);
               setOpen(false);
             }}
-            className="ui-dropdown-option whitespace-nowrap text-xs"
+            className="ui-dropdown-option"
           >
-            {option}
+            <span className={cn(badgeVariants({ variant: option.variant }))}>
+              {option.label}
+            </span>
           </button>
         ))}
       </div>
@@ -125,14 +144,14 @@ export function CaseStatusSelect({ status, onChange }: CaseStatusSelectProps) {
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          "flex h-7 w-max max-w-full items-center justify-between gap-2 rounded-lg px-2.5 text-xs font-medium shadow-none transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200",
-          getStatusColorClasses(status)
+          badgeVariants({ variant: selected?.variant ?? "muted" }),
+          "h-7 gap-2 rounded-lg px-2.5 focus:outline-none focus:ring-2 focus:ring-gray-200"
         )}
-        aria-label={`Status: ${status}. Click to change.`}
+        aria-label={`${ariaLabel}: ${selected?.label ?? value}. Click to change.`}
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        <span className="whitespace-nowrap">{status}</span>
+        <span className="whitespace-nowrap">{selected?.label ?? value}</span>
         <ChevronDown className="h-3.5 w-3.5 shrink-0 opacity-70" />
       </button>
       {typeof document !== "undefined" && menu

@@ -66,6 +66,46 @@
   }
 }
 
+@layer components {
+  /* Shared custom dropdown — replaces native OS select menus */
+  .ui-select-trigger {
+    @apply flex h-10 w-full items-center justify-between gap-2 rounded-input border border-gray-200 bg-white px-3 text-sm font-medium text-text-primary transition-colors;
+    @apply focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200;
+    @apply disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .ui-select-trigger--placeholder {
+    @apply font-normal text-text-muted;
+  }
+
+  .ui-select-trigger--underline {
+    @apply mt-0.5 h-auto rounded-none border-0 border-b border-gray-300 bg-transparent px-0 py-0.5 shadow-none;
+    @apply focus:border-text-primary focus:ring-0;
+  }
+
+  .ui-select-chevron {
+    @apply h-4 w-4 shrink-0 text-text-muted;
+  }
+
+  .ui-dropdown-menu {
+    @apply flex flex-col overflow-hidden rounded-input border border-gray-200 bg-white py-1 shadow-lg;
+    z-index: 120;
+  }
+
+  .ui-dropdown-menu--scroll {
+    @apply overflow-y-auto;
+  }
+
+  .ui-dropdown-option {
+    @apply flex w-full items-center px-3 py-2 text-left text-sm text-text-primary transition-colors;
+    @apply hover:bg-[#eceef1] disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  .ui-dropdown-option[aria-selected="true"] {
+    @apply bg-cream-card font-semibold;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

@@ -1,18 +1,48 @@
 "use client";
 
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { ChipStatusSelect } from "@/components/ui/ChipStatusSelect";
 import { DetailField, PageSection } from "@/components/ui/PageSection";
 import { Tabs } from "@/components/ui/Tabs";
-import { getStaffById, mockCases } from "@/lib/mock";
+import { getStaffById, mockCases, mockStaff } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
-import { formatDate } from "@/lib/utils/formatDate";
+import { formatDate, toDateInputValue } from "@/lib/utils/formatDate";
+import { emailError, phoneError } from "@/lib/utils/validateContact";
+import type { StaffStatus } from "@/types/staff";
+import { Pencil } from "lucide-react";
 import { notFound, useRouter } from "next/navigation";
 import { useState } from "react";
+
+const STAFF_STATUS_OPTIONS = [
+  { value: "Active" as const, label: "Active", variant: "green" as const },
+  { value: "On Leave" as const, label: "On Leave", variant: "amber" as const },
+  { value: "Inactive" as const, label: "Inactive", variant: "muted" as const },
+];
 
 export default function StaffProfilePage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const staff = getStaffById(params.id);
   const [tab, setTab] = useState("profile");
+  const [editing, setEditing] = useState(false);
+  const [contactErrors, setContactErrors] = useState<{
+    email: string | null;
+    phone: string | null;
+  }>({ email: null, phone: null });
+  const [draft, setDraft] = useState({
+    name: "",
+    email: "",
+    status: "" as StaffStatus | "",
+    employeeId: "",
+    designation: "",
+    department: "",
+    lineManager: "",
+    barCouncilNo: "",
+    joinDate: "",
+    phone: "",
+    salary: "",
+    cleHours: "",
+  });
 
   if (!staff) notFound();
 
@@ -22,6 +52,48 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
   const workloadPct = staff.capacity
     ? Math.round((staff.activeCases / staff.capacity) * 100)
     : 0;
+  const displayStatus = (draft.status || staff.status) as StaffStatus;
+  const displayJoinDate = draft.joinDate || staff.joinDate;
+  const displayDesignation = draft.designation || staff.role;
+
+  function startEditing() {
+    setDraft({
+      name: staff!.name,
+      email: staff!.email ?? "",
+      status: staff!.status,
+      employeeId: staff!.employeeId ?? "",
+      designation: staff!.role,
+      department: staff!.department ?? "",
+      lineManager: staff!.lineManager ?? "",
+      barCouncilNo: staff!.barCouncilNo ?? "",
+      joinDate: toDateInputValue(staff!.joinDate),
+      phone: staff!.phone ?? "",
+      salary: staff!.salary != null ? String(staff!.salary) : "",
+      cleHours: staff!.cleHours != null ? String(staff!.cleHours) : "",
+    });
+    setContactErrors({ email: null, phone: null });
+    setEditing(true);
+  }
+
+  function finishEditing() {
+    const next = {
+      email: emailError(draft.email),
+      phone: phoneError(draft.phone),
+    };
+    setContactErrors(next);
+    if (next.email || next.phone) return;
+    setEditing(false);
+  }
+
+  function patchDraft(key: keyof typeof draft, value: string) {
+    setDraft((prev) => ({ ...prev, [key]: value }));
+    if (key === "email") {
+      setContactErrors((prev) => ({ ...prev, email: emailError(value) }));
+    }
+    if (key === "phone") {
+      setContactErrors((prev) => ({ ...prev, phone: phoneError(value) }));
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -31,12 +103,74 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
             {staff.initials}
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="text-lg font-bold">{staff.name}</h2>
-            <p className="truncate text-sm text-text-sec">{staff.role} · {staff.email}</p>
+            {editing ? (
+              <input
+                type="text"
+                value={draft.name}
+                onChange={(e) => patchDraft("name", e.target.value)}
+                className="w-full border-0 border-b border-gray-300 bg-transparent py-0.5 text-lg font-bold text-text-primary outline-none focus:border-text-primary"
+              />
+            ) : (
+              <h2 className="text-lg font-bold">{draft.name || staff.name}</h2>
+            )}
+            {editing ? (
+              <>
+                <input
+                  type="email"
+                  value={draft.email}
+                  onChange={(e) => patchDraft("email", e.target.value)}
+                  aria-invalid={Boolean(contactErrors.email) || undefined}
+                  className={`mt-0.5 w-full truncate border-0 border-b bg-transparent py-0.5 text-sm text-text-sec outline-none focus:border-text-primary ${
+                    contactErrors.email
+                      ? "border-red focus:border-red"
+                      : "border-gray-300"
+                  }`}
+                />
+                {contactErrors.email ? (
+                  <p className="mt-1 text-xs text-red">{contactErrors.email}</p>
+                ) : null}
+              </>
+            ) : (
+              <p className="truncate text-sm text-text-sec">
+                {displayDesignation} · {draft.email || staff.email}
+              </p>
+            )}
           </div>
-          <Badge variant={staff.status === "Active" ? "green" : "amber"} className="sm:ml-auto">
-            {staff.status}
-          </Badge>
+          <div className="flex shrink-0 flex-wrap items-center gap-2 sm:ml-auto">
+            {editing ? (
+              <ChipStatusSelect
+                value={displayStatus}
+                onChange={(v) => patchDraft("status", v)}
+                options={STAFF_STATUS_OPTIONS}
+              />
+            ) : (
+              <Badge
+                variant={
+                  displayStatus === "Active"
+                    ? "green"
+                    : displayStatus === "On Leave"
+                      ? "amber"
+                      : "muted"
+                }
+              >
+                {displayStatus}
+              </Badge>
+            )}
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => (editing ? finishEditing() : startEditing())}
+            >
+              {editing ? (
+                "Done"
+              ) : (
+                <>
+                  <Pencil className="h-4 w-4" />
+                  Edit
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -53,11 +187,95 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
       {tab === "profile" && (
         <PageSection title="Employee Profile">
           <div className="grid-fields-3">
-            <DetailField label="Bar Council No." value={staff.barCouncilNo ?? "—"} />
-            <DetailField label="Join Date" value={staff.joinDate ? formatDate(staff.joinDate) : "—"} />
-            <DetailField label="Phone" value={staff.phone ?? "—"} />
-            <DetailField label="Salary (BDT)" value={staff.salary ? formatCurrency(staff.salary) : "—"} />
-            <DetailField label="CLE Hours" value={staff.cleHours ?? "—"} />
+            <DetailField
+              label="Employee ID"
+              value={draft.employeeId || staff.employeeId || "—"}
+              editing={editing}
+              editValue={draft.employeeId}
+              onChange={(v) => patchDraft("employeeId", v)}
+            />
+            <DetailField
+              label="Designation"
+              value={displayDesignation}
+              editing={editing}
+              editValue={draft.designation}
+              onChange={(v) => patchDraft("designation", v)}
+              options={[
+                "Partner",
+                "Advocate",
+                "Associate",
+                "Junior Associate",
+                "Paralegal",
+                "Clerk",
+                "Admin",
+              ].map((r) => ({ value: r, label: r }))}
+            />
+            <DetailField
+              label="Department"
+              value={draft.department || staff.department || "—"}
+              editing={editing}
+              editValue={draft.department}
+              onChange={(v) => patchDraft("department", v)}
+            />
+            <DetailField
+              label="Line Manager"
+              value={draft.lineManager || staff.lineManager || "—"}
+              editing={editing}
+              editValue={draft.lineManager}
+              onChange={(v) => patchDraft("lineManager", v)}
+              options={[
+                { value: "", label: "None" },
+                ...mockStaff
+                  .filter((s) => s.id !== staff.id)
+                  .map((s) => ({ value: s.name, label: s.name })),
+              ]}
+            />
+            <DetailField
+              label="Bar Council No."
+              value={draft.barCouncilNo || staff.barCouncilNo || "—"}
+              editing={editing}
+              editValue={draft.barCouncilNo}
+              onChange={(v) => patchDraft("barCouncilNo", v)}
+            />
+            <DetailField
+              label="Join Date"
+              value={displayJoinDate ? formatDate(displayJoinDate) : "—"}
+              editing={editing}
+              editValue={draft.joinDate}
+              onChange={(v) => patchDraft("joinDate", v)}
+              inputType="date"
+            />
+            <DetailField
+              label="Phone"
+              value={draft.phone || staff.phone || "—"}
+              editing={editing}
+              editValue={draft.phone}
+              onChange={(v) => patchDraft("phone", v)}
+              inputType="tel"
+              error={editing ? contactErrors.phone : null}
+            />
+            <DetailField
+              label="Salary (BDT)"
+              value={
+                draft.salary
+                  ? formatCurrency(Number(draft.salary) || 0)
+                  : staff.salary
+                    ? formatCurrency(staff.salary)
+                    : "—"
+              }
+              editing={editing}
+              editValue={draft.salary}
+              onChange={(v) => patchDraft("salary", v)}
+              inputType="number"
+            />
+            <DetailField
+              label="CLE Hours"
+              value={draft.cleHours || (staff.cleHours ?? "—")}
+              editing={editing}
+              editValue={draft.cleHours}
+              onChange={(v) => patchDraft("cleHours", v)}
+              inputType="number"
+            />
             <DetailField label="Attendance" value={`${staff.attendancePercent}%`} />
           </div>
         </PageSection>
