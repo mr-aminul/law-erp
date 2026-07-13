@@ -40,6 +40,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/clients", label: "Clients", icon: Users },
   {
     href: "/cases",
     label: "Matters",
@@ -49,14 +50,13 @@ const navItems: NavItem[] = [
       { href: "/cases/services", label: "Services", icon: Handshake },
     ],
   },
-  { href: "/clients", label: "Clients", icon: Users },
   { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/documents", label: "Documents", icon: FileText },
+  { href: "/court-filing", label: "Court Filing", icon: Gavel },
+  { href: "/communications", label: "Communications", icon: MessageSquare },
   { href: "/billing", label: "Billing", icon: CreditCard },
   { href: "/staff", label: "Staff", icon: Scale },
-  { href: "/court-filing", label: "Court Filing", icon: Gavel },
   { href: "/reports", label: "Reports", icon: BarChart3 },
-  { href: "/communications", label: "Communications", icon: MessageSquare },
 ];
 
 function isMattersPath(pathname: string) {
