@@ -2,14 +2,16 @@
 
 ## Go (`services/api/`)
 
-- New handlers and pure logic require `_test.go`
-- Run: `go test ./...` or `make test-api`
+- **Every change** needs `_test.go` coverage for new or changed behavior (see `.cursor/rules/tdd-mandatory.mdc`)
+- Run: `go test ./...` or `make test-api` before marking work complete
 - Table-driven tests for handlers and config helpers
+- Cover happy path **and** edge cases (empty input, not found, unauthorized)
 
 ## Web (`apps/web/`)
 
 - Prefer tests for `lib/` utilities and non-trivial hooks
 - Run: `npm run lint` before finishing UI work
+- Bug fixes in UI logic need a regression test when test tooling exists
 - E2E patterns: see `/e2e-testing-patterns` when adding Playwright/Cypress
 
 ## Vertical slices

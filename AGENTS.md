@@ -41,7 +41,7 @@ law-erp/
 Before marking work complete:
 
 1. **Build** — `go build ./...` in `services/api/`; `npm run build` in `apps/web/` when UI changed
-2. **Tests** — New Go behavior has `_test.go`; run `go test ./...`
+2. **Tests** — New or changed behavior has `_test.go` (Go) or unit tests (`lib/`); run `go test ./...`
 3. **Lint** — `npm run lint` when touching `apps/web/`
 4. **DRY** — No third copy of logic; extract shared code
 5. **Dead code** — Remove obsolete code; no orphaned files
@@ -59,6 +59,7 @@ Before marking work complete:
 | Remove unused code | `dead-code-sweep` |
 | Review changes | `code-reviewer` |
 | Log/sync Notion tasks after code changes (`/notion-task-tracker`) | `notion-task-tracker` — MCP: `tools/ukil-notion-mcp/` |
+| **Any new behavior (TDD)** | `tdd` — tests required before done |
 | Local setup issues | `env-doctor` |
 | End session | `handoff` |
 

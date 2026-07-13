@@ -3,6 +3,8 @@
 import { cn } from "@/lib/utils/cn";
 import { useAppStore } from "@/lib/store/appStore";
 import { useSlickScrollbar } from "@/lib/hooks/useSlickScrollbar";
+import type { AuthUser } from "@/lib/auth/client";
+import { resolveUserAvatarUrl } from "@/lib/utils/userAvatar";
 import type { LucideIcon } from "lucide-react";
 import { useEffect } from "react";
 import { AiAssistant } from "@/components/assistant/AiAssistant";
@@ -15,9 +17,19 @@ interface ShellProps {
   title: string;
   icon: LucideIcon;
   subtitle?: string;
+  user: AuthUser;
 }
 
-export function Shell({ children, title, icon, subtitle }: ShellProps) {
+function initials(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+export function Shell({ children, title, icon, subtitle, user }: ShellProps) {
   const sidebarCollapsed = useAppStore((s) => s.sidebarCollapsed);
   const mobileNavOpen = useAppStore((s) => s.mobileNavOpen);
   const closeMobileNav = useAppStore((s) => s.closeMobileNav);
@@ -59,7 +71,16 @@ export function Shell({ children, title, icon, subtitle }: ShellProps) {
         )}
       >
         <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-panel border border-gray-300 bg-white max-lg:rounded-[14px]">
-          <Topbar title={title} icon={icon} subtitle={subtitle} />
+          <Topbar
+            title={title}
+            icon={icon}
+            subtitle={subtitle}
+            userName={user.fullName}
+            userRole={user.role.replace(/_/g, " ")}
+            userInitials={initials(user.fullName)}
+            userEmail={user.email}
+            userAvatarUrl={resolveUserAvatarUrl(user.avatarUrl)}
+          />
           <main
             ref={mainScrollRef}
             onScroll={handleMainScroll}

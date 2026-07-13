@@ -1,4 +1,4 @@
-.PHONY: dev dev-web dev-api install tidy test-api db-up migrate-up migrate-down gqlgen
+.PHONY: dev dev-web dev-api install tidy test-api db-up migrate-up migrate-down seed gqlgen
 
 dev:
 	@echo "Starting Go API (8080) and Next.js (3847)..."
@@ -30,3 +30,8 @@ migrate-up:
 
 migrate-down:
 	cd services/api && go run ./cmd/migrate down
+
+seed:
+	cd services/api && go run ./cmd/seed
+
+db-setup: db-up migrate-up seed

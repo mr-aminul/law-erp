@@ -1,6 +1,5 @@
 "use client";
 
-import { Shell } from "./Shell";
 import { usePathname } from "next/navigation";
 import {
   BarChart3,
@@ -17,6 +16,8 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import type { AuthUser } from "@/lib/auth/client";
+import { Shell } from "./Shell";
 
 function getPageTitle(pathname: string): string {
   const titles: [RegExp | string, string][] = [
@@ -76,10 +77,16 @@ function getPageIcon(pathname: string): LucideIcon {
   return LayoutDashboard;
 }
 
-export function DashboardShell({ children }: { children: React.ReactNode }) {
+export function DashboardShell({
+  children,
+  user,
+}: {
+  children: React.ReactNode;
+  user: AuthUser;
+}) {
   const pathname = usePathname();
   return (
-    <Shell title={getPageTitle(pathname)} icon={getPageIcon(pathname)}>
+    <Shell title={getPageTitle(pathname)} icon={getPageIcon(pathname)} user={user}>
       {children}
     </Shell>
   );
