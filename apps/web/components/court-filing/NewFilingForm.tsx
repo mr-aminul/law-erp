@@ -8,6 +8,7 @@ import { mockCases } from "@/lib/mock";
 interface NewFilingFormProps {
   onSubmit: () => void;
   onCancel: () => void;
+  defaultCaseId?: string;
 }
 
 const FILING_TYPES = [
@@ -18,7 +19,11 @@ const FILING_TYPES = [
   "Misc. Application",
 ];
 
-export function NewFilingForm({ onSubmit, onCancel }: NewFilingFormProps) {
+export function NewFilingForm({
+  onSubmit,
+  onCancel,
+  defaultCaseId,
+}: NewFilingFormProps) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     onSubmit();
@@ -28,7 +33,7 @@ export function NewFilingForm({ onSubmit, onCancel }: NewFilingFormProps) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid gap-4 max-h-[60vh] overflow-y-auto pr-1">
         <FormField label="Case" required>
-          <Select required defaultValue="">
+          <Select required defaultValue={defaultCaseId ?? ""}>
             <option value="" disabled>
               Select case
             </option>

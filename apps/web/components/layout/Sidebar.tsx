@@ -2,12 +2,17 @@
 
 import { cn } from "@/lib/utils/cn";
 import { useAppStore } from "@/lib/store/appStore";
+import { useNotificationStore } from "@/lib/store/notificationStore";
 import { NotificationBell } from "./NotificationBell";
 import {
+  Banknote,
   BarChart3,
   Briefcase,
   Calendar,
+  CalendarOff,
   ChevronDown,
+  Clock,
+  ContactRound,
   CreditCard,
   FileText,
   Folder,
@@ -15,17 +20,22 @@ import {
   Handshake,
   LayoutDashboard,
   LogOut,
+  Mail,
   MessageSquare,
+  MessagesSquare,
   PanelLeftClose,
   PanelLeftOpen,
+  Receipt,
   Scale,
+  ScrollText,
   Settings,
   Users,
+  Wallet,
   X,
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useIsDesktop } from "@/lib/hooks/useIsDesktop";
@@ -53,24 +63,53 @@ const navItems: NavItem[] = [
   { href: "/calendar", label: "Calendar", icon: Calendar },
   { href: "/documents", label: "Documents", icon: FileText },
   { href: "/court-filing", label: "Court Filing", icon: Gavel },
-  { href: "/communications", label: "Communications", icon: MessageSquare },
-  { href: "/billing", label: "Billing", icon: CreditCard },
-  { href: "/staff", label: "Staff", icon: Scale },
+  {
+    href: "/communications",
+    label: "Communications",
+    icon: MessageSquare,
+    children: [
+      { href: "/communications", label: "All", icon: LayoutDashboard },
+      { href: "/communications/internal", label: "Internal", icon: MessagesSquare },
+      { href: "/communications/email", label: "Email Log", icon: Mail },
+      { href: "/communications/notices", label: "Legal Notices", icon: ScrollText },
+    ],
+  },
+  {
+    href: "/billing",
+    label: "Billing",
+    icon: CreditCard,
+    children: [
+      { href: "/billing", label: "Overview", icon: LayoutDashboard },
+      { href: "/billing/invoices", label: "Invoices", icon: Receipt },
+      { href: "/billing/expenses", label: "Expenses", icon: Wallet },
+    ],
+  },
+  {
+    href: "/staff",
+    label: "Staff",
+    icon: Scale,
+    children: [
+      { href: "/staff", label: "Directory", icon: ContactRound },
+      { href: "/staff/attendance", label: "Attendance", icon: Clock },
+      { href: "/staff/leave", label: "Leave", icon: CalendarOff },
+      { href: "/staff/compensation", label: "Payroll", icon: Banknote },
+    ],
+  },
   { href: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
-function isMattersPath(pathname: string) {
-  return pathname === "/cases" || pathname.startsWith("/cases/");
+function isGroupPath(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(href + "/");
 }
 
-function isChildActive(pathname: string, href: string) {
-  if (href === "/cases") {
-    return (
-      pathname === "/cases" ||
-      (pathname.startsWith("/cases/") && !pathname.startsWith("/cases/services"))
-    );
-  }
-  return pathname === href || pathname.startsWith(href + "/");
+function isChildActive(pathname: string, href: string, siblings: NavChild[]) {
+  if (pathname !== href && !pathname.startsWith(href + "/")) return false;
+  return !siblings.some(
+    (sibling) =>
+      sibling.href !== href &&
+      sibling.href.length > href.length &&
+      (pathname === sibling.href || pathname.startsWith(sibling.href + "/"))
+  );
 }
 
 function CollapsedFlyout({
@@ -138,7 +177,7 @@ function CollapsedFlyout({
   const triggerClass = cn(
     "flex w-full items-center justify-center rounded-input px-2 py-2.5 text-[13px] font-semibold transition-colors",
     active
-      ? "bg-active-nav text-white"
+      ? "bg-active-nav text-on-active-nav"
       : "text-white/70 hover:bg-white/10 hover:text-white"
   );
 
@@ -169,7 +208,7 @@ function CollapsedFlyout({
             onMouseEnter={hasMenu ? show : undefined}
             onMouseLeave={hasMenu ? hide : undefined}
             className={cn(
-              "fixed z-[120] -translate-y-1/2 rounded-md border border-active-nav bg-active-nav shadow-[0_4px_16px_rgba(0,0,0,0.1)]",
+              "fixed z-[120] -translate-y-1/2 rounded-md border border-active-nav bg-active-nav text-on-active-nav shadow-[0_4px_16px_rgba(0,0,0,0.1)]",
               hasMenu ? "min-w-[160px] py-0.5" : "px-2.5 py-1.5"
             )}
             style={{ top: pos.top, left: pos.left }}
@@ -180,7 +219,7 @@ function CollapsedFlyout({
             />
             {hasMenu ? (
               <>
-                <p className="border-b border-white/15 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-white/70">
+                <p className="border-b border-current/15 px-2.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.08em] opacity-70">
                   {label}
                 </p>
                 <div className="flex flex-col gap-px p-1">
@@ -192,9 +231,9 @@ function CollapsedFlyout({
                       onClick={() => setOpen(false)}
                       className={cn(
                         "flex items-center gap-2 rounded px-2 py-1.5 text-[12px] font-medium transition-colors",
-                        isChildActive(pathname, childHref)
-                          ? "bg-[color-mix(in_srgb,var(--color-active-nav)_60%,var(--color-sidebar))] text-white"
-                          : "text-white/80 hover:bg-white/10 hover:text-white"
+                        isChildActive(pathname, childHref, items!)
+                          ? "bg-active-nav-soft text-on-active-nav-soft"
+                          : "opacity-80 hover:bg-black/10 hover:opacity-100"
                       )}
                     >
                       <ChildIcon className="h-3.5 w-3.5 shrink-0 opacity-70" />
@@ -204,7 +243,7 @@ function CollapsedFlyout({
                 </div>
               </>
             ) : (
-              <p className="whitespace-nowrap text-[12px] font-medium text-white">
+              <p className="whitespace-nowrap text-[12px] font-medium">
                 {label}
               </p>
             )}
@@ -215,18 +254,38 @@ function CollapsedFlyout({
   );
 }
 
+function initialOpenGroups(pathname: string) {
+  return Object.fromEntries(
+    navItems
+      .filter((item) => item.children)
+      .map((item) => [item.href, isGroupPath(pathname, item.href)])
+  );
+}
+
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const isDesktop = useIsDesktop();
   const { sidebarCollapsed, toggleSidebar, mobileNavOpen, closeMobileNav } =
     useAppStore();
-  const [mattersOpen, setMattersOpen] = useState(isMattersPath(pathname));
+  const notificationDrawerOpen = useNotificationStore((s) => s.drawerOpen);
+  const [openGroups, setOpenGroups] = useState(() => initialOpenGroups(pathname));
 
   // Collapse is desktop-only; mobile drawer always shows labels.
   const collapsed = isDesktop && sidebarCollapsed;
 
   useEffect(() => {
-    if (isMattersPath(pathname)) setMattersOpen(true);
+    setOpenGroups((prev) => {
+      let next = prev;
+      for (const item of navItems) {
+        if (!item.children || !isGroupPath(pathname, item.href) || prev[item.href]) {
+          continue;
+        }
+        if (next === prev) next = { ...prev };
+        next[item.href] = true;
+      }
+      return next;
+    });
   }, [pathname]);
 
   useEffect(() => {
@@ -244,7 +303,6 @@ export function Sidebar() {
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
-    if (href === "/cases") return false;
     return pathname.startsWith(href);
   }
 
@@ -255,7 +313,9 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "fixed z-40 flex flex-col rounded-panel bg-sidebar transition-[width,transform] duration-200 ease-in-out",
+        "fixed flex flex-col rounded-panel bg-sidebar transition-[width,transform] duration-200 ease-in-out",
+        // Above the notification scrim so nav stays clear while the panel is open
+        notificationDrawerOpen ? "z-[112]" : "z-40",
         "max-lg:w-[min(var(--sidebar-width),calc(100vw-var(--shell-margin)*2))]",
         "max-lg:-translate-x-[calc(100%+var(--shell-margin)+12px)]",
         mobileNavOpen && "max-lg:translate-x-0",
@@ -282,8 +342,8 @@ export function Sidebar() {
         }}
       >
         <div className={cn("flex min-w-0", !collapsed && "items-start gap-2.5")}>
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-input bg-active-nav">
-            <Scale className="h-5 w-5 text-white" />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-input bg-active-nav text-on-active-nav">
+            <Scale className="h-5 w-5" />
           </div>
           {!collapsed && (
             <div className="overflow-hidden">
@@ -348,28 +408,29 @@ export function Sidebar() {
                 icon={Icon}
                 href={children ? undefined : href}
                 items={children}
-                active={children ? isMattersPath(pathname) : isActive(href)}
+                active={children ? isGroupPath(pathname, href) : isActive(href)}
                 pathname={pathname}
               />
             );
           }
 
           if (children) {
-            const groupActive = isMattersPath(pathname);
+            const groupActive = isGroupPath(pathname, href);
+            const groupOpen = openGroups[href] ?? false;
             return (
               <div key={href} className="flex flex-col gap-0.5">
                 <div
                   className={cn(
                     "flex w-full items-center rounded-input transition-colors",
                     groupActive
-                      ? "bg-active-nav text-white"
+                      ? "bg-active-nav text-on-active-nav"
                       : "text-white/70 hover:bg-white/10 hover:text-white"
                   )}
                 >
                   <Link
                     href={href}
                     onClick={() => {
-                      setMattersOpen(true);
+                      setOpenGroups((prev) => ({ ...prev, [href]: true }));
                       handleNavClick();
                     }}
                     className="flex min-w-0 flex-1 items-center gap-2.5 rounded-input px-3 py-2 text-[13px] font-semibold"
@@ -379,23 +440,31 @@ export function Sidebar() {
                   </Link>
                   <button
                     type="button"
-                    onClick={() => setMattersOpen((open) => !open)}
+                    onClick={() => {
+                      const willOpen = !groupOpen;
+                      setOpenGroups((prev) => ({ ...prev, [href]: willOpen }));
+                      // Expanding should select the parent so active styling matches the label click.
+                      if (willOpen) {
+                        router.push(href);
+                        handleNavClick();
+                      }
+                    }}
                     className={cn(
                       "mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-input transition-colors",
-                      groupActive ? "hover:bg-white/15" : "hover:bg-white/10"
+                      groupActive ? "hover:bg-black/10" : "hover:bg-white/10"
                     )}
-                    aria-expanded={mattersOpen}
-                    aria-label={mattersOpen ? `Collapse ${label}` : `Expand ${label}`}
+                    aria-expanded={groupOpen}
+                    aria-label={groupOpen ? `Collapse ${label}` : `Expand ${label}`}
                   >
                     <ChevronDown
                       className={cn(
                         "h-3.5 w-3.5 shrink-0 transition-transform",
-                        mattersOpen ? "rotate-0" : "-rotate-90"
+                        groupOpen ? "rotate-0" : "-rotate-90"
                       )}
                     />
                   </button>
                 </div>
-                {mattersOpen && (
+                {groupOpen && (
                   <div className="ml-4 flex flex-col gap-0.5 border-l border-white/10 pl-2">
                     {children.map(
                       ({ href: childHref, label: childLabel, icon: ChildIcon }) => (
@@ -405,8 +474,8 @@ export function Sidebar() {
                           onClick={handleNavClick}
                           className={cn(
                             "flex items-center gap-2.5 rounded-input px-3 py-1.5 text-[13px] font-semibold transition-colors",
-                            isChildActive(pathname, childHref)
-                              ? "bg-[color-mix(in_srgb,var(--color-active-nav)_60%,transparent)] text-white"
+                            isChildActive(pathname, childHref, children)
+                              ? "bg-active-nav-soft text-on-active-nav-soft"
                               : "text-white/60 hover:bg-white/10 hover:text-white"
                           )}
                         >
@@ -429,7 +498,7 @@ export function Sidebar() {
               className={cn(
                 "flex items-center gap-2.5 rounded-input px-3 py-2 text-[13px] font-semibold transition-colors",
                 isActive(href)
-                  ? "bg-active-nav text-white"
+                  ? "bg-active-nav text-on-active-nav"
                   : "text-white/70 hover:bg-white/10 hover:text-white"
               )}
             >
@@ -458,7 +527,7 @@ export function Sidebar() {
             "mt-2 flex items-center gap-2.5 rounded-input px-3 py-2 text-[13px] font-semibold transition-colors",
             "mx-[var(--sidebar-logo-inset)]",
             pathname.startsWith("/settings")
-              ? "bg-active-nav text-white"
+              ? "bg-active-nav text-on-active-nav"
               : "text-white/70 hover:bg-white/10 hover:text-white"
           )}
         >
@@ -470,7 +539,7 @@ export function Sidebar() {
       <div className="mt-3 border-t border-white/10">
         <div
           className={cn(
-            "group flex rounded-b-panel transition-colors hover:bg-active-nav has-[.logout-btn:hover]:!bg-transparent",
+            "group flex rounded-b-panel transition-colors hover:bg-active-nav hover:text-on-active-nav has-[.logout-btn:hover]:!bg-transparent has-[.logout-btn:hover]:!text-white",
             collapsed
               ? "flex-col items-center gap-1 px-2 pb-2 pt-3"
               : "flex-row items-center gap-2 px-[var(--sidebar-logo-inset)] pb-4 pt-3"
@@ -484,15 +553,15 @@ export function Sidebar() {
             )}
             aria-label="Open profile menu"
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-active-nav text-[11px] font-bold text-white group-hover:bg-white/20 group-has-[.logout-btn:hover]:bg-active-nav">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-active-nav text-[11px] font-bold text-on-active-nav group-hover:bg-black/10 group-has-[.logout-btn:hover]:bg-active-nav group-has-[.logout-btn:hover]:text-on-active-nav">
               AI
             </div>
             {!collapsed && (
               <div className="min-w-0 overflow-hidden">
-                <p className="truncate text-sm font-semibold leading-tight text-white">
+                <p className="truncate text-sm font-semibold leading-tight text-white group-hover:text-inherit group-has-[.logout-btn:hover]:text-white">
                   Aminul Islam
                 </p>
-                <p className="truncate text-[11px] text-white/60 group-hover:text-white/80 group-has-[.logout-btn:hover]:text-white/60">
+                <p className="truncate text-[11px] text-white/60 group-hover:text-inherit group-hover:opacity-80 group-has-[.logout-btn:hover]:text-white/60 group-has-[.logout-btn:hover]:opacity-100">
                   Managing Partner
                 </p>
               </div>
@@ -503,7 +572,7 @@ export function Sidebar() {
             onClick={() => {
               window.location.href = "/";
             }}
-            className="logout-btn flex h-8 w-8 shrink-0 items-center justify-center rounded-input text-white/60 transition-colors group-hover:text-white hover:bg-[#dc2626] hover:text-white"
+            className="logout-btn flex h-8 w-8 shrink-0 items-center justify-center rounded-input text-white/60 transition-colors group-hover:text-inherit hover:bg-[#dc2626] hover:text-white"
             aria-label="Log out"
             title="Log out"
           >

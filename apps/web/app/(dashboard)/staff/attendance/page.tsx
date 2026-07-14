@@ -107,7 +107,7 @@ export default function AttendancePage() {
                     onClick={() => setStatus(s.id, status)}
                     className={`rounded-badge px-2.5 py-1 text-xs font-semibold ${
                       marks[s.id] === status
-                        ? "bg-active-nav text-white"
+                        ? "bg-active-nav text-on-active-nav"
                         : "bg-cream-card text-text-sec hover:bg-gray-100"
                     }`}
                   >

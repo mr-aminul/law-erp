@@ -8,6 +8,12 @@ export type StaffRole =
   | "Admin";
 
 export type StaffStatus = "Active" | "On Leave" | "Inactive";
+export type EmployeeType =
+  | "Full-time"
+  | "Part-time"
+  | "Contract"
+  | "Intern"
+  | "Consultant";
 export type LeaveType = "Annual" | "Sick" | "Casual" | "Maternity";
 
 export interface Staff {
@@ -17,6 +23,7 @@ export interface Staff {
   initials: string;
   /** Job designation (shown as “Designation” in UI) */
   role: StaffRole;
+  employeeType: EmployeeType;
   department?: string;
   lineManager?: string;
   activeCases: number;

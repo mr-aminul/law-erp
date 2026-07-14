@@ -5,7 +5,7 @@ import { FormField, Select } from "@/components/ui/Form";
 import { Input } from "@/components/ui/Input";
 import { mockStaff } from "@/lib/mock";
 import { emailError, phoneError } from "@/lib/utils/validateContact";
-import type { StaffRole, StaffStatus } from "@/types/staff";
+import type { EmployeeType, StaffRole, StaffStatus } from "@/types/staff";
 import { useState } from "react";
 
 export const STAFF_DESIGNATIONS: StaffRole[] = [
@@ -16,6 +16,14 @@ export const STAFF_DESIGNATIONS: StaffRole[] = [
   "Paralegal",
   "Clerk",
   "Admin",
+];
+
+export const STAFF_EMPLOYEE_TYPES: EmployeeType[] = [
+  "Full-time",
+  "Part-time",
+  "Contract",
+  "Intern",
+  "Consultant",
 ];
 
 export const STAFF_DEPARTMENTS = [
@@ -32,6 +40,7 @@ interface NewEmployeeFormProps {
 
 export function NewEmployeeForm({ onSubmit, onCancel }: NewEmployeeFormProps) {
   const [designation, setDesignation] = useState<StaffRole>("Associate");
+  const [employeeType, setEmployeeType] = useState<EmployeeType>("Full-time");
   const [status, setStatus] = useState<StaffStatus>("Active");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -79,6 +88,19 @@ export function NewEmployeeForm({ onSubmit, onCancel }: NewEmployeeFormProps) {
                 {STAFF_DESIGNATIONS.map((d) => (
                   <option key={d} value={d}>
                     {d}
+                  </option>
+                ))}
+              </Select>
+            </FormField>
+            <FormField label="Employee Type" required>
+              <Select
+                required
+                value={employeeType}
+                onChange={(e) => setEmployeeType(e.target.value as EmployeeType)}
+              >
+                {STAFF_EMPLOYEE_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
                   </option>
                 ))}
               </Select>

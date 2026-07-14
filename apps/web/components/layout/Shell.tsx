@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils/cn";
+import { SCRIM_CLASS } from "@/components/ui/Scrim";
 import { useAppStore } from "@/lib/store/appStore";
 import { useSlickScrollbar } from "@/lib/hooks/useSlickScrollbar";
 import type { LucideIcon } from "lucide-react";
@@ -43,7 +44,7 @@ export function Shell({ children, title, icon, subtitle }: ShellProps) {
       {mobileNavOpen ? (
         <button
           type="button"
-          className="fixed inset-0 z-[35] bg-sidebar/45 backdrop-blur-[2px] lg:hidden"
+          className={cn("fixed inset-0 z-[35] lg:hidden", SCRIM_CLASS)}
           aria-label="Close navigation"
           onClick={closeMobileNav}
         />
@@ -64,12 +65,12 @@ export function Shell({ children, title, icon, subtitle }: ShellProps) {
             ref={mainScrollRef}
             onScroll={handleMainScroll}
             className={cn(
-              "min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4",
+              "min-h-0 flex-1 overflow-y-auto overflow-x-hidden",
               scrollbarClassName
             )}
           >
             {scrollbarOverlay}
-            {children}
+            <div className="p-3 sm:p-4">{children}</div>
           </main>
         </div>
       </div>

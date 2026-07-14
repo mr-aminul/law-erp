@@ -157,6 +157,7 @@ function StaffDirectoryContent() {
             <TableHead>Employee ID</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Designation</TableHead>
+            <TableHead>Employee Type</TableHead>
             <TableHead>Department</TableHead>
             <TableHead>Line Manager</TableHead>
             <TableHead>Bar Council #</TableHead>
@@ -175,6 +176,7 @@ function StaffDirectoryContent() {
                   </span>
                 </TableCell>
                 <TableCell>{s.role}</TableCell>
+                <TableCell>{s.employeeType}</TableCell>
                 <TableCell>{s.department ?? "—"}</TableCell>
                 <TableCell className="text-text-sec">
                   {s.lineManager ?? "—"}

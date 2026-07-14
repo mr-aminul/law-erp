@@ -1,7 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
-  <!-- fill uses --color-theme from app/theme.css -->
-  <rect width="32" height="32" rx="9" fill="var(--color-theme, #1a5c45)"/>
-  <g transform="translate(4, 4)" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <rect width="32" height="32" rx="9" fill="var(--color-sidebar, #123f2f)"/>
+  <g transform="translate(4, 4)" stroke="var(--color-on-sidebar, #ffffff)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none">
     <path d="M12 3v18"/>
     <path d="m19 8 3 8a5 5 0 0 1-6 0zV7"/>
     <path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1"/>

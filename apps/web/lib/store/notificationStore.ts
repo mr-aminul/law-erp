@@ -95,5 +95,8 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
     return sortNotifications(filterByTab(active, tab));
   },
 
-  tabCount: (tab) => get().visibleNotifications(tab).length,
+  tabCount: (tab) =>
+    get()
+      .visibleNotifications(tab)
+      .filter((notification) => !get().isRead(notification.id)).length,
 }));

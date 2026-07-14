@@ -9,7 +9,8 @@ import { getStaffById, mockCases, mockStaff } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate, toDateInputValue } from "@/lib/utils/formatDate";
 import { emailError, phoneError } from "@/lib/utils/validateContact";
-import type { StaffStatus } from "@/types/staff";
+import { STAFF_EMPLOYEE_TYPES } from "@/components/staff/NewEmployeeForm";
+import type { EmployeeType, StaffStatus } from "@/types/staff";
 import { Pencil } from "lucide-react";
 import { notFound, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -35,6 +36,7 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
     status: "" as StaffStatus | "",
     employeeId: "",
     designation: "",
+    employeeType: "" as EmployeeType | "",
     department: "",
     lineManager: "",
     barCouncilNo: "",
@@ -55,6 +57,7 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
   const displayStatus = (draft.status || staff.status) as StaffStatus;
   const displayJoinDate = draft.joinDate || staff.joinDate;
   const displayDesignation = draft.designation || staff.role;
+  const displayEmployeeType = draft.employeeType || staff.employeeType;
 
   function startEditing() {
     setDraft({
@@ -63,6 +66,7 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
       status: staff!.status,
       employeeId: staff!.employeeId ?? "",
       designation: staff!.role,
+      employeeType: staff!.employeeType,
       department: staff!.department ?? "",
       lineManager: staff!.lineManager ?? "",
       barCouncilNo: staff!.barCouncilNo ?? "",
@@ -99,7 +103,7 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
     <div className="space-y-4">
       <div className="rounded-card border border-gray-200 bg-surface p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sidebar text-lg font-bold text-white">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sidebar text-lg font-bold text-on-sidebar">
             {staff.initials}
           </div>
           <div className="min-w-0 flex-1">
@@ -209,6 +213,14 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
                 "Clerk",
                 "Admin",
               ].map((r) => ({ value: r, label: r }))}
+            />
+            <DetailField
+              label="Employee Type"
+              value={displayEmployeeType}
+              editing={editing}
+              editValue={draft.employeeType}
+              onChange={(v) => patchDraft("employeeType", v)}
+              options={STAFF_EMPLOYEE_TYPES.map((t) => ({ value: t, label: t }))}
             />
             <DetailField
               label="Department"

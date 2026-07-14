@@ -1,5 +1,9 @@
 "use client";
 
+import {
+  GlobalSearch,
+  GlobalSearchTrigger,
+} from "@/components/layout/GlobalSearch";
 import { ApiStatusBadge } from "@/components/dashboard/ApiStatusBadge";
 import { useAppStore } from "@/lib/store/appStore";
 import { formatLongDate } from "@/lib/utils/formatDate";
@@ -15,10 +19,22 @@ interface TopbarProps {
 export function Topbar({ title, icon: Icon, subtitle }: TopbarProps) {
   const toggleMobileNav = useAppStore((s) => s.toggleMobileNav);
   const [dateLabel, setDateLabel] = useState<string | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
     setDateLabel(subtitle ?? formatLongDate());
   }, [subtitle]);
+
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   return (
     <header className="shrink-0 border-b border-gray-200 bg-[#f4f5f6] px-3 py-2.5 sm:px-4 sm:py-3">
@@ -38,13 +54,19 @@ export function Topbar({ title, icon: Icon, subtitle }: TopbarProps) {
             <span className="truncate">{title}</span>
           </h1>
           <ApiStatusBadge />
+          <GlobalSearchTrigger
+            onOpen={() => setSearchOpen(true)}
+            className="ml-auto"
+          />
           {dateLabel ? (
-            <span className="ml-auto hidden text-xs text-text-primary sm:inline">
+            <span className="hidden text-xs text-text-primary lg:inline">
               {dateLabel}
             </span>
           ) : null}
         </div>
       </div>
+
+      <GlobalSearch open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
   );
 }

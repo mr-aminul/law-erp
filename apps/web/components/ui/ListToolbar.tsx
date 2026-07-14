@@ -208,7 +208,7 @@ export function ListToolbar({
               >
                 <Filter className="h-4 w-4" />
                 {hasActiveFilters ? (
-                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-theme px-1.5 text-[11px] font-bold leading-none text-white">
+                  <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[11px] font-bold leading-none text-primary-foreground">
                     {activeFilterCount}
                   </span>
                 ) : null}

@@ -23,18 +23,6 @@ export interface Payment {
   reference?: string;
 }
 
-export interface TimeEntry {
-  id: string;
-  date: string;
-  lawyer: string;
-  caseId: string;
-  caseName: string;
-  description: string;
-  hours: number;
-  rate: number;
-  billable: boolean;
-}
-
 export interface FeeAgreement {
   id: string;
   clientId: string;

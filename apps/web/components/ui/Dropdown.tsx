@@ -124,7 +124,7 @@ export function Dropdown({
               className={cn(
                 "flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border border-gray-200 bg-white",
                 isSelected &&
-                  "border-[var(--color-theme)] bg-[var(--color-theme)] text-white"
+                  "border-theme bg-theme text-on-theme"
               )}
             >
               {isSelected ? <Check className="h-2.5 w-2.5" /> : null}

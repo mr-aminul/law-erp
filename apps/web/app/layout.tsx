@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Providers } from "./providers";
+import { THEME_COLOR_BOOTSTRAP } from "@/lib/theme/brand";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -23,8 +25,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className="font-sans antialiased">
+        <Script
+          id="ukil-theme-color"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: THEME_COLOR_BOOTSTRAP }}
+        />
         <Providers>{children}</Providers>
       </body>
     </html>

@@ -12,6 +12,7 @@ import type {
 import {
   AlertCircle,
   Bell,
+  CheckCheck,
   CheckCircle2,
   ChevronDown,
   Info,
@@ -43,7 +44,7 @@ const systemIconMeta: Record<
 > = {
   info: { icon: Info, bg: "bg-blue-light", text: "text-blue" },
   alert: { icon: AlertCircle, bg: "bg-red-light", text: "text-red" },
-  success: { icon: CheckCircle2, bg: "bg-green-light", text: "text-green" },
+  success: { icon: CheckCircle2, bg: "bg-status-completed-surface", text: "text-status-completed" },
 };
 
 function MatterChip({ chip }: { chip: NotificationMatterChip }) {
@@ -81,7 +82,7 @@ function TeamNotificationCard({
       )}
     >
       <div className="flex gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-active-nav text-[11px] font-bold text-white">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-active-nav text-[11px] font-bold text-on-active-nav">
           {notification.actorInitials}
         </div>
         <div className="min-w-0 flex-1">
@@ -97,7 +98,7 @@ function TeamNotificationCard({
           </p>
         </div>
         {unread && (
-          <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[var(--color-theme)]" />
+          <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-theme" />
         )}
       </div>
     </button>
@@ -139,12 +140,12 @@ function FirmNotificationCard({
                 className={cn(
                   "text-[11px] font-medium",
                   notification.statusLabel === "Completed"
-                    ? "text-green"
+                    ? "text-status-completed"
                     : "text-text-muted"
                 )}
               >
                 {notification.statusLabel === "Completed" && (
-                  <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-green" />
+                  <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-status-completed" />
                 )}
                 {notification.statusLabel}
               </span>
@@ -155,7 +156,7 @@ function FirmNotificationCard({
           </div>
         </div>
         {unread && (
-          <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[var(--color-theme)]" />
+          <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-theme" />
         )}
       </div>
     </button>
@@ -296,18 +297,24 @@ export function NotificationCard({
   );
 }
 
-export function useNotificationLists(dismissedIds: string[]) {
+export function useNotificationLists(
+  dismissedIds: string[],
+  readIds: string[]
+) {
   const tabCounts = useMemo(() => {
-    const active = mockNotifications.filter(
-      (notification) => !dismissedIds.includes(notification.id)
+    const unread = mockNotifications.filter(
+      (notification) =>
+        !dismissedIds.includes(notification.id) &&
+        !readIds.includes(notification.id)
     );
     return {
-      all: active.length,
-      firm: active.filter((notification) => notification.kind === "firm").length,
-      system: active.filter((notification) => notification.kind === "system")
+      all: unread.length,
+      firm: unread.filter((notification) => notification.kind === "firm")
+        .length,
+      system: unread.filter((notification) => notification.kind === "system")
         .length,
     };
-  }, [dismissedIds]);
+  }, [dismissedIds, readIds]);
 
   function getFilteredNotifications(filter: NotificationTab) {
     const active = mockNotifications.filter(
@@ -344,6 +351,7 @@ interface NotificationPanelProps {
   unreadCount: number;
   centerHref?: string;
   onCenterClick?: () => void;
+  onClose?: () => void;
   titleId?: string;
   className?: string;
   listClassName?: string;
@@ -364,12 +372,15 @@ export function NotificationPanel({
   unreadCount,
   centerHref = "/communications",
   onCenterClick,
+  onClose,
   titleId,
   className,
   listClassName,
 }: NotificationPanelProps) {
-  const { tabCounts, getFilteredNotifications } =
-    useNotificationLists(dismissedIds);
+  const { tabCounts, getFilteredNotifications } = useNotificationLists(
+    dismissedIds,
+    readIds
+  );
   const notifications = getFilteredNotifications(filter);
   const {
     scrollRef: listScrollRef,
@@ -387,18 +398,39 @@ export function NotificationPanel({
         >
           Notifications
         </h2>
-        {onRefresh ? (
+        <div className="flex items-center gap-0.5">
           <button
             type="button"
-            onClick={onRefresh}
-            className="rounded-lg p-1.5 text-text-muted transition-colors hover:bg-cream-card hover:text-text-primary"
-            aria-label="Refresh notifications"
+            onClick={onMarkAllRead}
+            disabled={unreadCount === 0}
+            className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-[12px] font-medium text-text-muted transition-colors hover:bg-cream-card hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-40"
           >
-            <RefreshCw
-              className={cn("h-4 w-4", refreshing && "animate-spin")}
-            />
+            <CheckCheck className="h-3.5 w-3.5" />
+            Read all
           </button>
-        ) : null}
+          {onRefresh ? (
+            <button
+              type="button"
+              onClick={onRefresh}
+              className="rounded-lg p-1.5 text-text-muted transition-colors hover:bg-cream-card hover:text-text-primary"
+              aria-label="Refresh notifications"
+            >
+              <RefreshCw
+                className={cn("h-4 w-4", refreshing && "animate-spin")}
+              />
+            </button>
+          ) : null}
+          {onClose ? (
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg p-1.5 text-text-muted transition-colors hover:bg-cream-card hover:text-text-primary lg:hidden"
+              aria-label="Close notifications"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="px-4 pb-3">
@@ -407,11 +439,14 @@ export function NotificationPanel({
           fill
           activeTab={filter}
           onChange={(id) => onFilterChange(id as NotificationTab)}
-          tabs={notificationTabs.map((tab) => ({
-            id: tab.id,
-            label: tab.label,
-            badge: tabCounts[tab.id],
-          }))}
+          tabs={notificationTabs.map((tab) => {
+            const count = tabCounts[tab.id];
+            return {
+              id: tab.id,
+              label: tab.label,
+              badge: count > 0 ? count : undefined,
+            };
+          })}
         />
       </div>
 
@@ -419,7 +454,7 @@ export function NotificationPanel({
         ref={listScrollRef}
         onScroll={handleListScroll}
         className={cn(
-          "overflow-y-auto px-4 pb-3",
+          "overflow-y-auto pb-3",
           scrollbarClassName,
           listClassName
         )}
@@ -438,7 +473,7 @@ export function NotificationPanel({
             </p>
           </div>
         ) : (
-          <div className="space-y-2.5">
+          <div className="space-y-2.5 px-4">
             {notifications.map((notification) => (
               <NotificationCard
                 key={notification.id}
@@ -454,15 +489,7 @@ export function NotificationPanel({
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-3 border-t border-gray-200 px-4 py-3">
-        <button
-          type="button"
-          onClick={onMarkAllRead}
-          disabled={unreadCount === 0}
-          className="text-xs font-medium text-text-primary underline underline-offset-2 transition-opacity disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          Mark all as read
-        </button>
+      <div className="flex items-center justify-end border-t border-gray-200 px-4 py-3">
         {onCenterClick ? (
           <button
             type="button"

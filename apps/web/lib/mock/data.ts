@@ -12,6 +12,7 @@ export const mockStaff: Staff[] = [
     name: "Adv. Rahima Khan",
     initials: "RK",
     role: "Partner",
+    employeeType: "Full-time",
     department: "Litigation",
     activeCases: 12,
     attendancePercent: 96,
@@ -29,6 +30,7 @@ export const mockStaff: Staff[] = [
     name: "Adv. Tanvir Ahmed",
     initials: "TA",
     role: "Associate",
+    employeeType: "Full-time",
     department: "Litigation",
     lineManager: "Adv. Rahima Khan",
     activeCases: 8,
@@ -47,6 +49,7 @@ export const mockStaff: Staff[] = [
     name: "Adv. Nusrat Jahan",
     initials: "NJ",
     role: "Associate",
+    employeeType: "Contract",
     department: "Corporate",
     lineManager: "Adv. Rahima Khan",
     activeCases: 6,
@@ -65,6 +68,7 @@ export const mockStaff: Staff[] = [
     name: "Farhana Begum",
     initials: "FB",
     role: "Paralegal",
+    employeeType: "Part-time",
     department: "Operations",
     lineManager: "Adv. Tanvir Ahmed",
     activeCases: 4,
@@ -830,10 +834,10 @@ export const dashboardStats = {
 };
 
 export const caseStatusChartData = [
-  { name: "Completed", value: 42, color: chartColors.theme },
+  { name: "Completed", value: 42, color: chartColors.completed },
   { name: "In-Progress", value: 18, color: chartColors.blue },
   { name: "Pending", value: 22, color: chartColors.amber },
-  { name: "On-Hold", value: 5, color: chartColors.textMuted },
+  { name: "On-Hold", value: 5, color: chartColors.hold },
 ];
 
 export const monthlyCasesData = [

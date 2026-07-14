@@ -1,5 +1,5 @@
 import type { AuditEntry, FirmProfile, SystemUser } from "@/types/admin";
-import type { Expense, FeeAgreement, Payment, TimeEntry } from "@/types/billing";
+import type { Expense, FeeAgreement, Payment } from "@/types/billing";
 import type { CaseComment, Communication, ContactLog } from "@/types/communication";
 import type { CaseMilestone, CaseNote } from "@/types/case";
 import type { Document } from "@/types/document";
@@ -229,42 +229,6 @@ export const mockPayments: Payment[] = [
     method: "bKash",
     receivedAt: "2026-05-25",
     reference: "BK-9928341",
-  },
-];
-
-export const mockTimeEntries: TimeEntry[] = [
-  {
-    id: "t1",
-    date: "2026-06-01",
-    lawyer: "Adv. Rahima Khan",
-    caseId: "1",
-    caseName: "Land dispute — Gulshan Block C",
-    description: "Drafted reply to preliminary objection",
-    hours: 3.5,
-    rate: 15000,
-    billable: true,
-  },
-  {
-    id: "t2",
-    date: "2026-06-02",
-    lawyer: "Adv. Tanvir Ahmed",
-    caseId: "6",
-    caseName: "Civil suit — recovery of dues",
-    description: "Court appearance and client briefing",
-    hours: 5,
-    rate: 8000,
-    billable: true,
-  },
-  {
-    id: "t3",
-    date: "2026-06-02",
-    lawyer: "Adv. Nusrat Jahan",
-    caseId: "2",
-    caseName: "Contract breach",
-    description: "Document review and research",
-    hours: 2,
-    rate: 8000,
-    billable: true,
   },
 ];
 

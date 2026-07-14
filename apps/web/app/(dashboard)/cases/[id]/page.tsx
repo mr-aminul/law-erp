@@ -4,6 +4,7 @@ import { AssignedLawyers } from "@/components/cases/AssignedLawyers";
 import { CaseStatusBadge } from "@/components/cases/CaseStatusBadge";
 import { CaseStatusSelect } from "@/components/cases/CaseStatusSelect";
 import { UploadDocumentForm } from "@/components/cases/UploadDocumentForm";
+import { NewFilingForm } from "@/components/court-filing/NewFilingForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Form";
@@ -26,6 +27,7 @@ import {
   mockClients,
   mockDocuments,
   mockExpenses,
+  mockFilings,
   mockInvoices,
   mockMilestones,
   mockCaseNotes,
@@ -34,11 +36,12 @@ import {
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate, toDateInputValue } from "@/lib/utils/formatDate";
 import type { CaseType } from "@/types/case";
+import type { FilingStatus } from "@/types/filing";
 import type { CourtLevel } from "@/types/hearing";
 import { CheckCircle2, Circle, Pencil } from "lucide-react";
 import Link from "next/link";
-import { notFound, useRouter } from "next/navigation";
-import { useState } from "react";
+import { notFound, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 const stages = ["Filing", "Hearing", "Judgment", "Appeal", "Closed"];
 
@@ -68,11 +71,34 @@ function namesFromLawyerIds(ids: string[]) {
   return mockStaff.filter((s) => ids.includes(s.id)).map((s) => s.name);
 }
 
-export default function CaseDetailPage({ params }: { params: { id: string } }) {
+const filingStatusVariant = (s: FilingStatus) =>
+  s === "Accepted" ? "green" : s === "Rejected" ? "red" : s === "Submitted" ? "blue" : "muted";
+
+const CASE_TABS = [
+  "overview",
+  "pipeline",
+  "documents",
+  "filings",
+  "notes",
+  "billing",
+  "thread",
+] as const;
+
+function CaseDetailContent({ id }: { id: string }) {
   const router = useRouter();
-  const caseData = getCaseById(params.id);
-  const [tab, setTab] = useState("overview");
+  const searchParams = useSearchParams();
+  const caseData = getCaseById(id);
+  const tabParam = searchParams.get("tab");
+  const filingParam = searchParams.get("filing");
+  const initialTab =
+    tabParam && (CASE_TABS as readonly string[]).includes(tabParam)
+      ? tabParam
+      : filingParam
+        ? "filings"
+        : "overview";
+  const [tab, setTab] = useState(initialTab);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [newFilingOpen, setNewFilingOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState({
     matter: "",
@@ -92,15 +118,26 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
     lawyerIds: [] as string[],
   });
 
-  if (!caseData) notFound();
+  useEffect(() => {
+    const nextTab = searchParams.get("tab");
+    if (nextTab && (CASE_TABS as readonly string[]).includes(nextTab)) {
+      setTab(nextTab);
+      return;
+    }
+    if (searchParams.get("filing")) setTab("filings");
+  }, [searchParams]);
 
-  const docs = mockDocuments.filter((d) => d.caseId === caseData.id);
-  const invoices = mockInvoices.filter((i) => i.caseId === caseData.caseId);
-  const expenses = mockExpenses.filter((e) => e.caseId === caseData.id);
-  const notes = mockCaseNotes.filter((n) => n.caseId === caseData.id);
-  const comments = mockCaseComments.filter((c) => c.caseId === caseData.id);
+  const docs = mockDocuments.filter((d) => d.caseId === id);
+  const filings = mockFilings.filter((f) => f.caseId === id);
+  const invoices = mockInvoices.filter((i) => i.caseId === caseData?.caseId);
+  const expenses = mockExpenses.filter((e) => e.caseId === id);
+  const notes = mockCaseNotes.filter((n) => n.caseId === id);
+  const comments = mockCaseComments.filter((c) => c.caseId === id);
   const lawyers = mockStaff.filter((s) => s.role !== "Admin");
   const activeClients = mockClients.filter((c) => c.status === "Active");
+  const focusFilingId = searchParams.get("filing");
+
+  if (!caseData) notFound();
 
   const displayClientId = draft.clientId || caseData.clientId;
   const displayClientName =
@@ -119,28 +156,40 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
     { id: "overview", label: "Overview" },
     { id: "pipeline", label: "Pipeline" },
     { id: "documents", label: "Documents" },
+    { id: "filings", label: "Filings" },
     { id: "notes", label: "Notes & Memos" },
     { id: "billing", label: "Billing" },
     { id: "thread", label: "Team Thread" },
   ];
 
+  function changeTab(next: string) {
+    setTab(next);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", next);
+    if (next !== "filings") params.delete("filing");
+    const qs = params.toString();
+    // ponytail: use route id — caseData narrows don't carry into nested fns
+    router.replace(`/cases/${id}${qs ? `?${qs}` : ""}`, { scroll: false });
+  }
+
   function startEditing() {
+    if (!caseData) return;
     setDraft({
-      matter: caseData!.matter,
-      clientId: caseData!.clientId,
-      type: caseData!.type,
-      court: caseData!.court,
-      courtName: caseData!.courtName,
-      caseNumber: caseData!.caseNumber ?? "",
-      firstHearing: toDateInputValue(caseData!.nextHearing),
-      deadline: toDateInputValue(caseData!.limitationDate),
-      status: caseData!.status,
-      oppositeParty: caseData!.opposingParty?.name ?? "",
-      opposingCounsel: caseData!.opposingParty?.counsel ?? "",
-      causeListRef: caseData!.causeListRef ?? "",
-      outcome: caseData!.outcome ?? "Pending",
-      description: caseData!.description ?? "",
-      lawyerIds: lawyerIdsFromNames(caseData!.assignedLawyers),
+      matter: caseData.matter,
+      clientId: caseData.clientId,
+      type: caseData.type,
+      court: caseData.court,
+      courtName: caseData.courtName,
+      caseNumber: caseData.caseNumber ?? "",
+      firstHearing: toDateInputValue(caseData.nextHearing),
+      deadline: toDateInputValue(caseData.limitationDate),
+      status: caseData.status,
+      oppositeParty: caseData.opposingParty?.name ?? "",
+      opposingCounsel: caseData.opposingParty?.counsel ?? "",
+      causeListRef: caseData.causeListRef ?? "",
+      outcome: caseData.outcome ?? "Pending",
+      description: caseData.description ?? "",
+      lawyerIds: lawyerIdsFromNames(caseData.assignedLawyers),
     });
     setEditing(true);
   }
@@ -234,7 +283,7 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      <Tabs tabs={tabs} activeTab={tab} onChange={setTab} />
+      <Tabs tabs={tabs} activeTab={tab} onChange={changeTab} />
 
       {tab === "overview" && (
         <PageSection title="Case Overview">
@@ -443,6 +492,68 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
         />
       </Modal>
 
+      {tab === "filings" && (
+        <PageSection
+          title="Court Filings"
+          action={
+            <Button size="sm" onClick={() => setNewFilingOpen(true)}>
+              New Filing
+            </Button>
+          }
+        >
+          {filings.length === 0 ? (
+            <p className="text-sm text-text-muted">No filings for this case yet.</p>
+          ) : (
+            <Table compact>
+              <TableHeader>
+                <TableHead>Ref</TableHead>
+                <TableHead>Court</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Filed By</TableHead>
+                <TableHead>Fee</TableHead>
+                <TableHead>Summons</TableHead>
+                <TableHead>Status</TableHead>
+              </TableHeader>
+              <TableBody>
+                {filings.map((f) => (
+                  <TableRow
+                    key={f.id}
+                    className={
+                      focusFilingId === f.id
+                        ? "bg-green-light/40 ring-1 ring-inset ring-green/30"
+                        : undefined
+                    }
+                  >
+                    <TableCell className="font-semibold">{f.filingRef}</TableCell>
+                    <TableCell className="text-text-sec">{f.court}</TableCell>
+                    <TableCell>{f.filingType}</TableCell>
+                    <TableCell>{f.filedBy}</TableCell>
+                    <TableCell>{formatCurrency(f.filingFee)}</TableCell>
+                    <TableCell>{f.summonsDispatched ? "Sent" : "—"}</TableCell>
+                    <TableCell>
+                      <Badge variant={filingStatusVariant(f.status)}>{f.status}</Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </PageSection>
+      )}
+
+      <Modal
+        open={newFilingOpen}
+        onClose={() => setNewFilingOpen(false)}
+        title="New Filing"
+        className="max-w-xl"
+      >
+        <NewFilingForm
+          defaultCaseId={caseData.id}
+          onSubmit={() => setNewFilingOpen(false)}
+          onCancel={() => setNewFilingOpen(false)}
+        />
+      </Modal>
+
       {tab === "notes" && (
         <PageSection title="Notes & Internal Memos" action={<Button size="sm">Add Note</Button>}>
           <div className="space-y-3">
@@ -521,5 +632,13 @@ export default function CaseDetailPage({ params }: { params: { id: string } }) {
         </PageSection>
       )}
     </div>
+  );
+}
+
+export default function CaseDetailPage({ params }: { params: { id: string } }) {
+  return (
+    <Suspense fallback={<div className="text-sm text-text-muted">Loading case...</div>}>
+      <CaseDetailContent id={params.id} />
+    </Suspense>
   );
 }

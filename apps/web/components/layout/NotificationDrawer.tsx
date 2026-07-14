@@ -1,6 +1,7 @@
 "use client";
 
 import { NotificationPanel } from "@/components/notifications/NotificationPanel";
+import { Scrim } from "@/components/ui/Scrim";
 import { useAppStore } from "@/lib/store/appStore";
 import { useNotificationStore } from "@/lib/store/notificationStore";
 import { mockNotifications } from "@/lib/mock/notifications";
@@ -76,19 +77,15 @@ export function NotificationDrawer() {
 
   const drawer = (
     <>
-      <div
-        className="fixed inset-0 z-[35] bg-sidebar/35 backdrop-blur-[3px]"
-        onClick={closeDrawer}
-        aria-hidden
-      />
+      <Scrim className="fixed z-[110]" onClick={closeDrawer} />
       <aside
         role="dialog"
         aria-modal="true"
         aria-labelledby="notification-drawer-title"
         className={cn(
-          "fixed z-[111] flex flex-col overflow-hidden rounded-panel border border-gray-300 bg-white",
-          "inset-[var(--shell-margin)] w-auto",
-          "lg:inset-auto lg:w-[min(400px,calc(100vw-var(--shell-margin)*2-80px))]"
+          "fixed z-[111] flex flex-col overflow-hidden rounded-panel border border-gray-300 bg-white shadow-[0_12px_40px_rgb(0_0_0/0.14)]",
+          "inset-x-3 top-[max(0.75rem,env(safe-area-inset-top))] bottom-auto h-[min(78dvh,calc(100dvh-5.5rem))] w-auto",
+          "lg:inset-x-auto lg:top-[var(--shell-margin)] lg:w-[min(400px,calc(100vw-var(--shell-margin)*2-80px))]"
         )}
         style={
           isDesktop
@@ -96,8 +93,6 @@ export function NotificationDrawer() {
                 left: sidebarCollapsed
                   ? "calc(var(--sidebar-width-collapsed) + var(--shell-margin) * 2 + 8px)"
                   : "calc(var(--sidebar-width) + var(--shell-margin) * 2 + 8px)",
-                top: "var(--shell-margin)",
-                height: "calc(100dvh - calc(var(--shell-margin) * 2))",
               }
             : undefined
         }
@@ -121,6 +116,7 @@ export function NotificationDrawer() {
           className="h-full"
           listClassName="min-h-0 flex-1"
           onCenterClick={handleOpenCenter}
+          onClose={closeDrawer}
         />
       </aside>
     </>

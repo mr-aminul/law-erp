@@ -2,6 +2,7 @@
 
 import { useSlickScrollbar } from "@/lib/hooks/useSlickScrollbar";
 import { cn } from "@/lib/utils/cn";
+import { Scrim } from "@/components/ui/Scrim";
 import { X } from "lucide-react";
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
@@ -59,11 +60,7 @@ export function Modal({
       )}
       role="presentation"
     >
-      <div
-        className="absolute inset-0 bg-sidebar/40 backdrop-blur-sm"
-        onClick={onClose}
-        aria-hidden
-      />
+      <Scrim className="absolute" onClick={onClose} />
       <div
         ref={scrollRef}
         role="dialog"
@@ -71,26 +68,28 @@ export function Modal({
         aria-labelledby="modal-title"
         onScroll={onScroll}
         className={cn(
-          "relative z-10 max-h-[min(90dvh,90vh)] w-full max-w-lg overflow-y-auto rounded-card border border-gray-200 bg-white p-4 sm:p-5",
+          "relative z-10 max-h-[min(90dvh,90vh)] w-full max-w-lg overflow-y-auto rounded-card border border-gray-200 bg-white",
           scrollbarClassName,
           className
         )}
       >
         {scrollbarOverlay}
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <h3 id="modal-title" className="min-w-0 text-base font-bold text-text-primary">
-            {title}
-          </h3>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1 text-text-muted hover:bg-cream-card hover:text-text-primary"
-            aria-label="Close"
-          >
-            <X className="h-4 w-4" />
-          </button>
+        <div className="p-4 sm:p-5">
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <h3 id="modal-title" className="min-w-0 text-base font-bold text-text-primary">
+              {title}
+            </h3>
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-lg p-1 text-text-muted hover:bg-cream-card hover:text-text-primary"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          {children}
         </div>
-        {children}
       </div>
     </div>
   );

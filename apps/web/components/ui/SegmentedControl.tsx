@@ -94,7 +94,7 @@ export function SegmentedControl({
       {fill && activeIndex >= 0 && items.length > 0 ? (
         <div
           aria-hidden
-          className="absolute bottom-1 top-1 rounded-full bg-active-nav transition-transform duration-300 ease-out"
+          className="absolute bottom-1 top-1 rounded-full bg-primary transition-transform duration-300 ease-out"
           style={{
             width: `calc((100% - 0.5rem) / ${items.length})`,
             transform: `translateX(calc(${activeIndex} * 100%))`,
@@ -104,7 +104,7 @@ export function SegmentedControl({
       {!fill && pill ? (
         <div
           aria-hidden
-          className="pointer-events-none absolute bottom-1 top-1 rounded-full bg-active-nav transition-[left,width] duration-300 ease-out"
+          className="pointer-events-none absolute bottom-1 top-1 rounded-full bg-primary transition-[left,width] duration-300 ease-out"
           style={{ left: pill.left, width: pill.width }}
         />
       ) : null}
@@ -112,18 +112,13 @@ export function SegmentedControl({
         const isActive = value === item.id;
         const classNameForItem = cn(
           segmentClass,
-          isActive ? "text-white" : "text-gray-600 hover:text-gray-900"
+          isActive ? "text-primary-foreground" : "text-gray-600 hover:text-gray-900"
         );
         const content = (
           <>
             <span className="truncate">{item.label}</span>
             {item.badge != null ? (
-              <span
-                className={cn(
-                  "tabular-nums",
-                  isActive ? "text-white/80" : "text-gray-400"
-                )}
-              >
+              <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-red px-1 text-[9px] font-bold leading-none text-white tabular-nums">
                 {item.badge}
               </span>
             ) : null}

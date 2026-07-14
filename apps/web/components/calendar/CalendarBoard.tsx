@@ -12,7 +12,7 @@ const HOUR_END = 18;
 const HOURS = Array.from({ length: HOUR_END - HOUR_START }, (_, i) => HOUR_START + i);
 
 const eventTone: Record<string, string> = {
-  "Court Hearing": "bg-green text-white",
+  "Court Hearing": "bg-green text-on-green",
   "Filing Deadline": "bg-amber text-white",
   "Internal Meeting": "bg-blue text-white",
 };
@@ -196,7 +196,7 @@ function MonthGrid({
                 onClick={() => onDayClick(day)}
                 className={cn(
                   "mb-0.5 flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium",
-                  isToday && "bg-green text-white",
+                  isToday && "bg-green text-on-green",
                   !isToday && inMonth && "text-text-primary hover:bg-cream-card",
                   !isToday && !inMonth && "text-text-muted"
                 )}
@@ -260,7 +260,7 @@ function WeekGrid({
                 <p
                   className={cn(
                     "mx-auto mt-0.5 flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold",
-                    isToday ? "bg-green text-white" : "text-text-primary"
+                    isToday ? "bg-green text-on-green" : "text-text-primary"
                   )}
                 >
                   {d.getDate()}

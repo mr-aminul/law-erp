@@ -1,5 +1,6 @@
 "use client";
 
+import { ThemeColorSettings } from "@/components/settings/ThemeColorSettings";
 import { SubNav } from "@/components/layout/SubNav";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -35,6 +36,11 @@ export default function SettingsPage() {
   return (
     <div className="space-y-4">
       <SubNav items={settingsSubNav} />
+
+      <section className="flex items-center gap-2.5 rounded-card border border-gray-200 bg-surface px-3 py-3 sm:px-4">
+        <h2 className="text-sm font-bold text-text-primary">Brand Theme</h2>
+        <ThemeColorSettings />
+      </section>
 
       <PageSection title="Firm Profile" description="Bar Council registration, address, and branch offices.">
         <div className="grid-pair">

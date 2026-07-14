@@ -202,7 +202,7 @@ export function MultiSelectDropdown({
                     className={cn(
                       "flex h-4 w-4 shrink-0 items-center justify-center rounded border border-gray-200 bg-white",
                       isSelected &&
-                        "border-[var(--color-theme)] bg-[var(--color-theme)] text-white"
+                        "border-theme bg-theme text-on-theme"
                     )}
                   >
                     {isSelected ? <Check className="h-3 w-3" /> : null}

@@ -52,6 +52,8 @@ function CourtFilingContent() {
   const [filedByFilters, setFiledByFilters] = useState<string[]>([]);
   const [newFilingOpen, setNewFilingOpen] = useState(false);
 
+  const prefillCaseId = searchParams.get("case") ?? undefined;
+
   useEffect(() => {
     setNewFilingOpen(searchParams.get("new") === "1");
   }, [searchParams]);
@@ -78,14 +80,19 @@ function CourtFilingContent() {
   function openNewFilingModal() {
     setNewFilingOpen(true);
     if (searchParams.get("new") !== "1") {
-      router.replace("/court-filing?new=1", { scroll: false });
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("new", "1");
+      router.replace(`/court-filing?${params}`, { scroll: false });
     }
   }
 
   function closeNewFilingModal() {
     setNewFilingOpen(false);
     if (searchParams.get("new")) {
-      router.replace("/court-filing");
+      const params = new URLSearchParams(searchParams.toString());
+      params.delete("new");
+      const qs = params.toString();
+      router.replace(qs ? `/court-filing?${qs}` : "/court-filing");
     }
   }
 
@@ -155,7 +162,12 @@ function CourtFilingContent() {
         </TableHeader>
         <TableBody>
           {filtered.map((f) => (
-            <TableRow key={f.id} onClick={() => router.push(`/cases/${f.caseId}`)}>
+            <TableRow
+              key={f.id}
+              onClick={() =>
+                router.push(`/cases/${f.caseId}?tab=filings&filing=${f.id}`)
+              }
+            >
               <TableCell className="font-semibold">{f.filingRef}</TableCell>
               <TableCell className="max-w-[160px] truncate">{f.caseName}</TableCell>
               <TableCell className="text-text-sec">{f.court}</TableCell>
@@ -175,7 +187,12 @@ function CourtFilingContent() {
         title="New Filing"
         className="max-w-xl"
       >
-        <NewFilingForm onSubmit={handleCreateFiling} onCancel={closeNewFilingModal} />
+        <NewFilingForm
+          key={prefillCaseId ?? "any-case"}
+          defaultCaseId={prefillCaseId}
+          onSubmit={handleCreateFiling}
+          onCancel={closeNewFilingModal}
+        />
       </Modal>
     </div>
   );

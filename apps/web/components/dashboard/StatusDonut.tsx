@@ -29,7 +29,7 @@ export function StatusDonut() {
               const data = payload[0].payload;
               const pct = ((data.value / total) * 100).toFixed(1);
               return (
-                <div className="rounded-badge bg-sidebar px-3 py-2 text-xs text-white shadow-lg">
+                <div className="rounded-badge bg-sidebar px-3 py-2 text-xs text-on-sidebar shadow-lg">
                   <p className="font-semibold">{data.name}</p>
                   <p>
                     {data.value} cases ({pct}%)

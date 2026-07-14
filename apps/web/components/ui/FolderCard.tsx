@@ -128,10 +128,10 @@ const GRADIENT_LAYERS: Record<FolderCardVariant, readonly string[]> = {
     "linear-gradient(122deg, #E63C46 0%, #ED5667 42%, #F0789A 72%, #FB9479 100%)",
   ],
   green: [
-    "radial-gradient(125% 100% at 12% 16%, rgba(210,245,225,0.95) 0%, rgba(210,245,225,0) 42%)",
-    "radial-gradient(140% 130% at 93% 6%, #1a5c45 0%, rgba(26,92,69,0) 58%)",
-    "radial-gradient(130% 120% at 28% 102%, rgba(140,200,170,0.55) 0%, rgba(140,200,170,0) 52%)",
-    "linear-gradient(135deg, #4a9e7a 0%, #2d7a5c 48%, #1a5c45 100%)",
+    "radial-gradient(125% 100% at 12% 16%, color-mix(in srgb, var(--color-theme-subtle) 95%, transparent) 0%, transparent 42%)",
+    "radial-gradient(140% 130% at 93% 6%, var(--color-theme) 0%, transparent 58%)",
+    "radial-gradient(130% 120% at 28% 102%, color-mix(in srgb, var(--color-theme-bright) 55%, transparent) 0%, transparent 52%)",
+    "linear-gradient(135deg, var(--color-theme-bright) 0%, var(--color-theme-mid) 48%, var(--color-theme) 100%)",
   ],
   amber: [
     "radial-gradient(118% 92% at 87% 15%, rgba(255,236,200,0.96) 0%, rgba(255,236,200,0) 44%)",
@@ -140,10 +140,10 @@ const GRADIENT_LAYERS: Record<FolderCardVariant, readonly string[]> = {
     "linear-gradient(122deg, #d4923a 0%, #c47a20 42%, #b87d2b 72%, #e8a85c 100%)",
   ],
   sidebar: [
-    "radial-gradient(125% 100% at 12% 16%, rgba(180,210,195,0.5) 0%, rgba(180,210,195,0) 42%)",
-    "radial-gradient(140% 130% at 93% 6%, #0f3d2e 0%, rgba(15,61,46,0) 58%)",
-    "radial-gradient(130% 120% at 28% 102%, rgba(60,120,95,0.45) 0%, rgba(60,120,95,0) 52%)",
-    "linear-gradient(135deg, #2d6b52 0%, #1a5c45 48%, #0f3d2e 100%)",
+    "radial-gradient(125% 100% at 12% 16%, color-mix(in srgb, var(--color-theme-subtle) 50%, transparent) 0%, transparent 42%)",
+    "radial-gradient(140% 130% at 93% 6%, var(--color-theme-darkest) 0%, transparent 58%)",
+    "radial-gradient(130% 120% at 28% 102%, color-mix(in srgb, var(--color-theme) 45%, transparent) 0%, transparent 52%)",
+    "linear-gradient(135deg, var(--color-theme-darker) 0%, var(--color-theme) 48%, var(--color-theme-darkest) 100%)",
   ],
 };
 

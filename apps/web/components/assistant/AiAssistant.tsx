@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { useSlickScrollbar } from "@/lib/hooks/useSlickScrollbar";
+import { useNotificationStore } from "@/lib/store/notificationStore";
 import { cn } from "@/lib/utils/cn";
 import { MessageCircle, Send, Sparkles, X } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
@@ -39,6 +40,7 @@ function mockReply(prompt: string): string {
 }
 
 export function AiAssistant() {
+  const notificationDrawerOpen = useNotificationStore((s) => s.drawerOpen);
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME]);
@@ -101,6 +103,8 @@ export function AiAssistant() {
     }, 450);
   }
 
+  if (notificationDrawerOpen) return null;
+
   return (
     <div className="pointer-events-none fixed bottom-5 right-5 z-[120] flex flex-col items-end gap-3 max-lg:bottom-4 max-lg:right-4">
       {open ? (
@@ -109,18 +113,18 @@ export function AiAssistant() {
           role="dialog"
           aria-label="AI assistant"
         >
-          <div className="flex items-center gap-2 border-b border-gray-200 bg-theme px-3 py-2.5 text-white">
+          <div className="flex items-center gap-2 border-b border-gray-200 bg-primary px-3 py-2.5 text-primary-foreground">
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/15">
               <Sparkles className="h-4 w-4" aria-hidden />
             </span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold">UKIL Assistant</p>
-              <p className="truncate text-[11px] text-white/75">Ask anything about your firm</p>
+              <p className="truncate text-[11px] opacity-75">Ask anything about your firm</p>
             </div>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-lg p-1.5 text-white/85 hover:bg-white/10 hover:text-white"
+              className="rounded-lg p-1.5 opacity-85 hover:bg-white/10 hover:opacity-100"
               aria-label="Close assistant"
             >
               <X className="h-4 w-4" />
@@ -130,36 +134,38 @@ export function AiAssistant() {
           <div
             ref={setListRef}
             onScroll={onScroll}
-            className={cn("min-h-0 flex-1 space-y-3 overflow-y-auto p-3", scrollbarClassName)}
+            className={cn("min-h-0 flex-1 overflow-y-auto", scrollbarClassName)}
           >
             {scrollbarOverlay}
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={cn(
-                  "flex",
-                  msg.role === "user" ? "justify-end" : "justify-start"
-                )}
-              >
+            <div className="space-y-3 p-3">
+              {messages.map((msg) => (
                 <div
+                  key={msg.id}
                   className={cn(
-                    "max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed",
-                    msg.role === "user"
-                      ? "rounded-br-md bg-theme text-white"
-                      : "rounded-bl-md bg-theme-subtle text-text-primary"
+                    "flex",
+                    msg.role === "user" ? "justify-end" : "justify-start"
                   )}
                 >
-                  {msg.text}
+                  <div
+                    className={cn(
+                      "max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed",
+                      msg.role === "user"
+                        ? "rounded-br-md bg-primary text-primary-foreground"
+                        : "rounded-bl-md bg-theme-subtle text-text-primary"
+                    )}
+                  >
+                    {msg.text}
+                  </div>
                 </div>
-              </div>
-            ))}
-            {busy ? (
-              <div className="flex justify-start">
-                <div className="rounded-2xl rounded-bl-md bg-theme-subtle px-3 py-2 text-sm text-text-muted">
-                  Thinking…
+              ))}
+              {busy ? (
+                <div className="flex justify-start">
+                  <div className="rounded-2xl rounded-bl-md bg-theme-subtle px-3 py-2 text-sm text-text-muted">
+                    Thinking…
+                  </div>
                 </div>
-              </div>
-            ) : null}
+              ) : null}
+            </div>
           </div>
 
           <form
@@ -189,8 +195,8 @@ export function AiAssistant() {
         type="button"
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full bg-theme text-white shadow-[0_8px_24px_rgb(26_92_69/0.35)] transition hover:bg-theme-darker focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-theme/40",
-          open && "bg-theme-darker"
+          "pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_8px_24px_color-mix(in_srgb,var(--color-sidebar)_35%,transparent)] transition hover:bg-sidebar-alt focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
+          open && "bg-sidebar-alt"
         )}
         aria-label={open ? "Close AI assistant" : "Open AI assistant"}
         aria-expanded={open}

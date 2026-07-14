@@ -29,6 +29,8 @@ const HIDDEN: ThumbState = {
  * that sits above the content while scrolling.
  *
  * Render `scrollbarOverlay` as the first child of the scroll container.
+ * Keep horizontal padding on an inner wrapper — not the scroll container —
+ * so the thumb sits on the panel’s right edge.
  */
 export function useSlickScrollbar(hideDelayMs = 700): {
   scrollRef: RefCallback<HTMLElement | null>;
@@ -112,7 +114,7 @@ export function useSlickScrollbar(hideDelayMs = 700): {
     >
       <div
         className={cn(
-          "absolute right-1 w-1 rounded-full bg-gray-400/75 transition-opacity duration-300",
+          "absolute right-0.5 w-1 rounded-full bg-gray-400/75 transition-opacity duration-300",
           thumb.show && thumb.visible ? "opacity-100" : "opacity-0"
         )}
         style={{ top: thumb.top, height: thumb.height }}

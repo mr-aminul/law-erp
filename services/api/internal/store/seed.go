@@ -45,7 +45,7 @@ func (s *SeedStore) DashboardStats() *model.DashboardStats {
 
 func (s *SeedStore) CaseStatusChart() []*model.StatusSlice {
 	return []*model.StatusSlice{
-		{Name: "Completed", Value: 42, Color: "#1a5c45"},
+		{Name: "Completed", Value: 42, Color: "#123f2f"},
 		{Name: "In-Progress", Value: 18, Color: "#1d4ed8"},
 		{Name: "Pending", Value: 14, Color: "#b87d2b"},
 		{Name: "New", Value: 8, Color: "#64748b"},
