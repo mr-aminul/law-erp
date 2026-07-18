@@ -74,7 +74,7 @@ export function NewEmployeeForm({ onSubmit, onCancel }: NewEmployeeFormProps) {
           </p>
           <div className="mt-3 grid-fields-2">
             <FormField label="Full Name" required>
-              <Input required placeholder="e.g. Adv. Sara Ahmed" />
+              <Input required placeholder="e.g. Sara Ahmed" />
             </FormField>
             <FormField label="Employee ID">
               <Input placeholder="Auto e.g. EMP-005" />

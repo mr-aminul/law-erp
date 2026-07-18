@@ -86,7 +86,7 @@ export default function AttendancePage() {
         description={
           savedAt
             ? `Saved at ${savedAt} · ${markedCount} of ${mockStaff.length} marked`
-            : `Mark present / absent per staff member · ${markedCount} of ${mockStaff.length} marked`
+            : `Mark present / absent per employee · ${markedCount} of ${mockStaff.length} marked`
         }
       >
         <div className="space-y-2">

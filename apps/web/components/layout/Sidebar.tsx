@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils/cn";
 import { useAppStore } from "@/lib/store/appStore";
 import { useNotificationStore } from "@/lib/store/notificationStore";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { NotificationBell } from "./NotificationBell";
 import {
   Banknote,
@@ -49,7 +50,7 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/clients", label: "Clients", icon: Users },
   {
     href: "/cases",
@@ -85,14 +86,14 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    href: "/staff",
-    label: "Staff",
+    href: "/employees",
+    label: "Employees",
     icon: Scale,
     children: [
-      { href: "/staff", label: "Directory", icon: ContactRound },
-      { href: "/staff/attendance", label: "Attendance", icon: Clock },
-      { href: "/staff/leave", label: "Leave", icon: CalendarOff },
-      { href: "/staff/compensation", label: "Payroll", icon: Banknote },
+      { href: "/employees", label: "Directory", icon: ContactRound },
+      { href: "/employees/attendance", label: "Attendance", icon: Clock },
+      { href: "/employees/leave", label: "Leave", icon: CalendarOff },
+      { href: "/employees/compensation", label: "Payroll", icon: Banknote },
     ],
   },
   { href: "/reports", label: "Reports", icon: BarChart3 },
@@ -270,6 +271,7 @@ export function Sidebar() {
     useAppStore();
   const notificationDrawerOpen = useNotificationStore((s) => s.drawerOpen);
   const [openGroups, setOpenGroups] = useState(() => initialOpenGroups(pathname));
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   // Collapse is desktop-only; mobile drawer always shows labels.
   const collapsed = isDesktop && sidebarCollapsed;
@@ -302,7 +304,7 @@ export function Sidebar() {
   }, [mobileNavOpen, closeMobileNav]);
 
   function isActive(href: string) {
-    if (href === "/") return pathname === "/";
+    if (href === "/dashboard") return pathname === "/dashboard";
     return pathname.startsWith(href);
   }
 
@@ -569,10 +571,8 @@ export function Sidebar() {
           </button>
           <button
             type="button"
-            onClick={() => {
-              window.location.href = "/";
-            }}
-            className="logout-btn flex h-8 w-8 shrink-0 items-center justify-center rounded-input text-white/60 transition-colors group-hover:text-inherit hover:bg-[#dc2626] hover:text-white"
+            onClick={() => setLogoutConfirmOpen(true)}
+            className="logout-btn flex h-8 w-8 shrink-0 items-center justify-center rounded-input text-white/60 transition-colors group-hover:text-inherit hover:bg-red hover:text-white"
             aria-label="Log out"
             title="Log out"
           >
@@ -580,6 +580,19 @@ export function Sidebar() {
           </button>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={logoutConfirmOpen}
+        onClose={() => setLogoutConfirmOpen(false)}
+        onConfirm={() => {
+          window.location.href = "/";
+        }}
+        tone="danger"
+        title="Sign out?"
+        description="Are you sure you want to sign out?"
+        confirmLabel="Sign out"
+        cancelLabel="Cancel"
+      />
     </aside>
   );
 }

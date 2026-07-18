@@ -23,6 +23,8 @@
   --font-sans: "Inter", system-ui, sans-serif;
   --font-heading: "Inter", system-ui, sans-serif;
 
+  --color-surface: var(--color-white);
+
   --background: var(--color-white);
   --foreground: var(--color-text-primary);
   --card: var(--color-white);

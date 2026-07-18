@@ -4,12 +4,7 @@ import { FYTable } from "@/components/dashboard/FYTable";
 import { MonthlyCasesChart } from "@/components/dashboard/MonthlyCasesChart";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { StatusDonut } from "@/components/dashboard/StatusDonut";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card";
+import { PageSection } from "@/components/ui/PageSection";
 import { getDashboardStats } from "@/lib/graphql/getDashboard";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { Briefcase, Gavel, Receipt, Users } from "lucide-react";
@@ -18,7 +13,7 @@ export default async function DashboardPage() {
   const { hearings, invoices, cases, hr } = await getDashboardStats();
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <div className="grid-stats">
         <StatCard
           title="Hearings"
@@ -61,7 +56,7 @@ export default async function DashboardPage() {
         />
 
         <StatCard
-          title="HR / Staff"
+          title="HR / Employees"
           icon={Users}
           accent="amber"
           primaryValue={`${hr.present}/${hr.total}`}
@@ -74,59 +69,27 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid-split">
-        <div className="min-w-0 space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-bold text-text-primary">
-                Recent Case Activity
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CasesTable />
-            </CardContent>
-          </Card>
+        <div className="flex min-w-0 flex-col gap-4">
+          <PageSection title="Recent Case Activity">
+            <CasesTable />
+          </PageSection>
 
           <div className="grid-pair">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm font-bold text-text-primary">
-                  Case Status
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <StatusDonut />
-              </CardContent>
-            </Card>
+            <PageSection title="Case Status">
+              <StatusDonut />
+            </PageSection>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm font-bold text-text-primary">
-                  Monthly Cases Due
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <MonthlyCasesChart />
-              </CardContent>
-            </Card>
+            <PageSection title="Monthly Cases Due">
+              <MonthlyCasesChart />
+            </PageSection>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-sm font-bold text-text-primary">
-                FY Wise Case Status Report
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <FYTable />
-            </CardContent>
-          </Card>
+          <PageSection title="FY Wise Case Status Report">
+            <FYTable />
+          </PageSection>
         </div>
 
-        <Card>
-          <CardContent>
-            <AlertPanel />
-          </CardContent>
-        </Card>
+        <AlertPanel />
       </div>
     </div>
   );

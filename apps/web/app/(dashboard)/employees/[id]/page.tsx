@@ -9,19 +9,19 @@ import { getStaffById, mockCases, mockStaff } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate, toDateInputValue } from "@/lib/utils/formatDate";
 import { emailError, phoneError } from "@/lib/utils/validateContact";
-import { STAFF_EMPLOYEE_TYPES } from "@/components/staff/NewEmployeeForm";
+import { STAFF_EMPLOYEE_TYPES } from "@/components/employees/NewEmployeeForm";
 import type { EmployeeType, StaffStatus } from "@/types/staff";
 import { Pencil } from "lucide-react";
 import { notFound, useRouter } from "next/navigation";
 import { useState } from "react";
 
-const STAFF_STATUS_OPTIONS = [
+const EMPLOYEE_STATUS_OPTIONS = [
   { value: "Active" as const, label: "Active", variant: "green" as const },
   { value: "On Leave" as const, label: "On Leave", variant: "amber" as const },
   { value: "Inactive" as const, label: "Inactive", variant: "muted" as const },
 ];
 
-export default function StaffProfilePage({ params }: { params: { id: string } }) {
+export default function EmployeeProfilePage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const staff = getStaffById(params.id);
   const [tab, setTab] = useState("profile");
@@ -49,7 +49,7 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
   if (!staff) notFound();
 
   const assignedCases = mockCases.filter((c) =>
-    c.assignedLawyers.some((l) => l.includes(staff.name.replace("Adv. ", "")) || l === staff.name)
+    c.assignedLawyers.some((l) => l === staff.name)
   );
   const workloadPct = staff.capacity
     ? Math.round((staff.activeCases / staff.capacity) * 100)
@@ -145,7 +145,7 @@ export default function StaffProfilePage({ params }: { params: { id: string } })
               <ChipStatusSelect
                 value={displayStatus}
                 onChange={(v) => patchDraft("status", v)}
-                options={STAFF_STATUS_OPTIONS}
+                options={EMPLOYEE_STATUS_OPTIONS}
               />
             ) : (
               <Badge

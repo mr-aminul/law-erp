@@ -1,3 +1,4 @@
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
 
@@ -38,18 +39,18 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "flex flex-col rounded-card border border-gray-200 bg-white p-4",
+        "flex flex-col rounded-card border border-gray-200 bg-surface p-3 sm:p-4",
         className
       )}
     >
       <div className="flex items-start gap-3">
         <div
           className={cn(
-            "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl",
+            "flex size-10 shrink-0 items-center justify-center rounded-badge",
             styles.icon
           )}
         >
-          <Icon className="h-5 w-5" />
+          <Icon className="size-5" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium text-text-sec">{title}</p>
@@ -61,21 +62,24 @@ export function StatCard({
       </div>
 
       {metrics.length > 0 && (
-        <div className="mt-4 flex gap-4 border-t border-gray-200 pt-3">
-          {metrics.map((metric) => (
-            <div key={metric.label} className="min-w-0 flex-1">
-              <p className="text-xs text-text-muted">{metric.label}</p>
-              <p
-                className={cn(
-                  "text-sm font-semibold",
-                  metric.highlight ? styles.metric : "text-text-primary"
-                )}
-              >
-                {metric.value}
-              </p>
-            </div>
-          ))}
-        </div>
+        <>
+          <Separator className="my-3" />
+          <div className="flex gap-4">
+            {metrics.map((metric) => (
+              <div key={metric.label} className="min-w-0 flex-1">
+                <p className="text-xs text-text-muted">{metric.label}</p>
+                <p
+                  className={cn(
+                    "text-sm font-semibold",
+                    metric.highlight ? styles.metric : "text-text-primary"
+                  )}
+                >
+                  {metric.value}
+                </p>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );

@@ -84,10 +84,10 @@ export function SegmentedControl({
     <div
       ref={trackRef}
       className={cn(
-        "relative flex rounded-full bg-gray-100 p-1",
+        "relative rounded-full bg-gray-100 p-1",
         fill
-          ? "w-full"
-          : "inline-flex max-w-full overflow-x-auto overscroll-x-contain",
+          ? "flex w-full"
+          : "inline-flex w-fit max-w-full self-start overflow-x-auto overscroll-x-contain",
         className
       )}
     >

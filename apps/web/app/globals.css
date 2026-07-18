@@ -11,6 +11,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global error / danger red — source of truth for text-red, bg-red, destructive, alerts */
+:root {
+  --color-red: #dc2626;
+  --color-red-light: color-mix(in srgb, var(--color-red) 12%, white);
+  --destructive: var(--color-red);
+  --destructive-foreground: var(--color-white);
+}
+
 @layer base {
   *,
   *::before,
@@ -35,7 +43,8 @@
     --muted-foreground: oklch(0.708 0 0);
     --accent: oklch(0.269 0 0);
     --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
+    --destructive: var(--color-red);
+    --destructive-foreground: var(--color-white);
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
     --ring: oklch(0.556 0 0);
@@ -63,6 +72,11 @@
 
   body {
     overflow-x: clip;
+  }
+
+  /* Auth pages need real mobile widths; dashboard keeps 1280px floor */
+  body:has(.auth-shell) {
+    min-width: 0;
   }
 }
 
@@ -103,6 +117,64 @@
 
   .ui-dropdown-option[aria-selected="true"] {
     @apply bg-cream-card font-semibold;
+  }
+
+  .nav-progress-bar {
+    height: 100%;
+    width: 100%;
+    transform-origin: left center;
+    background: var(--color-theme);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--color-theme) 45%, transparent);
+    animation: nav-progress-load 8s cubic-bezier(0.1, 0.05, 0, 1) forwards;
+  }
+
+  .nav-progress-bar--done {
+    animation: nav-progress-done 200ms cubic-bezier(0.2, 0, 0, 1) forwards;
+  }
+
+  .confirm-dialog-panel {
+    animation: confirm-dialog-enter 180ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .confirm-dialog-panel {
+      animation: none;
+    }
+  }
+}
+
+@keyframes nav-progress-load {
+  0% {
+    transform: scaleX(0);
+  }
+  100% {
+    transform: scaleX(0.82);
+  }
+}
+
+@keyframes nav-progress-done {
+  0% {
+    transform: scaleX(0.82);
+    opacity: 1;
+  }
+  70% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+@keyframes confirm-dialog-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }
 

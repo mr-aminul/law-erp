@@ -1,6 +1,6 @@
 "use client";
 
-import { NewEmployeeForm, STAFF_DEPARTMENTS, STAFF_DESIGNATIONS } from "@/components/staff/NewEmployeeForm";
+import { NewEmployeeForm, STAFF_DEPARTMENTS, STAFF_DESIGNATIONS } from "@/components/employees/NewEmployeeForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ListToolbar } from "@/components/ui/ListToolbar";
@@ -37,7 +37,7 @@ const statusOptions = [
   { value: "Inactive", label: "Inactive" },
 ];
 
-function StaffDirectoryContent() {
+function EmployeesDirectoryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [search, setSearch] = useState("");
@@ -73,20 +73,20 @@ function StaffDirectoryContent() {
   function openNewEmployeeModal() {
     setNewEmployeeOpen(true);
     if (searchParams.get("new") !== "1") {
-      router.replace("/staff?new=1", { scroll: false });
+      router.replace("/employees?new=1", { scroll: false });
     }
   }
 
   function closeNewEmployeeModal() {
     setNewEmployeeOpen(false);
     if (searchParams.get("new")) {
-      router.replace("/staff");
+      router.replace("/employees");
     }
   }
 
   function handleCreateEmployee() {
     closeNewEmployeeModal();
-    router.push("/staff/1");
+    router.push("/employees/1");
   }
 
   return (
@@ -165,7 +165,7 @@ function StaffDirectoryContent() {
           </TableHeader>
           <TableBody>
             {filtered.map((s) => (
-              <TableRow key={s.id} onClick={() => router.push(`/staff/${s.id}`)}>
+              <TableRow key={s.id} onClick={() => router.push(`/employees/${s.id}`)}>
                 <TableCell className="tabular-nums">
                   {s.employeeId ?? "—"}
                 </TableCell>
@@ -218,10 +218,10 @@ function StaffDirectoryContent() {
   );
 }
 
-export default function StaffPage() {
+export default function EmployeesPage() {
   return (
     <Suspense fallback={null}>
-      <StaffDirectoryContent />
+      <EmployeesDirectoryContent />
     </Suspense>
   );
 }

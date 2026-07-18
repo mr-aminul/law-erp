@@ -20,7 +20,7 @@ export function Table({
       className={cn(
         /* overflow-x-auto must win over overflow-hidden so tables scroll on narrow screens */
         "overflow-x-auto overscroll-x-contain border border-gray-200 outline-none focus:outline-none",
-        isRounded && "rounded-lg",
+        isRounded && "rounded-card",
         className
       )}
     >
@@ -28,9 +28,9 @@ export function Table({
         className={cn(
           "w-full border-separate border-spacing-0 text-xs [&_tbody_tr:last-child_td]:border-b-0",
           isRounded &&
-            "[&_thead_th:first-child]:rounded-tl-lg [&_thead_th:last-child]:rounded-tr-lg",
+            "[&_thead_th:first-child]:rounded-tl-card [&_thead_th:last-child]:rounded-tr-card",
           rounded === "full" &&
-            "[&_tbody_tr:last-child_td:first-child]:rounded-bl-lg [&_tbody_tr:last-child_td:last-child]:rounded-br-lg",
+            "[&_tbody_tr:last-child_td:first-child]:rounded-bl-card [&_tbody_tr:last-child_td:last-child]:rounded-br-card",
           compact && "[&_th]:px-3 [&_th]:py-1.5 [&_td]:px-3 [&_td]:py-1.5"
         )}
       >

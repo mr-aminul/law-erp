@@ -75,17 +75,17 @@ func (s *SeedStore) RecentCases(limit int) []*model.CaseSummary {
 		{
 			ID: "1", CaseID: "CS-2024-001", Matter: "Contract Dispute — Bashundhara",
 			ClientName: "Bashundhara Group", Status: "In-Progress",
-			NextHearing: strPtr("2026-07-15"), AssignedLawyers: []string{"Adv. Rahima Khan"},
+			NextHearing: strPtr("2026-07-15"), AssignedLawyers: []string{"Rahima Khan"},
 		},
 		{
 			ID: "2", CaseID: "CS-2024-002", Matter: "Labour Tribunal — Grameen",
 			ClientName: "Grameen Telecom", Status: "Pending",
-			NextHearing: strPtr("2026-07-22"), AssignedLawyers: []string{"Adv. Tanvir Ahmed"},
+			NextHearing: strPtr("2026-07-22"), AssignedLawyers: []string{"Tanvir Ahmed"},
 		},
 		{
 			ID: "3", CaseID: "CS-2025-003", Matter: "Property Suit — Dhanmondi",
 			ClientName: "Mr. Karim Uddin", Status: "New",
-			AssignedLawyers: []string{"Adv. Nusrat Jahan"},
+			AssignedLawyers: []string{"Nusrat Jahan"},
 		},
 	}
 	if limit <= 0 || limit > len(all) {

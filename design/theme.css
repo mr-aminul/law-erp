@@ -57,22 +57,19 @@
   --color-amber: #c2882c;
   --color-amber-light: color-mix(in srgb, var(--color-amber) 12%, white);
 
-  --color-red: #d45c4f;
+  /* Error / danger — keep in sync with apps/web/app/globals.css */
+  --color-red: #dc2626;
   --color-red-light: color-mix(in srgb, var(--color-red) 12%, white);
 
   --color-status-completed: #2f7a5d;
-  --color-status-completed-surface: color-mix(
-    in srgb,
-    var(--color-status-completed) 12%,
-    white
-  );
+  --color-status-completed-surface: color-mix(in srgb,
+      var(--color-status-completed) 12%,
+      white);
 
   --color-status-on-hold: #6b7585;
-  --color-status-on-hold-surface: color-mix(
-    in srgb,
-    var(--color-status-on-hold) 10%,
-    white
-  );
+  --color-status-on-hold-surface: color-mix(in srgb,
+      var(--color-status-on-hold) 10%,
+      white);
 
   --color-status-in-progress: var(--color-blue);
   --color-status-in-progress-surface: var(--color-blue-light);

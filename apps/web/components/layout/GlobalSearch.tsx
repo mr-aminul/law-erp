@@ -1,7 +1,6 @@
 "use client";
 
-import { Input } from "@/components/ui/Input";
-import { Modal } from "@/components/ui/Modal";
+import { UserAvatar } from "@/components/ui/UserChip";
 import { cn } from "@/lib/utils/cn";
 import {
   groupSearchHits,
@@ -37,51 +36,77 @@ const CATEGORY_ICONS: Record<SearchCategory, LucideIcon> = {
 };
 
 interface GlobalSearchProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  className?: string;
 }
 
-export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
+export function GlobalSearch({ className }: GlobalSearchProps) {
   const router = useRouter();
+  const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listId = useId();
   const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [shortcut, setShortcut] = useState("⌘K");
 
   const hits = runGlobalSearch(query);
   const groups = groupSearchHits(hits);
+  const showPanel = open && query.trim().length > 0;
 
   useEffect(() => {
-    if (!open) return;
-    setQuery("");
-    setActiveIndex(0);
-    const t = window.setTimeout(() => inputRef.current?.focus(), 0);
-    return () => window.clearTimeout(t);
-  }, [open]);
+    setShortcut(/Mac|iPhone|iPad/.test(navigator.platform) ? "⌘K" : "Ctrl K");
+  }, []);
 
   useEffect(() => {
     setActiveIndex(0);
   }, [query]);
 
-  function close() {
-    onOpenChange(false);
-  }
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        inputRef.current?.focus();
+        setOpen(true);
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    function onPointerDown(e: MouseEvent) {
+      if (!rootRef.current?.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [open]);
 
   function navigate(hit: SearchHit) {
     router.push(hit.href);
-    close();
+    setQuery("");
+    setOpen(false);
+    inputRef.current?.blur();
   }
 
-  function onKeyDown(e: React.KeyboardEvent) {
+  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setOpen(false);
+      inputRef.current?.blur();
+      return;
+    }
+    if (!showPanel || hits.length === 0) return;
+
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      if (hits.length === 0) return;
       setActiveIndex((i) => (i + 1) % hits.length);
       return;
     }
     if (e.key === "ArrowUp") {
       e.preventDefault();
-      if (hits.length === 0) return;
       setActiveIndex((i) => (i - 1 + hits.length) % hits.length);
       return;
     }
@@ -95,51 +120,58 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
   let flatIndex = 0;
 
   return (
-    <Modal open={open} onClose={close} title="Search" className="max-w-xl">
-      <div onKeyDown={onKeyDown}>
-        <div className="relative mb-3">
-          <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted"
-            aria-hidden
-          />
-          <Input
-            ref={inputRef}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search pages, clients, matters…"
-            className="pl-9"
-            role="combobox"
-            aria-expanded={hits.length > 0}
-            aria-controls={listId}
-            aria-autocomplete="list"
-            aria-activedescendant={
-              hits[activeIndex] ? `${listId}-${hits[activeIndex].id}` : undefined
-            }
-          />
-        </div>
+    <div ref={rootRef} className={cn("relative", className)}>
+      <div className="relative">
+        <Search
+          className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted sm:left-3"
+          aria-hidden
+        />
+        <input
+          ref={inputRef}
+          type="search"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={onKeyDown}
+          placeholder="Search…"
+          className="h-9 w-full min-w-0 rounded-input border border-gray-200 bg-white py-0 pl-8 pr-14 text-sm text-text-primary outline-none transition-colors placeholder:text-text-muted focus:border-gray-300 focus:ring-2 focus:ring-gray-200 sm:min-w-[200px] sm:pl-9 sm:pr-16"
+          role="combobox"
+          aria-expanded={showPanel}
+          aria-controls={listId}
+          aria-autocomplete="list"
+          aria-activedescendant={
+            showPanel && hits[activeIndex]
+              ? `${listId}-${hits[activeIndex].id}`
+              : undefined
+          }
+        />
+        <kbd className="pointer-events-none absolute right-2.5 top-1/2 hidden -translate-y-1/2 font-sans text-[11px] font-normal tracking-wide text-gray-400 sm:inline">
+          {shortcut}
+        </kbd>
+      </div>
 
+      {showPanel ? (
         <div
           id={listId}
           role="listbox"
-          className="max-h-[min(60dvh,420px)] overflow-y-auto"
+          className="absolute right-0 top-[calc(100%+6px)] z-[120] max-h-[min(60dvh,420px)] w-[min(100vw-2rem,360px)] overflow-y-auto rounded-input border border-gray-200 bg-white py-1 shadow-lg sm:w-[360px]"
         >
-          {!query.trim() ? (
-            <p className="py-6 text-center text-sm text-text-muted">
-              Search pages, clients, employees, matters, documents…
-            </p>
-          ) : hits.length === 0 ? (
-            <p className="py-6 text-center text-sm text-text-muted">
+          {hits.length === 0 ? (
+            <p className="px-3 py-6 text-center text-sm text-text-muted">
               No results for “{query.trim()}”
             </p>
           ) : (
             groups.map(({ category, hits: categoryHits }) => {
               const Icon = CATEGORY_ICONS[category];
               return (
-                <div key={category} className="mb-2 last:mb-0">
-                  <p className="px-1 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+                <div key={category} className="mb-1 last:mb-0">
+                  <p className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-text-muted">
                     {category}
                   </p>
-                  <ul className="space-y-0.5">
+                  <ul>
                     {categoryHits.map((hit) => {
                       const index = flatIndex++;
                       const isActive = index === activeIndex;
@@ -151,16 +183,20 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
                             onClick={() => navigate(hit)}
                             onMouseEnter={() => setActiveIndex(index)}
                             className={cn(
-                              "flex w-full items-start gap-2.5 rounded-input px-2 py-2 text-left transition-colors",
+                              "flex w-full items-center gap-2.5 px-3 py-2 text-left transition-colors",
                               isActive
-                                ? "bg-cream-card text-text-primary"
-                                : "text-text-primary hover:bg-cream-card/70"
+                                ? "bg-gray-100 text-text-primary"
+                                : "text-text-primary hover:bg-gray-50"
                             )}
                           >
-                            <Icon
-                              className="mt-0.5 h-4 w-4 shrink-0 text-text-muted"
-                              aria-hidden
-                            />
+                            {hit.initials ? (
+                              <UserAvatar initials={hit.initials} size="sm" />
+                            ) : (
+                              <Icon
+                                className="h-4 w-4 shrink-0 text-text-muted"
+                                aria-hidden
+                              />
+                            )}
                             <span className="min-w-0 flex-1">
                               <span className="block truncate text-sm font-medium">
                                 {hit.title}
@@ -181,43 +217,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
             })
           )}
         </div>
-      </div>
-    </Modal>
-  );
-}
-
-interface GlobalSearchTriggerProps {
-  onOpen: () => void;
-  className?: string;
-}
-
-export function GlobalSearchTrigger({
-  onOpen,
-  className,
-}: GlobalSearchTriggerProps) {
-  const [shortcut, setShortcut] = useState("⌘K");
-
-  useEffect(() => {
-    setShortcut(
-      /Mac|iPhone|iPad/.test(navigator.platform) ? "⌘K" : "Ctrl K"
-    );
-  }, []);
-
-  return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className={cn(
-        "flex h-9 shrink-0 items-center gap-2 rounded-input border border-gray-200 bg-white px-2.5 text-sm text-text-muted transition-colors hover:bg-cream-card hover:text-text-primary sm:min-w-[200px] sm:px-3",
-        className
-      )}
-      aria-label="Open search"
-    >
-      <Search className="h-4 w-4 shrink-0" aria-hidden />
-      <span className="hidden flex-1 text-left sm:inline">Search…</span>
-      <kbd className="ml-auto hidden font-sans text-[11px] font-normal tracking-wide text-gray-400 sm:inline">
-        {shortcut}
-      </kbd>
-    </button>
+      ) : null}
+    </div>
   );
 }

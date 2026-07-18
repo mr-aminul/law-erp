@@ -54,7 +54,7 @@ export const mockNotifications: AppNotification[] = [
     body: "left a comment on Case R7N2X8.",
     href: "/communications",
     createdAt: "2026-07-07T11:05:00.000Z",
-    actorName: "Adv. Tanvir Ahmed",
+    actorName: "Tanvir Ahmed",
     actorInitials: "TA",
     matterChip: {
       label: "R7N2X8 — Contract Review",
@@ -133,7 +133,7 @@ export const mockNotifications: AppNotification[] = [
     href: "/communications",
     createdAt: "2026-07-04T15:30:00.000Z",
     read: true,
-    actorName: "Adv. Rahima Khan",
+    actorName: "Rahima Khan",
     actorInitials: "RK",
     matterChip: {
       label: "Bashundhara Group v. State",

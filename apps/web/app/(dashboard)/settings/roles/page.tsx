@@ -5,7 +5,7 @@ import { PageSection } from "@/components/ui/PageSection";
 import { settingsSubNav } from "@/lib/config/navigation";
 import { mockSystemUsers } from "@/lib/mock";
 
-const permissions = ["Cases", "Clients", "Billing", "Documents", "Staff", "Settings", "Reports"];
+const permissions = ["Cases", "Clients", "Billing", "Documents", "Employees", "Settings", "Reports"];
 
 const roleMatrix: Record<string, boolean[]> = {
   "Managing Partner": [true, true, true, true, true, true, true],

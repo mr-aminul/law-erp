@@ -23,7 +23,7 @@ import {
 
 function getPageTitle(pathname: string): string {
   const titles: [RegExp | string, string][] = [
-    ["/", "Dashboard"],
+    ["/dashboard", "Dashboard"],
     ["/cases/new", "New Case"],
     [/^\/cases\/services\/[^/]+$/, "Service Detail"],
     ["/cases/services", "Services"],
@@ -38,11 +38,11 @@ function getPageTitle(pathname: string): string {
     ["/billing/invoices", "Invoices"],
     ["/billing/expenses", "Expenses"],
     ["/billing", "Billing"],
-    ["/staff/attendance", "Attendance"],
-    ["/staff/leave", "Leave Management"],
-    ["/staff/compensation", "Payroll"],
-    [/^\/staff\/[^/]+$/, "Staff Profile"],
-    ["/staff", "Staff"],
+    ["/employees/attendance", "Attendance"],
+    ["/employees/leave", "Leave Management"],
+    ["/employees/compensation", "Payroll"],
+    [/^\/employees\/[^/]+$/, "Employee Profile"],
+    ["/employees", "Employees"],
     ["/court-filing", "Court Filing"],
     ["/reports", "Reports & Analytics"],
     ["/communications/internal", "Internal"],
@@ -72,7 +72,7 @@ function getPageIcon(pathname: string): LucideIcon {
   if (pathname.startsWith("/calendar")) return Calendar;
   if (pathname.startsWith("/documents")) return FileText;
   if (pathname.startsWith("/billing")) return CreditCard;
-  if (pathname.startsWith("/staff")) return Scale;
+  if (pathname.startsWith("/employees")) return Scale;
   if (pathname.startsWith("/court-filing")) return Gavel;
   if (pathname.startsWith("/reports")) return BarChart3;
   if (pathname.startsWith("/communications/internal")) return MessagesSquare;
@@ -80,7 +80,7 @@ function getPageIcon(pathname: string): LucideIcon {
   if (pathname.startsWith("/communications/notices")) return ScrollText;
   if (pathname.startsWith("/communications")) return MessageSquare;
   if (pathname.startsWith("/settings")) return Settings;
-  if (pathname === "/") return LayoutDashboard;
+  if (pathname === "/dashboard") return LayoutDashboard;
   return LayoutDashboard;
 }
 

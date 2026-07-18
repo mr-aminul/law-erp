@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
 /** ponytail: module stack so nested modals only close the topmost on Escape */
-const openModalLayers: number[] = [];
+export const openModalLayers: number[] = [];
 
 interface ModalProps {
   open: boolean;

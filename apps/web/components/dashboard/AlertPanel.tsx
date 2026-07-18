@@ -1,9 +1,10 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/Card";
 import { Dropdown } from "@/components/ui/Dropdown";
+import { PageSection } from "@/components/ui/PageSection";
 import { dashboardAlerts } from "@/lib/mock/data";
 import { useAppStore } from "@/lib/store/appStore";
+import { cn } from "@/lib/utils";
 import { AlertTriangle, Clock, Loader } from "lucide-react";
 
 const alertFilterOptions = [
@@ -46,9 +47,9 @@ export function AlertPanel() {
   const { alertFilter, setAlertFilter } = useAppStore();
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-text-primary">Alerts</h3>
+    <PageSection
+      title="Alerts"
+      action={
         <Dropdown
           options={alertFilterOptions}
           value={alertFilter}
@@ -56,12 +57,12 @@ export function AlertPanel() {
             setAlertFilter(v as "Today" | "This Week" | "This Month")
           }
         />
-      </div>
-
-      <Card size="sm" className="bg-cream-card">
-        <CardContent className="flex flex-col gap-2">
+      }
+    >
+      <div className="flex flex-col gap-3">
+        <div className="rounded-card bg-cream-card px-3 py-3">
           <p className="text-xs font-semibold text-text-sec">Clients</p>
-          <div className="flex gap-4">
+          <div className="mt-2 flex gap-4">
             <div>
               <p className="text-lg font-bold text-green">
                 {dashboardAlerts.activeClients}
@@ -75,28 +76,30 @@ export function AlertPanel() {
               <p className="text-xs text-text-muted">Inactive</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      <div className="space-y-3">
         {alertCards.map(
           ({ key, label, value, icon: Icon, bg, text, iconColor }) => (
-            <Card key={key} size="sm">
-              <CardContent className="flex items-center gap-3">
-                <div
-                  className={`flex size-10 shrink-0 items-center justify-center rounded-card ${bg}`}
-                >
-                  <Icon className={iconColor} />
-                </div>
-                <div>
-                  <p className="text-xs text-text-sec">{label}</p>
-                  <p className={`text-xl font-bold ${text}`}>{value}</p>
-                </div>
-              </CardContent>
-            </Card>
+            <div
+              key={key}
+              className="flex items-center gap-3 rounded-card border border-gray-200 px-3 py-2.5"
+            >
+              <div
+                className={cn(
+                  "flex size-10 shrink-0 items-center justify-center rounded-badge",
+                  bg
+                )}
+              >
+                <Icon className={cn("size-5", iconColor)} />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-text-sec">{label}</p>
+                <p className={cn("text-xl font-bold", text)}>{value}</p>
+              </div>
+            </div>
           )
         )}
       </div>
-    </div>
+    </PageSection>
   );
 }

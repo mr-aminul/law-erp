@@ -34,6 +34,8 @@ export type SearchHit = {
   subtitle?: string;
   href: string;
   keywords: string;
+  /** Employee avatar initials when category is Employees. */
+  initials?: string;
 };
 
 const CATEGORY_ORDER: SearchCategory[] = [
@@ -109,12 +111,13 @@ function buildIndex(): SearchHit[] {
   }));
 
   const employees: SearchHit[] = mockStaff.map((s) => ({
-    id: `staff:${s.id}`,
+    id: `employee:${s.id}`,
     category: "Employees" as const,
     title: s.name,
     subtitle: [s.employeeId, s.role, s.department].filter(Boolean).join(" · "),
-    href: `/staff/${s.id}`,
+    href: `/employees/${s.id}`,
     keywords: blob(s.name, s.employeeId, s.email, s.role, s.department),
+    initials: s.initials,
   }));
 
   const cases: SearchHit[] = mockCases.map((c) => ({

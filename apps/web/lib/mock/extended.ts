@@ -20,7 +20,7 @@ export const mockHearings: Hearing[] = [
     date: "2026-06-10",
     time: "10:30",
     type: "Court Hearing",
-    assignedLawyers: ["Adv. Rahima Khan"],
+    assignedLawyers: ["Rahima Khan"],
     causeListRef: "CL-2026-06-10-HCD-142",
   },
   {
@@ -33,7 +33,7 @@ export const mockHearings: Hearing[] = [
     date: "2026-06-05",
     time: "11:00",
     type: "Court Hearing",
-    assignedLawyers: ["Adv. Rahima Khan"],
+    assignedLawyers: ["Rahima Khan"],
   },
   {
     id: "h3",
@@ -45,7 +45,7 @@ export const mockHearings: Hearing[] = [
     date: "2026-06-03",
     time: "09:00",
     type: "Court Hearing",
-    assignedLawyers: ["Adv. Tanvir Ahmed"],
+    assignedLawyers: ["Tanvir Ahmed"],
   },
   {
     id: "h4",
@@ -57,7 +57,7 @@ export const mockHearings: Hearing[] = [
     date: "2026-06-15",
     time: "14:00",
     type: "Court Hearing",
-    assignedLawyers: ["Adv. Nusrat Jahan"],
+    assignedLawyers: ["Nusrat Jahan"],
     adjourned: true,
     adjournmentReason: "Opposing counsel requested extension",
   },
@@ -71,7 +71,7 @@ export const mockHearings: Hearing[] = [
     date: "2026-06-20",
     time: "10:00",
     type: "Filing Deadline",
-    assignedLawyers: ["Adv. Nusrat Jahan"],
+    assignedLawyers: ["Nusrat Jahan"],
   },
 ];
 
@@ -85,7 +85,7 @@ export const mockDocuments: Document[] = [
     clientName: "Bashundhara Group",
     language: "English",
     version: 3,
-    uploadedBy: "Adv. Tanvir Ahmed",
+    uploadedBy: "Tanvir Ahmed",
     uploadedAt: "2026-05-20",
     size: "2.4 MB",
     accessLevel: "Partner",
@@ -113,7 +113,7 @@ export const mockDocuments: Document[] = [
     clientName: "Square Pharmaceuticals",
     language: "Bilingual",
     version: 2,
-    uploadedBy: "Adv. Nusrat Jahan",
+    uploadedBy: "Nusrat Jahan",
     uploadedAt: "2026-04-10",
     size: "890 KB",
     accessLevel: "Associate",
@@ -153,7 +153,7 @@ export const mockFilings: CourtFiling[] = [
     court: "High Court Division, Dhaka",
     filingType: "Writ Petition",
     submittedAt: "2026-05-15",
-    filedBy: "Adv. Rahima Khan",
+    filedBy: "Rahima Khan",
     status: "Accepted",
     causeListRef: "CL-2026-06-10-HCD-142",
     processServer: "Karim Uddin",
@@ -169,7 +169,7 @@ export const mockFilings: CourtFiling[] = [
     court: "1st Court of Joint District Judge, Dhaka",
     filingType: "Plaint",
     submittedAt: "2026-05-28",
-    filedBy: "Adv. Tanvir Ahmed",
+    filedBy: "Tanvir Ahmed",
     status: "Submitted",
     filingFee: 1800,
     summonsDispatched: false,
@@ -205,7 +205,7 @@ export const mockExpenses: Expense[] = [
     category: "Travel",
     amount: 1200,
     date: "2026-06-03",
-    recordedBy: "Adv. Tanvir Ahmed",
+    recordedBy: "Tanvir Ahmed",
   },
 ];
 
@@ -267,7 +267,7 @@ export const mockContactLogs: ContactLog[] = [
     type: "Meeting",
     subject: "Case strategy review",
     notes: "Discussed interim relief options with client legal team.",
-    loggedBy: "Adv. Rahima Khan",
+    loggedBy: "Rahima Khan",
     loggedAt: "2026-05-28T14:00:00",
   },
   {
@@ -286,7 +286,7 @@ export const mockCaseComments: CaseComment[] = [
   {
     id: "cc1",
     caseId: "1",
-    author: "Adv. Tanvir Ahmed",
+    author: "Tanvir Ahmed",
     content: "Draft reply submitted. Awaiting court date for hearing on preliminary objection.",
     createdAt: "2026-05-29T16:00:00",
   },
@@ -303,7 +303,7 @@ export const mockServiceComments: CaseComment[] = [
   {
     id: "sc1",
     caseId: "1",
-    author: "Adv. Rahima Khan",
+    author: "Rahima Khan",
     content: "First draft of opinion circulated for partner review.",
     createdAt: "2026-05-22T11:00:00",
   },
@@ -339,7 +339,7 @@ export const mockCommunications: Communication[] = [
     clientName: "Square Pharmaceuticals",
     status: "Sent",
     sentAt: "2026-04-10T11:00:00",
-    sentBy: "Adv. Nusrat Jahan",
+    sentBy: "Nusrat Jahan",
   },
   {
     id: "cm3",
@@ -376,7 +376,7 @@ export const mockCaseNotes: CaseNote[] = [
   {
     id: "n1",
     caseId: "1",
-    author: "Adv. Rahima Khan",
+    author: "Rahima Khan",
     content: "Client prefers settlement if opposite party agrees to boundary demarcation.",
     isMemo: false,
     createdAt: "2026-05-10",
@@ -384,7 +384,7 @@ export const mockCaseNotes: CaseNote[] = [
   {
     id: "n2",
     caseId: "1",
-    author: "Adv. Tanvir Ahmed",
+    author: "Tanvir Ahmed",
     content: "INTERNAL: Evaluate appeal strategy if writ is dismissed at admission stage.",
     isMemo: true,
     createdAt: "2026-05-22",
@@ -395,7 +395,7 @@ export const mockServiceNotes: CaseNote[] = [
   {
     id: "sn1",
     caseId: "1",
-    author: "Adv. Rahima Khan",
+    author: "Rahima Khan",
     content: "Client asked for risk matrix covering RAJUK and title defects.",
     isMemo: false,
     createdAt: "2026-05-12",
@@ -403,7 +403,7 @@ export const mockServiceNotes: CaseNote[] = [
   {
     id: "sn2",
     caseId: "1",
-    author: "Adv. Rahima Khan",
+    author: "Rahima Khan",
     content: "INTERNAL: Cross-check with prior Gulshan Block C opinion before circulating.",
     isMemo: true,
     createdAt: "2026-05-28",
@@ -411,9 +411,9 @@ export const mockServiceNotes: CaseNote[] = [
 ];
 
 export const mockAttendance: AttendanceRecord[] = [
-  { id: "a1", staffId: "1", staffName: "Adv. Rahima Khan", date: "2026-06-03", status: "Present" },
-  { id: "a2", staffId: "2", staffName: "Adv. Tanvir Ahmed", date: "2026-06-03", status: "Present" },
-  { id: "a3", staffId: "3", staffName: "Adv. Nusrat Jahan", date: "2026-06-03", status: "Late" },
+  { id: "a1", staffId: "1", staffName: "Rahima Khan", date: "2026-06-03", status: "Present" },
+  { id: "a2", staffId: "2", staffName: "Tanvir Ahmed", date: "2026-06-03", status: "Present" },
+  { id: "a3", staffId: "3", staffName: "Nusrat Jahan", date: "2026-06-03", status: "Late" },
   { id: "a4", staffId: "4", staffName: "Farhana Begum", date: "2026-06-03", status: "Present" },
 ];
 
@@ -421,7 +421,7 @@ export const mockLeaveRequests: LeaveRequest[] = [
   {
     id: "lr1",
     staffId: "3",
-    staffName: "Adv. Nusrat Jahan",
+    staffName: "Nusrat Jahan",
     type: "Annual",
     from: "2026-06-15",
     to: "2026-06-17",
@@ -434,7 +434,7 @@ export const mockCompensation: CompensationRecord[] = [
   {
     id: "cr1",
     staffId: "1",
-    staffName: "Adv. Rahima Khan",
+    staffName: "Rahima Khan",
     month: "May 2026",
     grossSalary: 350000,
     tds: 35000,
@@ -444,7 +444,7 @@ export const mockCompensation: CompensationRecord[] = [
   {
     id: "cr2",
     staffId: "2",
-    staffName: "Adv. Tanvir Ahmed",
+    staffName: "Tanvir Ahmed",
     month: "May 2026",
     grossSalary: 180000,
     tds: 18000,
@@ -473,7 +473,7 @@ export const mockSystemUsers: SystemUser[] = [
   },
   {
     id: "u2",
-    name: "Adv. Rahima Khan",
+    name: "Rahima Khan",
     email: "rahima@ukil.ai",
     role: "Partner",
     status: "Active",
@@ -492,7 +492,7 @@ export const mockSystemUsers: SystemUser[] = [
 export const mockAuditLog: AuditEntry[] = [
   {
     id: "al1",
-    user: "Adv. Rahima Khan",
+    user: "Rahima Khan",
     action: "Updated case status",
     resource: "K4M9P2",
     timestamp: "2026-06-03T10:15:00",
@@ -510,7 +510,7 @@ export const mockAuditLog: AuditEntry[] = [
     id: "al3",
     user: "Aminul Islam",
     action: "Approved leave request",
-    resource: "Adv. Nusrat Jahan",
+    resource: "Nusrat Jahan",
     timestamp: "2026-06-01T11:00:00",
     ip: "103.24.1.10",
   },

@@ -22,7 +22,7 @@ export default function CompensationPage() {
       <PageSection title="Payroll Records" description="BDT salary with TDS deduction — May 2026 cycle.">
         <Table compact>
           <TableHeader>
-            <TableHead>Staff</TableHead>
+            <TableHead>Employee</TableHead>
             <TableHead>Month</TableHead>
             <TableHead>Gross</TableHead>
             <TableHead>TDS</TableHead>

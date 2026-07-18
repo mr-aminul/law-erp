@@ -30,11 +30,12 @@ export function CasesTable() {
   ).slice(0, 6);
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-4">
       <Tabs
         tabs={statusTabs}
         activeTab={caseFilterStatus}
         onChange={(id) => setCaseFilterStatus(id as CaseStatus | "All")}
+        size="sm"
       />
       <Table>
         <TableHeader>

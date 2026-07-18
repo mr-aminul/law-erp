@@ -7,7 +7,7 @@ export function StatusDonut() {
   const total = caseStatusChartData.reduce((sum, d) => sum + d.value, 0);
 
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center gap-3">
       <ResponsiveContainer width="100%" height={200}>
         <PieChart>
           <Pie
@@ -41,11 +41,11 @@ export function StatusDonut() {
         </PieChart>
       </ResponsiveContainer>
 
-      <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1">
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1">
         {caseStatusChartData.map((item) => (
           <div key={item.name} className="flex items-center gap-1.5 text-xs">
             <span
-              className="h-2.5 w-2.5 rounded-full"
+              className="size-2.5 rounded-full"
               style={{ backgroundColor: item.color }}
             />
             <span className="text-text-sec">{item.name}</span>

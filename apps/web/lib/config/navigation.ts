@@ -1,5 +1,5 @@
 export const mainNav = [
-  { href: "/", label: "Dashboard", icon: "LayoutDashboard" },
+  { href: "/dashboard", label: "Dashboard", icon: "LayoutDashboard" },
   {
     href: "/cases",
     label: "Matters",
@@ -23,14 +23,14 @@ export const mainNav = [
     ],
   },
   {
-    href: "/staff",
-    label: "Staff",
+    href: "/employees",
+    label: "Employees",
     icon: "Scale",
     children: [
-      { href: "/staff", label: "Directory", icon: "ContactRound" },
-      { href: "/staff/attendance", label: "Attendance", icon: "Clock" },
-      { href: "/staff/leave", label: "Leave", icon: "CalendarOff" },
-      { href: "/staff/compensation", label: "Payroll", icon: "Banknote" },
+      { href: "/employees", label: "Directory", icon: "ContactRound" },
+      { href: "/employees/attendance", label: "Attendance", icon: "Clock" },
+      { href: "/employees/leave", label: "Leave", icon: "CalendarOff" },
+      { href: "/employees/compensation", label: "Payroll", icon: "Banknote" },
     ],
   },
   { href: "/court-filing", label: "Court Filing", icon: "Gavel" },

@@ -57,6 +57,7 @@ module.exports = {
         "on-sidebar": "var(--color-on-sidebar)",
         cream: "var(--color-cream)",
         "cream-card": "var(--color-cream-card)",
+        surface: "var(--color-surface)",
         "text-primary": "var(--color-text-primary)",
         "text-sec": "var(--color-text-sec)",
         "text-muted": "var(--color-text-muted)",
