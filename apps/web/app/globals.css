@@ -27,42 +27,7 @@
   }
 }
 
-@layer base {
-  .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: var(--color-red);
-    --destructive-foreground: var(--color-white);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
-  }
-}
+/* Remove legacy shadcn .dark override — dark tokens live in design/theme.css */
 
 @layer base {
   html {
@@ -77,6 +42,44 @@
   /* Auth pages need real mobile widths; dashboard keeps 1280px floor */
   body:has(.auth-shell) {
     min-width: 0;
+  }
+}
+
+/**
+ * Hardcoded gray/white chrome → tokens in dark mode.
+ * text-white stays literal white (ink on brand fills).
+ */
+@layer utilities {
+  .dark .bg-white {
+    background-color: var(--color-surface);
+  }
+  .dark .bg-gray-50,
+  .dark .bg-gray-100 {
+    background-color: var(--color-muted-bg);
+  }
+  .dark .border-gray-200,
+  .dark .border-gray-300 {
+    border-color: var(--color-divider);
+  }
+  .dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--color-divider);
+  }
+  .dark .text-gray-500,
+  .dark .text-gray-600 {
+    color: var(--color-text-muted);
+  }
+  .dark .text-gray-700,
+  .dark .text-gray-800,
+  .dark .text-gray-900 {
+    color: var(--color-text-primary);
+  }
+  .dark .hover\:bg-gray-50:hover,
+  .dark .hover\:bg-gray-100:hover,
+  .dark .hover\:bg-\[\#eceef1\]:hover {
+    background-color: var(--color-muted-bg);
+  }
+  .dark .bg-\[\#f4f5f6\] {
+    background-color: var(--color-muted-bg);
   }
 }
 

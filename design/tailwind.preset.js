@@ -58,6 +58,7 @@ module.exports = {
         cream: "var(--color-cream)",
         "cream-card": "var(--color-cream-card)",
         surface: "var(--color-surface)",
+        "surface-raised": "var(--color-surface-raised)",
         "text-primary": "var(--color-text-primary)",
         "text-sec": "var(--color-text-sec)",
         "text-muted": "var(--color-text-muted)",

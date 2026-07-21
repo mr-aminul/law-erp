@@ -23,19 +23,17 @@
   --font-sans: "Inter", system-ui, sans-serif;
   --font-heading: "Inter", system-ui, sans-serif;
 
-  --color-surface: var(--color-white);
-
-  --background: var(--color-white);
+  --background: var(--color-cream);
   --foreground: var(--color-text-primary);
-  --card: var(--color-white);
+  --card: var(--color-surface);
   --card-foreground: var(--color-text-primary);
-  --popover: var(--color-white);
+  --popover: var(--color-surface-raised);
   --popover-foreground: var(--color-text-primary);
   --primary: var(--color-sidebar);
   --primary-foreground: var(--color-on-sidebar);
   --secondary: var(--color-theme-subtle);
   --secondary-foreground: var(--color-text-primary);
-  --muted: var(--color-theme-subtle);
+  --muted: var(--color-muted-bg);
   --muted-foreground: var(--color-text-muted);
   --accent: var(--color-green-light);
   --accent-foreground: var(--color-green);
@@ -52,3 +50,5 @@
     --shell-margin: 6px;
   }
 }
+
+/* shadcn bridge follows theme.css .dark surface remaps automatically via vars */

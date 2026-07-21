@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Providers } from "./providers";
-import { THEME_COLOR_BOOTSTRAP } from "@/lib/theme/brand";
+import { THEME_BOOTSTRAP } from "@/lib/theme/brand";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,11 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased">
+      <body className="bg-cream font-sans text-text-primary antialiased">
         <Script
-          id="ukil-theme-color"
+          id="ukil-theme"
           strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: THEME_COLOR_BOOTSTRAP }}
+          dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }}
         />
         <Providers>{children}</Providers>
       </body>

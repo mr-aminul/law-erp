@@ -2,6 +2,7 @@ import type { Config } from "tailwindcss";
 import sharedPreset from "../../design/tailwind.preset";
 
 const config: Config = {
+  darkMode: "class",
   presets: [sharedPreset],
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",

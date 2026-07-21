@@ -33,10 +33,10 @@ export function ThemeColorSettings() {
         type="button"
         onClick={() => inputRef.current?.click()}
         aria-label="Theme color"
-        className="group relative flex h-7 w-7 items-center justify-center rounded-full transition hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2"
+        className="group relative flex h-7 w-7 items-center justify-center rounded-full transition hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
       >
         <span
-          className="h-full w-full rounded-full shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)] ring-2 ring-white ring-offset-1 ring-offset-gray-200 transition group-hover:ring-offset-gray-300"
+          className="h-full w-full rounded-full shadow-[inset_0_0_0_1px_rgba(0,0,0,0.12)] ring-2 ring-surface ring-offset-1 ring-offset-divider transition"
           style={{ backgroundColor: color }}
         />
       </button>
