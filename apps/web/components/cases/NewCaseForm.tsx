@@ -7,9 +7,15 @@ import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 import { UserChip } from "@/components/ui/UserChip";
-import { mockClients, mockStaff } from "@/lib/mock";
+import { mockStaff } from "@/lib/mock";
+import {
+  type CreateCaseInput,
+  type CreateClientInput,
+  useDomainStore,
+} from "@/lib/store/domainStore";
 import { CASE_STATUSES } from "@/lib/utils/caseStatus";
-import type { CaseType } from "@/types/case";
+import type { CaseStatus, CaseType } from "@/types/case";
+import type { CourtLevel } from "@/types/hearing";
 import { useState } from "react";
 
 const DEFAULT_CASE_TYPES: CaseType[] = [
@@ -25,23 +31,59 @@ const CREATE_CLIENT_VALUE = "__create_client__";
 const CREATE_TYPE_VALUE = "__create_type__";
 
 interface NewCaseFormProps {
-  onSubmit: () => void;
+  onSubmit: (input: CreateCaseInput) => void;
   onCancel: () => void;
+  defaultClientId?: string;
 }
 
-export function NewCaseForm({ onSubmit, onCancel }: NewCaseFormProps) {
-  const [clientSelection, setClientSelection] = useState("");
+export function NewCaseForm({
+  onSubmit,
+  onCancel,
+  defaultClientId = "",
+}: NewCaseFormProps) {
+  const clients = useDomainStore((s) => s.clients);
+  const createClient = useDomainStore((s) => s.createClient);
+
+  const [clientSelection, setClientSelection] = useState(defaultClientId);
   const [newClientOpen, setNewClientOpen] = useState(false);
   const [typeSelection, setTypeSelection] = useState("Civil");
   const [customType, setCustomType] = useState("");
+  const [matter, setMatter] = useState("");
+  const [description, setDescription] = useState("");
+  const [court, setCourt] = useState<CourtLevel>("District Court");
+  const [courtName, setCourtName] = useState("");
+  const [caseNumber, setCaseNumber] = useState("");
+  const [nextHearing, setNextHearing] = useState("");
+  const [limitationDate, setLimitationDate] = useState("");
+  const [status, setStatus] = useState<CaseStatus>("Pending");
+  const [opposingParty, setOpposingParty] = useState("");
+  const [opposingCounsel, setOpposingCounsel] = useState("");
   const [assignedLawyerIds, setAssignedLawyerIds] = useState<string[]>([]);
 
   const lawyers = mockStaff.filter((s) => s.role !== "Admin");
-  const activeClients = mockClients.filter((c) => c.status === "Active");
+  const activeClients = clients.filter((c) => c.status === "Active");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    onSubmit();
+    if (!clientSelection || !matter.trim() || assignedLawyerIds.length === 0) return;
+    onSubmit({
+      matter,
+      clientId: clientSelection,
+      type: typeSelection === CREATE_TYPE_VALUE ? customType.trim() || "Civil" : typeSelection,
+      court,
+      courtName,
+      caseNumber,
+      description,
+      status,
+      assignedLawyers: assignedLawyerIds
+        .map((id) => lawyers.find((l) => l.id === id)?.name)
+        .filter((name): name is string => Boolean(name)),
+      opposingParty: opposingParty.trim()
+        ? { name: opposingParty, counsel: opposingCounsel }
+        : undefined,
+      nextHearing: nextHearing || undefined,
+      limitationDate: limitationDate || undefined,
+    });
   }
 
   function handleClientChange(value: string) {
@@ -52,10 +94,10 @@ export function NewCaseForm({ onSubmit, onCancel }: NewCaseFormProps) {
     setClientSelection(value);
   }
 
-  function handleClientCreated() {
+  function handleClientCreated(input: CreateClientInput) {
+    const created = createClient(input);
     setNewClientOpen(false);
-    const created = activeClients[0];
-    if (created) setClientSelection(created.id);
+    setClientSelection(created.id);
   }
 
   function handleTypeChange(value: string) {
@@ -113,19 +155,32 @@ export function NewCaseForm({ onSubmit, onCancel }: NewCaseFormProps) {
 
           <div className="col-span-2">
             <FormField label="Title" required>
-              <Input required placeholder="e.g. Land dispute — Gulshan Block C" />
+              <Input
+                required
+                value={matter}
+                onChange={(e) => setMatter(e.target.value)}
+                placeholder="e.g. Land dispute — Gulshan Block C"
+              />
             </FormField>
           </div>
 
           <div className="col-span-2">
             <FormField label="Description">
-              <Textarea placeholder="Optional details about the case" />
+              <Textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Optional details about the case"
+              />
             </FormField>
           </div>
 
           <FormField label="Court Level" required>
-            <Select required defaultValue="District Court">
-              {["Supreme Court", "High Court Division", "District Court", "Tribunal"].map(
+            <Select
+              required
+              value={court}
+              onChange={(e) => setCourt(e.target.value as CourtLevel)}
+            >
+              {(["Supreme Court", "High Court Division", "District Court", "Tribunal"] as const).map(
                 (c) => (
                   <option key={c} value={c}>
                     {c}
@@ -136,23 +191,43 @@ export function NewCaseForm({ onSubmit, onCancel }: NewCaseFormProps) {
           </FormField>
 
           <FormField label="Court Name" required>
-            <Input required placeholder="e.g. 1st Court of Joint District Judge, Dhaka" />
+            <Input
+              required
+              value={courtName}
+              onChange={(e) => setCourtName(e.target.value)}
+              placeholder="e.g. 1st Court of Joint District Judge, Dhaka"
+            />
           </FormField>
 
           <FormField label="Case Number">
-            <Input placeholder="Court-assigned number" />
+            <Input
+              value={caseNumber}
+              onChange={(e) => setCaseNumber(e.target.value)}
+              placeholder="Court-assigned number"
+            />
           </FormField>
 
           <FormField label="First Hearing Date">
-            <Input type="date" />
+            <Input
+              type="date"
+              value={nextHearing}
+              onChange={(e) => setNextHearing(e.target.value)}
+            />
           </FormField>
 
           <FormField label="Deadline">
-            <Input type="date" />
+            <Input
+              type="date"
+              value={limitationDate}
+              onChange={(e) => setLimitationDate(e.target.value)}
+            />
           </FormField>
 
           <FormField label="Status">
-            <Select defaultValue="Pending">
+            <Select
+              value={status}
+              onChange={(e) => setStatus(e.target.value as CaseStatus)}
+            >
               {CASE_STATUSES.filter((s) => s !== "Completed").map((s) => (
                 <option key={s} value={s}>
                   {s}
@@ -204,11 +279,19 @@ export function NewCaseForm({ onSubmit, onCancel }: NewCaseFormProps) {
           </div>
 
           <FormField label="Opposite Party">
-            <Input placeholder="Name of opposing party" />
+            <Input
+              value={opposingParty}
+              onChange={(e) => setOpposingParty(e.target.value)}
+              placeholder="Name of opposing party"
+            />
           </FormField>
 
           <FormField label="Opposing Counsel">
-            <Input placeholder="Advocate name" />
+            <Input
+              value={opposingCounsel}
+              onChange={(e) => setOpposingCounsel(e.target.value)}
+              placeholder="Advocate name"
+            />
           </FormField>
         </div>
 

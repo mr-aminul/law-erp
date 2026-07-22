@@ -3,7 +3,15 @@
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ChipStatusSelect } from "@/components/ui/ChipStatusSelect";
-import { DetailField, PageSection } from "@/components/ui/PageSection";
+import { DetailField, EmptyState, PageSection } from "@/components/ui/PageSection";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/Table";
 import { Tabs } from "@/components/ui/Tabs";
 import { getStaffById, mockCases, mockStaff } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
@@ -101,7 +109,7 @@ export default function EmployeeProfilePage({ params }: { params: { id: string }
 
   return (
     <div className="space-y-4">
-      <div className="rounded-card border border-gray-200 bg-surface p-4">
+      <div className="rounded-card border border-gray-200 bg-surface p-3 sm:p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-sidebar text-lg font-bold text-on-sidebar">
             {staff.initials}
@@ -162,17 +170,19 @@ export default function EmployeeProfilePage({ params }: { params: { id: string }
             )}
             <Button
               variant="secondary"
-              size="sm"
               onClick={() => (editing ? finishEditing() : startEditing())}
             >
               {editing ? (
                 "Done"
               ) : (
                 <>
-                  <Pencil className="h-4 w-4" />
+                  <Pencil className="mr-1.5 h-4 w-4" />
                   Edit
                 </>
               )}
+            </Button>
+            <Button variant="secondary" onClick={() => router.push("/employees")}>
+              Back to list
             </Button>
           </div>
         </div>
@@ -295,19 +305,31 @@ export default function EmployeeProfilePage({ params }: { params: { id: string }
 
       {tab === "cases" && (
         <PageSection title="Assigned Cases">
-          <div className="space-y-2">
-            {assignedCases.map((c) => (
-              <button
-                key={c.id}
-                type="button"
-                onClick={() => router.push(`/cases/${c.id}`)}
-                className="flex w-full justify-between rounded-card border border-gray-200 px-3 py-2 text-left hover:bg-cream-card"
-              >
-                <span className="text-sm font-semibold">{c.caseId} — {c.matter}</span>
-                <Badge variant="blue">{c.status}</Badge>
-              </button>
-            ))}
-          </div>
+          {assignedCases.length === 0 ? (
+            <EmptyState
+              title="No assigned cases"
+              description="This employee isn't assigned to any cases yet."
+            />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableHead>Case ID</TableHead>
+                <TableHead>Matter</TableHead>
+                <TableHead>Status</TableHead>
+              </TableHeader>
+              <TableBody>
+                {assignedCases.map((c) => (
+                  <TableRow key={c.id} onClick={() => router.push(`/cases/${c.id}`)}>
+                    <TableCell className="font-semibold">{c.caseId}</TableCell>
+                    <TableCell>{c.matter}</TableCell>
+                    <TableCell>
+                      <Badge variant="blue">{c.status}</Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </PageSection>
       )}
 

@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
-import { ListToolbar } from "@/components/ui/ListToolbar";
-import { PageSection } from "@/components/ui/PageSection";
+import { EmptyState } from "@/components/ui/PageSection";
 import {
   Table,
   TableBody,
@@ -14,13 +12,20 @@ import {
 import { mockCompensation } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate } from "@/lib/utils/formatDate";
+import { useRouter } from "next/navigation";
 
 export default function CompensationPage() {
+  const router = useRouter();
+
   return (
     <div className="space-y-4">
-      <ListToolbar actions={<Button>Run Payroll</Button>} />
-      <PageSection title="Payroll Records" description="BDT salary with TDS deduction — May 2026 cycle.">
-        <Table compact>
+      {mockCompensation.length === 0 ? (
+        <EmptyState
+          title="No payroll records"
+          description="Payroll cycles will appear here once processing is connected."
+        />
+      ) : (
+        <Table>
           <TableHeader>
             <TableHead>Employee</TableHead>
             <TableHead>Month</TableHead>
@@ -31,7 +36,7 @@ export default function CompensationPage() {
           </TableHeader>
           <TableBody>
             {mockCompensation.map((c) => (
-              <TableRow key={c.id}>
+              <TableRow key={c.id} onClick={() => router.push(`/employees/${c.staffId}`)}>
                 <TableCell className="font-semibold">{c.staffName}</TableCell>
                 <TableCell>{c.month}</TableCell>
                 <TableCell>{formatCurrency(c.grossSalary)}</TableCell>
@@ -42,7 +47,7 @@ export default function CompensationPage() {
             ))}
           </TableBody>
         </Table>
-      </PageSection>
+      )}
     </div>
   );
 }

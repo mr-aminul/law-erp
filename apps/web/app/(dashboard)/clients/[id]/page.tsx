@@ -4,7 +4,7 @@ import { CaseStatusBadge } from "@/components/cases/CaseStatusBadge";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ChipStatusSelect } from "@/components/ui/ChipStatusSelect";
-import { DetailField, PageSection } from "@/components/ui/PageSection";
+import { DetailField, EmptyState, PageSection } from "@/components/ui/PageSection";
 import { Tabs } from "@/components/ui/Tabs";
 import {
   Table,
@@ -14,18 +14,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
-import {
-  getCasesByClientId,
-  getClientById,
-  getInvoicesByClientId,
-  mockContactLogs,
-} from "@/lib/mock";
+import { getInvoicesByClientId, mockContactLogs } from "@/lib/mock";
+import { useDomainStore } from "@/lib/store/domainStore";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate } from "@/lib/utils/formatDate";
+import { invoiceStatusVariant } from "@/lib/utils/invoiceStatus";
 import { emailError, phoneError } from "@/lib/utils/validateContact";
-import { Pencil } from "lucide-react";
+import type { ClientStatus, ClientType } from "@/types/client";
+import { Pencil, Plus } from "lucide-react";
+import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ClientDetailPage({
   params,
@@ -33,7 +32,12 @@ export default function ClientDetailPage({
   params: { id: string };
 }) {
   const router = useRouter();
-  const client = getClientById(params.id);
+  const [ready, setReady] = useState(() => useDomainStore.persist.hasHydrated());
+  const client = useDomainStore((s) => s.clients.find((c) => c.id === params.id));
+  const cases = useDomainStore((s) =>
+    s.cases.filter((c) => c.clientId === params.id)
+  );
+  const updateClient = useDomainStore((s) => s.updateClient);
   const [tab, setTab] = useState("overview");
   const [editing, setEditing] = useState(false);
   const [contactErrors, setContactErrors] = useState<{
@@ -51,14 +55,26 @@ export default function ClientDetailPage({
     registrationNo: "",
     address: "",
     referralSource: "",
+    conflictChecked: true,
   });
+
+  useEffect(() => {
+    if (useDomainStore.persist.hasHydrated()) {
+      setReady(true);
+      return;
+    }
+    return useDomainStore.persist.onFinishHydration(() => setReady(true));
+  }, []);
+
+  if (!ready) {
+    return <div className="p-4 text-sm text-text-muted">Loading client…</div>;
+  }
 
   if (!client) notFound();
 
-  const cases = getCasesByClientId(client.id);
   const invoices = getInvoicesByClientId(client.id);
   const contacts = mockContactLogs.filter((c) => c.clientId === client.id);
-  const displayStatus = draft.status || client.status;
+  const displayStatus = (draft.status || client.status) as ClientStatus;
 
   const tabs = [
     { id: "overview", label: "Overview" },
@@ -80,6 +96,7 @@ export default function ClientDetailPage({
       registrationNo: client!.registrationNo ?? "",
       address: client!.address ?? "",
       referralSource: client!.referralSource ?? "",
+      conflictChecked: client!.conflictChecked,
     });
     setContactErrors({ email: null, phone: null });
     setEditing(true);
@@ -92,15 +109,28 @@ export default function ClientDetailPage({
     };
     setContactErrors(next);
     if (next.email || next.phone) return;
+    updateClient(client!.id, {
+      name: draft.name.trim() || client!.name,
+      type: (draft.type as ClientType) || client!.type,
+      status: (draft.status as ClientStatus) || client!.status,
+      email: draft.email.trim() || undefined,
+      phone: draft.phone.trim() || undefined,
+      nid: draft.nid.trim() || undefined,
+      passport: draft.passport.trim() || undefined,
+      registrationNo: draft.registrationNo.trim() || undefined,
+      address: draft.address.trim() || undefined,
+      referralSource: draft.referralSource.trim() || undefined,
+      conflictChecked: draft.conflictChecked,
+    });
     setEditing(false);
   }
 
-  function patchDraft(key: keyof typeof draft, value: string) {
+  function patchDraft(key: keyof typeof draft, value: string | boolean) {
     setDraft((prev) => ({ ...prev, [key]: value }));
-    if (key === "email") {
+    if (key === "email" && typeof value === "string") {
       setContactErrors((prev) => ({ ...prev, email: emailError(value) }));
     }
-    if (key === "phone") {
+    if (key === "phone" && typeof value === "string") {
       setContactErrors((prev) => ({ ...prev, phone: phoneError(value) }));
     }
   }
@@ -133,7 +163,6 @@ export default function ClientDetailPage({
         <div className="flex shrink-0 flex-wrap gap-2">
           <Button
             variant="secondary"
-            size="sm"
             onClick={() => (editing ? finishEditing() : startEditing())}
           >
             {editing ? (
@@ -145,7 +174,7 @@ export default function ClientDetailPage({
               </>
             )}
           </Button>
-          <Button variant="secondary" size="sm" onClick={() => router.push("/clients")}>
+          <Button variant="secondary" onClick={() => router.push("/clients")}>
             Back to list
           </Button>
         </div>
@@ -244,11 +273,22 @@ export default function ClientDetailPage({
             <DetailField
               label="Conflict Check"
               value={
-                client.conflictChecked ? (
+                (editing ? draft.conflictChecked : client.conflictChecked) ? (
                   <Badge variant="green">Cleared</Badge>
                 ) : (
                   <Badge variant="amber">Pending</Badge>
                 )
+              }
+              editing={editing}
+              editSlot={
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={draft.conflictChecked}
+                    onChange={(e) => patchDraft("conflictChecked", e.target.checked)}
+                  />
+                  COI cleared
+                </label>
               }
             />
             <DetailField label="Active Cases" value={client.activeCases} />
@@ -258,97 +298,140 @@ export default function ClientDetailPage({
       )}
 
       {tab === "cases" && (
-        <PageSection title="Linked Cases">
-          <Table compact>
-            <TableHeader>
-              <TableHead>Title</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Status</TableHead>
-            </TableHeader>
-            <TableBody>
-              {cases.map((c) => (
-                <TableRow key={c.id} onClick={() => router.push(`/cases/${c.id}`)}>
-                  <TableCell className="font-medium">{c.matter}</TableCell>
-                  <TableCell className="text-text-sec">{c.type}</TableCell>
-                  <TableCell><CaseStatusBadge status={c.status} /></TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <PageSection
+          title="Linked Cases"
+          action={
+            <Link href={`/cases?new=1&client=${client.id}`}>
+              <Button>
+                <Plus className="mr-1.5 h-4 w-4" />
+                New Case
+              </Button>
+            </Link>
+          }
+        >
+          {cases.length === 0 ? (
+            <EmptyState
+              title="No linked cases"
+              description="Cases opened for this client will appear here."
+            />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableHead>Title</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Status</TableHead>
+              </TableHeader>
+              <TableBody>
+                {cases.map((c) => (
+                  <TableRow key={c.id} onClick={() => router.push(`/cases/${c.id}`)}>
+                    <TableCell className="font-medium">{c.matter}</TableCell>
+                    <TableCell className="text-text-sec">{c.type}</TableCell>
+                    <TableCell><CaseStatusBadge status={c.status} /></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </PageSection>
       )}
 
       {tab === "invoices" && (
         <PageSection title="Invoices">
-          <Table compact>
-            <TableHeader>
-              <TableHead>Invoice #</TableHead>
-              <TableHead>Case</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Due</TableHead>
-            </TableHeader>
-            <TableBody>
-              {invoices.map((inv) => (
-                <TableRow key={inv.id} onClick={() => router.push(`/billing/invoices/${inv.id}`)}>
-                  <TableCell className="font-semibold">{inv.invoiceNumber}</TableCell>
-                  <TableCell>{inv.caseName}</TableCell>
-                  <TableCell>{formatCurrency(inv.amount)}</TableCell>
-                  <TableCell>
-                    <Badge variant={inv.status === "Paid" ? "green" : inv.status === "Overdue" ? "red" : inv.status === "Draft" ? "muted" : "amber"}>
-                      {inv.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-text-muted">{formatDate(inv.dueDate)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          {invoices.length === 0 ? (
+            <EmptyState
+              title="No invoices"
+              description="Invoices billed to this client will appear here."
+            />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableHead>Invoice #</TableHead>
+                <TableHead>Case</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Due</TableHead>
+              </TableHeader>
+              <TableBody>
+                {invoices.map((inv) => (
+                  <TableRow key={inv.id} onClick={() => router.push(`/billing/invoices/${inv.id}`)}>
+                    <TableCell className="font-semibold">{inv.invoiceNumber}</TableCell>
+                    <TableCell>{inv.caseName}</TableCell>
+                    <TableCell>{formatCurrency(inv.amount)}</TableCell>
+                    <TableCell>
+                      <Badge variant={invoiceStatusVariant(inv.status)}>{inv.status}</Badge>
+                    </TableCell>
+                    <TableCell className="text-text-muted">{formatDate(inv.dueDate)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </PageSection>
       )}
 
       {tab === "contacts" && (
         <PageSection title="Contact History">
-          <div className="space-y-3">
-            {contacts.length === 0 ? (
-              <p className="text-sm text-text-muted">No contact logs yet.</p>
-            ) : (
-              contacts.map((log) => (
-                <div key={log.id} className="rounded-card border border-gray-200 bg-cream-card p-3">
-                  <div className="flex items-center justify-between">
-                    <Badge variant="blue">{log.type}</Badge>
-                    <span className="text-xs text-text-muted">{formatDate(log.loggedAt)}</span>
-                  </div>
-                  <p className="mt-2 text-sm font-semibold">{log.subject}</p>
-                  <p className="mt-1 text-xs text-text-sec">{log.notes}</p>
-                  <p className="mt-2 text-[11px] text-text-muted">Logged by {log.loggedBy}</p>
-                </div>
-              ))
-            )}
-          </div>
+          {contacts.length === 0 ? (
+            <EmptyState
+              title="No contact logs yet"
+              description="Calls, emails, and meetings with this client will be logged here."
+            />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableHead>Type</TableHead>
+                <TableHead>Subject</TableHead>
+                <TableHead>Notes</TableHead>
+                <TableHead>Logged By</TableHead>
+                <TableHead>Date</TableHead>
+              </TableHeader>
+              <TableBody>
+                {contacts.map((log) => (
+                  <TableRow key={log.id}>
+                    <TableCell><Badge variant="blue">{log.type}</Badge></TableCell>
+                    <TableCell className="font-semibold">{log.subject}</TableCell>
+                    <TableCell className="max-w-[280px] truncate text-text-sec">{log.notes}</TableCell>
+                    <TableCell className="text-text-muted">{log.loggedBy}</TableCell>
+                    <TableCell className="text-text-muted">{formatDate(log.loggedAt)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </PageSection>
       )}
 
       {tab === "kyc" && (
         <PageSection title="KYC Document Vault">
-          <div className="space-y-2">
-            {(client.kycDocuments ?? []).map((doc) => (
-              <div key={doc.id} className="flex items-center justify-between rounded-card border border-gray-200 px-3 py-2">
-                <div>
-                  <p className="text-sm font-semibold">{doc.type}</p>
-                  {doc.expiryDate && (
-                    <p className="text-xs text-text-muted">Expires {formatDate(doc.expiryDate)}</p>
-                  )}
-                </div>
-                <Badge variant={doc.verified ? "green" : "amber"}>
-                  {doc.verified ? "Verified" : "Pending"}
-                </Badge>
-              </div>
-            ))}
-            {!client.kycDocuments?.length && (
-              <p className="text-sm text-text-muted">No KYC documents uploaded.</p>
-            )}
-          </div>
+          {!client.kycDocuments?.length ? (
+            <EmptyState
+              title="No KYC documents uploaded"
+              description="Identity and compliance documents for this client will appear here."
+            />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableHead>Document Type</TableHead>
+                <TableHead>Expires</TableHead>
+                <TableHead>Status</TableHead>
+              </TableHeader>
+              <TableBody>
+                {client.kycDocuments.map((doc) => (
+                  <TableRow key={doc.id}>
+                    <TableCell className="font-semibold">{doc.type}</TableCell>
+                    <TableCell className="text-text-muted">
+                      {doc.expiryDate ? formatDate(doc.expiryDate) : "—"}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={doc.verified ? "green" : "amber"}>
+                        {doc.verified ? "Verified" : "Pending"}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </PageSection>
       )}
     </div>

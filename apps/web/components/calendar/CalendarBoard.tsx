@@ -1,10 +1,8 @@
 "use client";
 
 import { EventFlyout } from "@/components/calendar/EventFlyout";
-import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils/cn";
 import type { Hearing } from "@/types/hearing";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const HOUR_START = 8;
@@ -24,7 +22,7 @@ function toISODate(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-function parseISODate(iso: string): Date {
+export function parseISODate(iso: string): Date {
   const [y, m, d] = iso.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
@@ -60,11 +58,11 @@ function parseHour(time: string): number {
   return h + (m || 0) / 60;
 }
 
-function monthLabel(cursor: Date): string {
+export function monthLabel(cursor: Date): string {
   return new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(cursor);
 }
 
-function weekLabel(cursor: Date): string {
+export function weekLabel(cursor: Date): string {
   const days = weekDays(cursor);
   const a = days[0];
   const b = days[6];
@@ -78,6 +76,13 @@ function weekLabel(cursor: Date): string {
 }
 
 type ViewMode = "week" | "month";
+
+export function shiftCalendarCursor(cursor: Date, view: ViewMode, delta: number): Date {
+  const next = new Date(cursor);
+  if (view === "month") next.setMonth(next.getMonth() + delta);
+  else next.setDate(next.getDate() + delta * 7);
+  return next;
+}
 
 interface CalendarBoardProps {
   hearings: Hearing[];
@@ -108,32 +113,8 @@ export function CalendarBoard({
     list.sort((a, b) => a.time.localeCompare(b.time));
   }
 
-  function shift(delta: number) {
-    const next = new Date(cursor);
-    if (view === "month") next.setMonth(next.getMonth() + delta);
-    else next.setDate(next.getDate() + delta * 7);
-    onCursorChange(next);
-  }
-
   return (
     <div className="overflow-hidden rounded-card border border-gray-200 bg-surface">
-      <div className="flex flex-wrap items-center gap-2 border-b border-gray-200 px-3 py-2.5">
-        <Button type="button" variant="outline" size="sm" onClick={() => onCursorChange(parseISODate(today))}>
-          Today
-        </Button>
-        <div className="flex items-center">
-          <Button type="button" variant="ghost" size="icon-sm" aria-label="Previous" onClick={() => shift(-1)}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button type="button" variant="ghost" size="icon-sm" aria-label="Next" onClick={() => shift(1)}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-        <h2 className="text-base font-semibold text-text-primary">
-          {view === "month" ? monthLabel(cursor) : weekLabel(cursor)}
-        </h2>
-      </div>
-
       {view === "month" ? (
         <MonthGrid
           cursor={cursor}

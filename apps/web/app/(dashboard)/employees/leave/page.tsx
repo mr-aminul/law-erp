@@ -4,8 +4,17 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { FormField, Select, Textarea } from "@/components/ui/Form";
 import { Input } from "@/components/ui/Input";
+import { ListToolbar } from "@/components/ui/ListToolbar";
 import { Modal } from "@/components/ui/Modal";
-import { EmptyState, PageSection } from "@/components/ui/PageSection";
+import { EmptyState } from "@/components/ui/PageSection";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/Table";
 import { mockLeaveRequests, mockStaff } from "@/lib/mock";
 import { formatDate } from "@/lib/utils/formatDate";
 import type { LeaveRequest, LeaveType } from "@/types/staff";
@@ -54,42 +63,46 @@ export default function LeavePage() {
 
   return (
     <div className="space-y-4">
-      <PageSection
-        title="Leave Management"
-        description="Track leave requests and approvals for the firm."
-        action={
-          <Button type="button" size="sm" onClick={() => setRequestOpen(true)}>
-            <Plus className="h-4 w-4" />
+      <ListToolbar
+        actions={
+          <Button type="button" onClick={() => setRequestOpen(true)}>
+            <Plus className="mr-1.5 h-4 w-4" />
             Request Leave
           </Button>
         }
-      >
-        {requests.length === 0 ? (
-          <EmptyState
-            title="No leave requests"
-            description="Submit a leave request to get started."
-            action={
-              <Button type="button" onClick={() => setRequestOpen(true)}>
-                <Plus className="h-4 w-4" />
-                Request Leave
-              </Button>
-            }
-          />
-        ) : (
-          <div className="space-y-2">
+      />
+
+      {requests.length === 0 ? (
+        <EmptyState
+          title="No leave requests"
+          description="Submit a leave request to get started."
+          action={
+            <Button type="button" onClick={() => setRequestOpen(true)}>
+              <Plus className="mr-1.5 h-4 w-4" />
+              Request Leave
+            </Button>
+          }
+        />
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableHead>Employee</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Dates</TableHead>
+            <TableHead>Reason</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead />
+          </TableHeader>
+          <TableBody>
             {requests.map((lr) => (
-              <div
-                key={lr.id}
-                className="flex flex-col gap-3 rounded-card border border-gray-200 px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div>
-                  <p className="text-sm font-semibold">{lr.staffName}</p>
-                  <p className="text-xs text-text-muted">
-                    {lr.type} leave · {formatDate(lr.from)} — {formatDate(lr.to)}
-                  </p>
-                  <p className="mt-1 text-xs text-text-sec">{lr.reason}</p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
+              <TableRow key={lr.id}>
+                <TableCell className="font-semibold">{lr.staffName}</TableCell>
+                <TableCell>{lr.type}</TableCell>
+                <TableCell className="text-text-sec">
+                  {formatDate(lr.from)} — {formatDate(lr.to)}
+                </TableCell>
+                <TableCell className="max-w-[220px] truncate text-text-sec">{lr.reason}</TableCell>
+                <TableCell>
                   <Badge
                     variant={
                       lr.status === "Approved"
@@ -101,30 +114,32 @@ export default function LeavePage() {
                   >
                     {lr.status}
                   </Badge>
+                </TableCell>
+                <TableCell>
                   {lr.status === "Pending" ? (
-                    <>
-                      <button
+                    <div className="flex flex-wrap gap-2">
+                      <Button
                         type="button"
+                        variant="outline"
                         onClick={() => setStatus(lr.id, "Approved")}
-                        className="rounded-badge bg-green-light px-2 py-1 text-xs font-semibold text-green"
                       >
                         Approve
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         type="button"
+                        variant="destructive"
                         onClick={() => setStatus(lr.id, "Rejected")}
-                        className="rounded-badge bg-red-light px-2 py-1 text-xs font-semibold text-red"
                       >
                         Reject
-                      </button>
-                    </>
+                      </Button>
+                    </div>
                   ) : null}
-                </div>
-              </div>
+                </TableCell>
+              </TableRow>
             ))}
-          </div>
-        )}
-      </PageSection>
+          </TableBody>
+        </Table>
+      )}
 
       <Modal
         open={requestOpen}

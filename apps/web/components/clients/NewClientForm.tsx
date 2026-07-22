@@ -4,15 +4,24 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { FormField, Select, Textarea } from "@/components/ui/Form";
 import { Input } from "@/components/ui/Input";
+import type { CreateClientInput } from "@/lib/store/domainStore";
 import { emailError, phoneError } from "@/lib/utils/validateContact";
+import type { ClientType } from "@/types/client";
 import { useState } from "react";
 
 interface NewClientFormProps {
-  onSubmit: () => void;
+  onSubmit: (input: CreateClientInput) => void;
   onCancel: () => void;
 }
 
 export function NewClientForm({ onSubmit, onCancel }: NewClientFormProps) {
+  const [name, setName] = useState("");
+  const [type, setType] = useState<ClientType>("Individual");
+  const [nid, setNid] = useState("");
+  const [passport, setPassport] = useState("");
+  const [registrationNo, setRegistrationNo] = useState("");
+  const [referralSource, setReferralSource] = useState("");
+  const [address, setAddress] = useState("");
   const [coiChecked, setCoiChecked] = useState(false);
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -25,14 +34,25 @@ export function NewClientForm({ onSubmit, onCancel }: NewClientFormProps) {
     const nextPhone = phoneError(phone);
     setEmailErr(nextEmail);
     setPhoneErr(nextPhone);
-    return !nextEmail && !nextPhone;
+    return !nextEmail && !nextPhone && name.trim().length > 0 && coiChecked;
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setTriedSubmit(true);
     if (!validate()) return;
-    onSubmit();
+    onSubmit({
+      name,
+      type,
+      email,
+      phone,
+      address,
+      nid,
+      passport,
+      registrationNo,
+      referralSource,
+      conflictChecked: coiChecked,
+    });
   }
 
   return (
@@ -46,26 +66,51 @@ export function NewClientForm({ onSubmit, onCancel }: NewClientFormProps) {
           </p>
           <div className="mt-3 grid-fields-2">
             <FormField label="Full Name / Organization" required>
-              <Input required placeholder="Client name" />
+              <Input
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Client name"
+              />
             </FormField>
             <FormField label="Client Type" required>
-              <Select required defaultValue="Individual">
+              <Select
+                required
+                value={type}
+                onChange={(e) => setType(e.target.value as ClientType)}
+              >
                 <option value="Individual">Individual</option>
                 <option value="Corporate">Corporate</option>
                 <option value="NGO">NGO</option>
               </Select>
             </FormField>
             <FormField label="NID Number">
-              <Input placeholder="1234567890123" />
+              <Input
+                value={nid}
+                onChange={(e) => setNid(e.target.value)}
+                placeholder="1234567890123"
+              />
             </FormField>
             <FormField label="Passport Number">
-              <Input placeholder="Optional for individuals" />
+              <Input
+                value={passport}
+                onChange={(e) => setPassport(e.target.value)}
+                placeholder="Optional for individuals"
+              />
             </FormField>
             <FormField label="Registration No.">
-              <Input placeholder="For corporate / NGO" />
+              <Input
+                value={registrationNo}
+                onChange={(e) => setRegistrationNo(e.target.value)}
+                placeholder="For corporate / NGO"
+              />
             </FormField>
             <FormField label="Referral Source">
-              <Input placeholder="How did they find the firm?" />
+              <Input
+                value={referralSource}
+                onChange={(e) => setReferralSource(e.target.value)}
+                placeholder="How did they find the firm?"
+              />
             </FormField>
             <FormField label="Email" error={triedSubmit || emailErr ? emailErr : null}>
               <Input
@@ -95,7 +140,11 @@ export function NewClientForm({ onSubmit, onCancel }: NewClientFormProps) {
             </FormField>
             <div className="col-span-2">
               <FormField label="Address">
-                <Textarea placeholder="Full address" />
+                <Textarea
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Full address"
+                />
               </FormField>
             </div>
           </div>
@@ -104,7 +153,7 @@ export function NewClientForm({ onSubmit, onCancel }: NewClientFormProps) {
         <div>
           <p className="text-sm font-bold text-text-primary">Conflict of Interest Check</p>
           <p className="mt-0.5 text-xs text-text-muted">
-            Run conflict check against existing clients and opposing parties.
+            Confirm conflict check against existing clients and opposing parties.
           </p>
           <label className="mt-3 flex items-start gap-3 rounded-card border border-gray-200 bg-cream-card p-4">
             <input
@@ -135,7 +184,7 @@ export function NewClientForm({ onSubmit, onCancel }: NewClientFormProps) {
         <Button type="button" variant="secondary" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit" disabled={!coiChecked}>
+        <Button type="submit" disabled={!coiChecked || !name.trim()}>
           Register Client
         </Button>
       </div>

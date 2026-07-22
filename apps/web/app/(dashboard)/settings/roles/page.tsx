@@ -1,8 +1,15 @@
 "use client";
 
-import { SubNav } from "@/components/layout/SubNav";
+import { Badge } from "@/components/ui/Badge";
 import { PageSection } from "@/components/ui/PageSection";
-import { settingsSubNav } from "@/lib/config/navigation";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/Table";
 import { mockSystemUsers } from "@/lib/mock";
 
 const permissions = ["Cases", "Clients", "Billing", "Documents", "Employees", "Settings", "Reports"];
@@ -21,39 +28,32 @@ export default function RolesPage() {
 
   return (
     <div className="space-y-4">
-      <SubNav items={settingsSubNav} />
-      <PageSection title="Role-Based Access Control">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[40rem] text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-left text-xs text-text-muted">
-                <th className="py-2 pr-4">Role</th>
-                {permissions.map((p) => (
-                  <th key={p} className="px-2 py-2 text-center">{p}</th>
+      <PageSection
+        title="Role-Based Access Control"
+        description={`${mockSystemUsers.length} active users across ${roles.length} roles.`}
+      >
+        <Table>
+          <TableHeader>
+            <TableHead>Role</TableHead>
+            {permissions.map((p) => (
+              <TableHead key={p} className="text-center">{p}</TableHead>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {roles.map((role) => (
+              <TableRow key={role}>
+                <TableCell className="font-semibold">{role}</TableCell>
+                {roleMatrix[role].map((allowed, i) => (
+                  <TableCell key={permissions[i]} className="text-center">
+                    <Badge variant={allowed ? "green" : "muted"}>
+                      {allowed ? "Allowed" : "No access"}
+                    </Badge>
+                  </TableCell>
                 ))}
-              </tr>
-            </thead>
-            <tbody>
-              {roles.map((role) => (
-                <tr key={role} className="border-b border-gray-200">
-                  <td className="py-2 pr-4 font-semibold">{role}</td>
-                  {roleMatrix[role].map((allowed, i) => (
-                    <td key={permissions[i]} className="px-2 py-2 text-center">
-                      {allowed ? (
-                        <span className="text-green">✓</span>
-                      ) : (
-                        <span className="text-text-muted">—</span>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="mt-3 text-xs text-text-muted">
-          {mockSystemUsers.length} active users. Changes apply immediately on save.
-        </p>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </PageSection>
     </div>
   );

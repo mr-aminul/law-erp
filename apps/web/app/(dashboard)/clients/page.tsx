@@ -14,7 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
-import { mockClients } from "@/lib/mock";
+import {
+  type CreateClientInput,
+  useDomainStore,
+} from "@/lib/store/domainStore";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { Plus, ShieldCheck } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -23,6 +26,8 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 function ClientsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const clients = useDomainStore((s) => s.clients);
+  const createClient = useDomainStore((s) => s.createClient);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -33,7 +38,7 @@ function ClientsContent() {
   }, [searchParams]);
 
   const filtered = useMemo(() => {
-    return mockClients.filter((c) => {
+    return clients.filter((c) => {
       const q = search.toLowerCase();
       const matchSearch =
         !q ||
@@ -43,7 +48,7 @@ function ClientsContent() {
       const matchStatus = statusFilter === "all" || c.status === statusFilter;
       return matchSearch && matchType && matchStatus;
     });
-  }, [search, typeFilter, statusFilter]);
+  }, [clients, search, typeFilter, statusFilter]);
 
   function openNewClientModal() {
     setNewClientOpen(true);
@@ -59,9 +64,10 @@ function ClientsContent() {
     }
   }
 
-  function handleCreateClient() {
+  function handleCreateClient(input: CreateClientInput) {
+    const created = createClient(input);
     closeNewClientModal();
-    router.push("/clients/1");
+    router.push(`/clients/${created.id}`);
   }
 
   return (

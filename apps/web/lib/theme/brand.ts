@@ -6,7 +6,9 @@ export const DEFAULT_THEME_COLOR = "#123f2f";
 
 export type AppearanceMode = "light" | "dark" | "system";
 
-export const THEME_BOOTSTRAP = `(function(){try{var d=document.documentElement;var t=localStorage.getItem(${JSON.stringify(THEME_COLOR_KEY)});if(t&&/^#[0-9A-Fa-f]{6}$/.test(t))d.style.setProperty("--color-theme",t.toLowerCase());var a=localStorage.getItem(${JSON.stringify(APPEARANCE_KEY)})||"system";var dark=a==="dark"||(a!=="light"&&window.matchMedia("(prefers-color-scheme:dark)").matches);d.classList.toggle("dark",dark);d.style.colorScheme=dark?"dark":"light"}catch(e){}})();`;
+export const DEFAULT_APPEARANCE: AppearanceMode = "light";
+
+export const THEME_BOOTSTRAP = `(function(){try{var d=document.documentElement;var t=localStorage.getItem(${JSON.stringify(THEME_COLOR_KEY)});if(t&&/^#[0-9A-Fa-f]{6}$/.test(t))d.style.setProperty("--color-theme",t.toLowerCase());var a=localStorage.getItem(${JSON.stringify(APPEARANCE_KEY)})||${JSON.stringify(DEFAULT_APPEARANCE)};var dark=a==="dark"||(a==="system"&&window.matchMedia("(prefers-color-scheme:dark)").matches);d.classList.toggle("dark",dark);d.style.colorScheme=dark?"dark":"light"}catch(e){}})();`;
 
 /** @deprecated use THEME_BOOTSTRAP */
 export const THEME_COLOR_BOOTSTRAP = THEME_BOOTSTRAP;
@@ -39,7 +41,7 @@ export function readThemeColor(): string {
 
 export function normalizeAppearance(value: string | null): AppearanceMode {
   if (value === "light" || value === "dark" || value === "system") return value;
-  return "system";
+  return DEFAULT_APPEARANCE;
 }
 
 function systemPrefersDark(): boolean {
@@ -63,7 +65,7 @@ export function applyAppearance(mode: AppearanceMode): AppearanceMode {
 }
 
 export function readAppearance(): AppearanceMode {
-  if (typeof document === "undefined") return "system";
+  if (typeof document === "undefined") return DEFAULT_APPEARANCE;
   return normalizeAppearance(localStorage.getItem(APPEARANCE_KEY));
 }
 

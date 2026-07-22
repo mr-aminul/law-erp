@@ -134,7 +134,7 @@ function EmployeesDirectoryContent() {
         }}
         actions={
           <Button type="button" onClick={openNewEmployeeModal}>
-            <Plus className="h-4 w-4" />
+            <Plus className="mr-1.5 h-4 w-4" />
             Add Employee
           </Button>
         }
@@ -146,7 +146,7 @@ function EmployeesDirectoryContent() {
           description="Try clearing filters or add a new employee to the directory."
           action={
             <Button type="button" onClick={openNewEmployeeModal}>
-              <Plus className="h-4 w-4" />
+              <Plus className="mr-1.5 h-4 w-4" />
               Add Employee
             </Button>
           }

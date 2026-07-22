@@ -7,7 +7,6 @@ import { useSlickScrollbar } from "@/lib/hooks/useSlickScrollbar";
 import type { LucideIcon } from "lucide-react";
 import { useEffect } from "react";
 import { AiAssistant } from "@/components/assistant/AiAssistant";
-import { NotificationDrawer } from "./NotificationDrawer";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 
@@ -15,10 +14,9 @@ interface ShellProps {
   children: React.ReactNode;
   title: string;
   icon: LucideIcon;
-  subtitle?: string;
 }
 
-export function Shell({ children, title, icon, subtitle }: ShellProps) {
+export function Shell({ children, title, icon }: ShellProps) {
   const sidebarCollapsed = useAppStore((s) => s.sidebarCollapsed);
   const mobileNavOpen = useAppStore((s) => s.mobileNavOpen);
   const closeMobileNav = useAppStore((s) => s.closeMobileNav);
@@ -49,7 +47,6 @@ export function Shell({ children, title, icon, subtitle }: ShellProps) {
           onClick={closeMobileNav}
         />
       ) : null}
-      <NotificationDrawer />
       <AiAssistant />
       <div
         className={cn(
@@ -60,7 +57,7 @@ export function Shell({ children, title, icon, subtitle }: ShellProps) {
         )}
       >
         <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-panel border border-gray-300 bg-white max-lg:rounded-[14px]">
-          <Topbar title={title} icon={icon} subtitle={subtitle} />
+          <Topbar title={title} icon={icon} />
           <main
             ref={mainScrollRef}
             onScroll={handleMainScroll}

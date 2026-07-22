@@ -1,25 +1,19 @@
 "use client";
 
 import { GlobalSearch } from "@/components/layout/GlobalSearch";
+import { NotificationBell } from "@/components/layout/NotificationBell";
+import { UserMenu } from "@/components/layout/UserMenu";
 import { ApiStatusBadge } from "@/components/dashboard/ApiStatusBadge";
 import { useAppStore } from "@/lib/store/appStore";
-import { formatLongDate } from "@/lib/utils/formatDate";
 import { Menu, type LucideIcon } from "lucide-react";
-import { useEffect, useState } from "react";
 
 interface TopbarProps {
   title: string;
   icon: LucideIcon;
-  subtitle?: string;
 }
 
-export function Topbar({ title, icon: Icon, subtitle }: TopbarProps) {
+export function Topbar({ title, icon: Icon }: TopbarProps) {
   const toggleMobileNav = useAppStore((s) => s.toggleMobileNav);
-  const [dateLabel, setDateLabel] = useState<string | null>(null);
-
-  useEffect(() => {
-    setDateLabel(subtitle ?? formatLongDate());
-  }, [subtitle]);
 
   return (
     <header className="shrink-0 border-b border-gray-200 bg-[#f4f5f6] px-3 py-2.5 sm:px-4 sm:py-3">
@@ -40,11 +34,10 @@ export function Topbar({ title, icon: Icon, subtitle }: TopbarProps) {
           </h1>
           <ApiStatusBadge />
           <GlobalSearch className="ml-auto w-[140px] sm:w-auto" />
-          {dateLabel ? (
-            <span className="hidden text-xs text-text-primary lg:inline">
-              {dateLabel}
-            </span>
-          ) : null}
+          <div className="flex shrink-0 items-center gap-1">
+            <NotificationBell />
+            <UserMenu />
+          </div>
         </div>
       </div>
     </header>

@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils/cn";
 import {
   applyAppearance,
+  DEFAULT_APPEARANCE,
   readAppearance,
   watchSystemAppearance,
   type AppearanceMode,
@@ -17,7 +18,7 @@ const OPTIONS: { id: AppearanceMode; label: string; icon: typeof Sun }[] = [
 ];
 
 export function AppearanceSettings() {
-  const [mode, setMode] = useState<AppearanceMode>("system");
+  const [mode, setMode] = useState<AppearanceMode>(DEFAULT_APPEARANCE);
 
   useEffect(() => {
     setMode(readAppearance());

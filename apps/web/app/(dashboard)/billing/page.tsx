@@ -1,8 +1,18 @@
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { PageSection } from "@/components/ui/PageSection";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/Table";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { mockExpenses, mockInvoices, mockPayments } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
+import { invoiceStatusVariant } from "@/lib/utils/invoiceStatus";
 import { CreditCard, Receipt, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
 
@@ -23,21 +33,38 @@ export default function BillingPage() {
       </div>
 
       <div className="grid-pair">
-        <PageSection title="Recent Invoices">
-          <div className="space-y-2">
-            {mockInvoices.slice(0, 4).map((inv) => (
-              <Link key={inv.id} href={`/billing/invoices/${inv.id}`} className="flex items-center justify-between rounded-card border border-gray-200 px-3 py-2 hover:bg-cream-card">
-                <div>
-                  <p className="text-sm font-semibold">{inv.invoiceNumber}</p>
-                  <p className="text-xs text-text-muted">{inv.clientName}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold">{formatCurrency(inv.amount)}</p>
-                  <Badge variant={inv.status === "Paid" ? "green" : inv.status === "Overdue" ? "red" : "amber"}>{inv.status}</Badge>
-                </div>
-              </Link>
-            ))}
-          </div>
+        <PageSection
+          title="Recent Invoices"
+          action={
+            <Link href="/billing/invoices">
+              <Button variant="ghost">View all</Button>
+            </Link>
+          }
+        >
+          <Table>
+            <TableHeader>
+              <TableHead>Invoice #</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Amount</TableHead>
+              <TableHead>Status</TableHead>
+            </TableHeader>
+            <TableBody>
+              {mockInvoices.slice(0, 4).map((inv) => (
+                <TableRow key={inv.id}>
+                  <TableCell className="font-semibold">
+                    <Link href={`/billing/invoices/${inv.id}`} className="hover:underline">
+                      {inv.invoiceNumber}
+                    </Link>
+                  </TableCell>
+                  <TableCell className="text-text-sec">{inv.clientName}</TableCell>
+                  <TableCell>{formatCurrency(inv.amount)}</TableCell>
+                  <TableCell>
+                    <Badge variant={invoiceStatusVariant(inv.status)}>{inv.status}</Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </PageSection>
 
         <PageSection title="VAT / AIT Compliance">

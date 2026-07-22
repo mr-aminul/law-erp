@@ -2,12 +2,9 @@
 
 import { cn } from "@/lib/utils/cn";
 import { useAppStore } from "@/lib/store/appStore";
-import { useNotificationStore } from "@/lib/store/notificationStore";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { NotificationBell } from "./NotificationBell";
+import { mainNav } from "@/lib/config/navigation";
 import {
   Banknote,
-  BarChart3,
   Briefcase,
   Calendar,
   CalendarOff,
@@ -20,15 +17,11 @@ import {
   Gavel,
   Handshake,
   LayoutDashboard,
-  LogOut,
-  Mail,
   MessageSquare,
-  MessagesSquare,
   PanelLeftClose,
   PanelLeftOpen,
   Receipt,
   Scale,
-  ScrollText,
   Settings,
   Users,
   Wallet,
@@ -41,6 +34,26 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useIsDesktop } from "@/lib/hooks/useIsDesktop";
 
+const ICONS: Record<string, LucideIcon> = {
+  LayoutDashboard,
+  Users,
+  Folder,
+  Briefcase,
+  Handshake,
+  Calendar,
+  FileText,
+  Gavel,
+  MessageSquare,
+  CreditCard,
+  Receipt,
+  Wallet,
+  ContactRound,
+  Clock,
+  CalendarOff,
+  Banknote,
+  Settings,
+};
+
 type NavChild = { href: string; label: string; icon: LucideIcon };
 type NavItem = {
   href: string;
@@ -49,55 +62,19 @@ type NavItem = {
   children?: NavChild[];
 };
 
-const navItems: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/clients", label: "Clients", icon: Users },
-  {
-    href: "/cases",
-    label: "Matters",
-    icon: Folder,
-    children: [
-      { href: "/cases", label: "Cases", icon: Briefcase },
-      { href: "/cases/services", label: "Services", icon: Handshake },
-    ],
-  },
-  { href: "/calendar", label: "Calendar", icon: Calendar },
-  { href: "/documents", label: "Documents", icon: FileText },
-  { href: "/court-filing", label: "Court Filing", icon: Gavel },
-  {
-    href: "/communications",
-    label: "Communications",
-    icon: MessageSquare,
-    children: [
-      { href: "/communications", label: "All", icon: LayoutDashboard },
-      { href: "/communications/internal", label: "Internal", icon: MessagesSquare },
-      { href: "/communications/email", label: "Email Log", icon: Mail },
-      { href: "/communications/notices", label: "Legal Notices", icon: ScrollText },
-    ],
-  },
-  {
-    href: "/billing",
-    label: "Billing",
-    icon: CreditCard,
-    children: [
-      { href: "/billing", label: "Overview", icon: LayoutDashboard },
-      { href: "/billing/invoices", label: "Invoices", icon: Receipt },
-      { href: "/billing/expenses", label: "Expenses", icon: Wallet },
-    ],
-  },
-  {
-    href: "/employees",
-    label: "Employees",
-    icon: Scale,
-    children: [
-      { href: "/employees", label: "Directory", icon: ContactRound },
-      { href: "/employees/attendance", label: "Attendance", icon: Clock },
-      { href: "/employees/leave", label: "Leave", icon: CalendarOff },
-      { href: "/employees/compensation", label: "Payroll", icon: Banknote },
-    ],
-  },
-  { href: "/reports", label: "Reports", icon: BarChart3 },
-];
+const navItems: NavItem[] = mainNav.map((item) => ({
+  href: item.href,
+  label: item.label,
+  icon: ICONS[item.icon] ?? LayoutDashboard,
+  children:
+    "children" in item && item.children
+      ? item.children.map((child) => ({
+          href: child.href,
+          label: child.label,
+          icon: ICONS[child.icon] ?? LayoutDashboard,
+        }))
+      : undefined,
+}));
 
 function isGroupPath(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(href + "/");
@@ -269,9 +246,7 @@ export function Sidebar() {
   const isDesktop = useIsDesktop();
   const { sidebarCollapsed, toggleSidebar, mobileNavOpen, closeMobileNav } =
     useAppStore();
-  const notificationDrawerOpen = useNotificationStore((s) => s.drawerOpen);
   const [openGroups, setOpenGroups] = useState(() => initialOpenGroups(pathname));
-  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   // Collapse is desktop-only; mobile drawer always shows labels.
   const collapsed = isDesktop && sidebarCollapsed;
@@ -315,9 +290,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "fixed flex flex-col rounded-panel bg-sidebar transition-[width,transform] duration-200 ease-in-out",
-        // Above the notification scrim so nav stays clear while the panel is open
-        notificationDrawerOpen ? "z-[112]" : "z-40",
+        "fixed flex flex-col overflow-hidden rounded-panel bg-sidebar transition-[width,transform] duration-200 ease-in-out z-40",
         "max-lg:w-[min(var(--sidebar-width),calc(100vw-var(--shell-margin)*2))]",
         "max-lg:-translate-x-[calc(100%+var(--shell-margin)+12px)]",
         mobileNavOpen && "max-lg:translate-x-0",
@@ -360,7 +333,6 @@ export function Sidebar() {
         </div>
         {!collapsed && (
           <div className="flex shrink-0 items-center gap-1">
-            <NotificationBell />
             <button
               type="button"
               onClick={toggleSidebar}
@@ -383,11 +355,10 @@ export function Sidebar() {
 
       {collapsed && (
         <div className="mb-2 px-2">
-          <NotificationBell collapsed />
           <button
             type="button"
             onClick={toggleSidebar}
-            className="mt-2 flex h-9 w-full items-center justify-center rounded-input text-white/60 transition-colors hover:bg-white/10 hover:text-white"
+            className="flex h-9 w-full items-center justify-center rounded-input text-white/60 transition-colors hover:bg-white/10 hover:text-white"
             aria-label="Expand sidebar"
           >
             <PanelLeftOpen className="h-4 w-4" />
@@ -397,7 +368,9 @@ export function Sidebar() {
 
       <nav
         className={cn(
-          "flex flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden",
+          // Keep overflow scroll for short viewports / expanded groups, but never
+          // show a native scrollbar (scrollbar-slick hides the gutter).
+          "flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden scrollbar-slick pb-3",
           collapsed ? "px-2" : "px-[var(--sidebar-logo-inset)]"
         )}
       >
@@ -511,8 +484,13 @@ export function Sidebar() {
         })}
       </nav>
 
-      {collapsed ? (
-        <div className="mt-2 px-2">
+      <div
+        className={cn(
+          "mt-auto border-t border-white/10",
+          collapsed ? "p-2" : "p-3"
+        )}
+      >
+        {collapsed ? (
           <CollapsedFlyout
             label="Settings"
             icon={Settings}
@@ -520,79 +498,22 @@ export function Sidebar() {
             active={pathname.startsWith("/settings")}
             pathname={pathname}
           />
-        </div>
-      ) : (
-        <Link
-          href="/settings"
-          onClick={handleNavClick}
-          className={cn(
-            "mt-2 flex items-center gap-2.5 rounded-input px-3 py-2 text-[13px] font-semibold transition-colors",
-            "mx-[var(--sidebar-logo-inset)]",
-            pathname.startsWith("/settings")
-              ? "bg-active-nav text-on-active-nav"
-              : "text-white/70 hover:bg-white/10 hover:text-white"
-          )}
-        >
-          <Settings className="h-4 w-4 shrink-0" />
-          <span>Settings</span>
-        </Link>
-      )}
-
-      <div className="mt-3 border-t border-white/10">
-        <div
-          className={cn(
-            "group flex rounded-b-panel transition-colors hover:bg-active-nav hover:text-on-active-nav has-[.logout-btn:hover]:!bg-transparent has-[.logout-btn:hover]:!text-white",
-            collapsed
-              ? "flex-col items-center gap-1 px-2 pb-2 pt-3"
-              : "flex-row items-center gap-2 px-[var(--sidebar-logo-inset)] pb-4 pt-3"
-          )}
-        >
-          <button
-            type="button"
+        ) : (
+          <Link
+            href="/settings"
+            onClick={handleNavClick}
             className={cn(
-              "flex min-w-0 items-center text-left",
-              collapsed ? "justify-center" : "flex-1 gap-2"
+              "flex items-center gap-2.5 rounded-input px-3 py-2 text-[13px] font-semibold transition-colors",
+              pathname.startsWith("/settings")
+                ? "bg-active-nav text-on-active-nav"
+                : "text-white/70 hover:bg-white/10 hover:text-white"
             )}
-            aria-label="Open profile menu"
           >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-active-nav text-[11px] font-bold text-on-active-nav group-hover:bg-black/10 group-has-[.logout-btn:hover]:bg-active-nav group-has-[.logout-btn:hover]:text-on-active-nav">
-              AI
-            </div>
-            {!collapsed && (
-              <div className="min-w-0 overflow-hidden">
-                <p className="truncate text-sm font-semibold leading-tight text-white group-hover:text-inherit group-has-[.logout-btn:hover]:text-white">
-                  Aminul Islam
-                </p>
-                <p className="truncate text-[11px] text-white/60 group-hover:text-inherit group-hover:opacity-80 group-has-[.logout-btn:hover]:text-white/60 group-has-[.logout-btn:hover]:opacity-100">
-                  Managing Partner
-                </p>
-              </div>
-            )}
-          </button>
-          <button
-            type="button"
-            onClick={() => setLogoutConfirmOpen(true)}
-            className="logout-btn flex h-8 w-8 shrink-0 items-center justify-center rounded-input text-white/60 transition-colors group-hover:text-inherit hover:bg-red hover:text-white"
-            aria-label="Log out"
-            title="Log out"
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
-        </div>
+            <Settings className="h-4 w-4 shrink-0" />
+            <span className="truncate">Settings</span>
+          </Link>
+        )}
       </div>
-
-      <ConfirmDialog
-        open={logoutConfirmOpen}
-        onClose={() => setLogoutConfirmOpen(false)}
-        onConfirm={() => {
-          window.location.href = "/";
-        }}
-        tone="danger"
-        title="Sign out?"
-        description="Are you sure you want to sign out?"
-        confirmLabel="Sign out"
-        cancelLabel="Cancel"
-      />
     </aside>
   );
 }

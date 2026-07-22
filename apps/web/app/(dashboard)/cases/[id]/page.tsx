@@ -1,16 +1,17 @@
 "use client";
 
+import { NewHearingForm } from "@/components/calendar/NewHearingForm";
 import { AssignedLawyers } from "@/components/cases/AssignedLawyers";
 import { CaseStatusBadge } from "@/components/cases/CaseStatusBadge";
 import { CaseStatusSelect } from "@/components/cases/CaseStatusSelect";
-import { UploadDocumentForm } from "@/components/cases/UploadDocumentForm";
 import { NewFilingForm } from "@/components/court-filing/NewFilingForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { ChecklistRow } from "@/components/ui/ChecklistRow";
 import { Textarea } from "@/components/ui/Form";
 import { Modal } from "@/components/ui/Modal";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
-import { DetailField, PageSection } from "@/components/ui/PageSection";
+import { DetailField, EmptyState, PageSection } from "@/components/ui/PageSection";
 import { Tabs } from "@/components/ui/Tabs";
 import {
   Table,
@@ -22,23 +23,26 @@ import {
 } from "@/components/ui/Table";
 import { UserChip } from "@/components/ui/UserChip";
 import {
-  getCaseById,
   mockCaseComments,
-  mockClients,
   mockDocuments,
   mockExpenses,
-  mockFilings,
   mockInvoices,
   mockMilestones,
   mockCaseNotes,
   mockStaff,
 } from "@/lib/mock";
+import {
+  type CreateFilingInput,
+  type CreateHearingInput,
+  useDomainStore,
+} from "@/lib/store/domainStore";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate, toDateInputValue } from "@/lib/utils/formatDate";
-import type { CaseType } from "@/types/case";
+import { invoiceStatusVariant } from "@/lib/utils/invoiceStatus";
+import type { CaseOutcome, CaseStatus, CaseType } from "@/types/case";
 import type { FilingStatus } from "@/types/filing";
 import type { CourtLevel } from "@/types/hearing";
-import { CheckCircle2, Circle, Pencil } from "lucide-react";
+import { CheckCircle2, Circle, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { notFound, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -71,9 +75,6 @@ function namesFromLawyerIds(ids: string[]) {
   return mockStaff.filter((s) => ids.includes(s.id)).map((s) => s.name);
 }
 
-const filingStatusVariant = (s: FilingStatus) =>
-  s === "Accepted" ? "green" : s === "Rejected" ? "red" : s === "Submitted" ? "blue" : "muted";
-
 const CASE_TABS = [
   "overview",
   "pipeline",
@@ -87,7 +88,14 @@ const CASE_TABS = [
 function CaseDetailContent({ id }: { id: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const caseData = getCaseById(id);
+  const [ready, setReady] = useState(() => useDomainStore.persist.hasHydrated());
+  const caseData = useDomainStore((s) => s.cases.find((c) => c.id === id));
+  const clients = useDomainStore((s) => s.clients);
+  const filings = useDomainStore((s) => s.filings.filter((f) => f.caseId === id));
+  const updateCase = useDomainStore((s) => s.updateCase);
+  const createFiling = useDomainStore((s) => s.createFiling);
+  const updateFiling = useDomainStore((s) => s.updateFiling);
+  const createHearing = useDomainStore((s) => s.createHearing);
   const tabParam = searchParams.get("tab");
   const filingParam = searchParams.get("filing");
   const initialTab =
@@ -97,9 +105,10 @@ function CaseDetailContent({ id }: { id: string }) {
         ? "filings"
         : "overview";
   const [tab, setTab] = useState(initialTab);
-  const [uploadOpen, setUploadOpen] = useState(false);
   const [newFilingOpen, setNewFilingOpen] = useState(false);
+  const [newHearingOpen, setNewHearingOpen] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [milestoneOverrides, setMilestoneOverrides] = useState<Record<string, boolean>>({});
   const [draft, setDraft] = useState({
     matter: "",
     clientId: "",
@@ -119,6 +128,14 @@ function CaseDetailContent({ id }: { id: string }) {
   });
 
   useEffect(() => {
+    if (useDomainStore.persist.hasHydrated()) {
+      setReady(true);
+      return;
+    }
+    return useDomainStore.persist.onFinishHydration(() => setReady(true));
+  }, []);
+
+  useEffect(() => {
     const nextTab = searchParams.get("tab");
     if (nextTab && (CASE_TABS as readonly string[]).includes(nextTab)) {
       setTab(nextTab);
@@ -128,14 +145,17 @@ function CaseDetailContent({ id }: { id: string }) {
   }, [searchParams]);
 
   const docs = mockDocuments.filter((d) => d.caseId === id);
-  const filings = mockFilings.filter((f) => f.caseId === id);
   const invoices = mockInvoices.filter((i) => i.caseId === caseData?.caseId);
   const expenses = mockExpenses.filter((e) => e.caseId === id);
   const notes = mockCaseNotes.filter((n) => n.caseId === id);
   const comments = mockCaseComments.filter((c) => c.caseId === id);
   const lawyers = mockStaff.filter((s) => s.role !== "Admin");
-  const activeClients = mockClients.filter((c) => c.status === "Active");
+  const activeClients = clients.filter((c) => c.status === "Active");
   const focusFilingId = searchParams.get("filing");
+
+  if (!ready) {
+    return <div className="p-4 text-sm text-text-muted">Loading case…</div>;
+  }
 
   if (!caseData) notFound();
 
@@ -168,7 +188,6 @@ function CaseDetailContent({ id }: { id: string }) {
     params.set("tab", next);
     if (next !== "filings") params.delete("filing");
     const qs = params.toString();
-    // ponytail: use route id — caseData narrows don't carry into nested fns
     router.replace(`/cases/${id}${qs ? `?${qs}` : ""}`, { scroll: false });
   }
 
@@ -194,13 +213,50 @@ function CaseDetailContent({ id }: { id: string }) {
     setEditing(true);
   }
 
+  function finishEditing() {
+    if (!caseData) return;
+    updateCase(caseData.id, {
+      matter: draft.matter.trim() || caseData.matter,
+      clientId: draft.clientId || caseData.clientId,
+      type: (draft.type as CaseType) || caseData.type,
+      court: (draft.court as CourtLevel) || caseData.court,
+      courtName: draft.courtName.trim() || caseData.courtName,
+      caseNumber: draft.caseNumber.trim() || undefined,
+      nextHearing: draft.firstHearing || undefined,
+      limitationDate: draft.deadline || undefined,
+      status: (draft.status as CaseStatus) || caseData.status,
+      opposingParty: draft.oppositeParty.trim()
+        ? {
+            name: draft.oppositeParty.trim(),
+            counsel: draft.opposingCounsel.trim() || undefined,
+          }
+        : undefined,
+      causeListRef: draft.causeListRef.trim() || undefined,
+      outcome: (draft.outcome as CaseOutcome) || undefined,
+      description: draft.description.trim() || undefined,
+      assignedLawyers: namesFromLawyerIds(draft.lawyerIds),
+    });
+    setEditing(false);
+  }
+
   function patchDraft(key: keyof typeof draft, value: string | string[]) {
     setDraft((prev) => ({ ...prev, [key]: value }));
   }
 
+  function handleCreateFiling(input: CreateFilingInput) {
+    createFiling(input);
+    setNewFilingOpen(false);
+    changeTab("filings");
+  }
+
+  function handleCreateHearing(input: CreateHearingInput) {
+    createHearing(input);
+    setNewHearingOpen(false);
+  }
+
   return (
     <div className="space-y-4">
-      <div className="rounded-card border border-gray-200 bg-surface p-4">
+      <div className="rounded-card border border-gray-200 bg-surface p-3 sm:p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -222,8 +278,7 @@ function CaseDetailContent({ id }: { id: string }) {
           <div className="flex flex-wrap gap-2">
             <Button
               variant="secondary"
-              size="sm"
-              onClick={() => (editing ? setEditing(false) : startEditing())}
+              onClick={() => (editing ? finishEditing() : startEditing())}
             >
               {editing ? (
                 "Done"
@@ -234,11 +289,11 @@ function CaseDetailContent({ id }: { id: string }) {
                 </>
               )}
             </Button>
-            <Link href={`/calendar?case=${caseData.id}`}>
-              <Button variant="secondary" size="sm">Schedule Hearing</Button>
-            </Link>
-            <Button variant="secondary" size="sm" onClick={() => router.push("/cases")}>
-              Back
+            <Button variant="secondary" onClick={() => setNewHearingOpen(true)}>
+              Schedule Hearing
+            </Button>
+            <Button variant="secondary" onClick={() => router.push("/cases")}>
+              Back to list
             </Button>
           </div>
         </div>
@@ -436,75 +491,67 @@ function CaseDetailContent({ id }: { id: string }) {
           </div>
           <h3 className="mb-3 text-xs font-bold uppercase text-text-muted">Milestones</h3>
           <div className="space-y-2">
-            {mockMilestones.map((m) => (
-              <label key={m.id} className="flex items-center gap-3 rounded-card border border-gray-200 px-3 py-2">
-                <input type="checkbox" defaultChecked={m.completed} />
-                <span className={`flex-1 text-sm ${m.completed ? "text-text-muted line-through" : "font-medium"}`}>
-                  {m.title}
-                </span>
-                {m.dueDate && <span className="text-xs text-text-muted">{formatDate(m.dueDate)}</span>}
-              </label>
-            ))}
+            {mockMilestones.map((m) => {
+              const completed = milestoneOverrides[m.id] ?? m.completed;
+              return (
+                <ChecklistRow
+                  key={m.id}
+                  title={m.title}
+                  completed={completed}
+                  dueDate={m.dueDate ? formatDate(m.dueDate) : undefined}
+                  onToggle={() =>
+                    setMilestoneOverrides((prev) => ({ ...prev, [m.id]: !completed }))
+                  }
+                />
+              );
+            })}
           </div>
         </PageSection>
       )}
 
       {tab === "documents" && (
-        <PageSection
-          title="Case Documents"
-          action={
-            <Button size="sm" onClick={() => setUploadOpen(true)}>
-              Upload Document
-            </Button>
-          }
-        >
-          <Table compact>
-            <TableHeader>
-              <TableHead>Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Version</TableHead>
-              <TableHead>Language</TableHead>
-              <TableHead>Uploaded</TableHead>
-            </TableHeader>
-            <TableBody>
-              {docs.map((d) => (
-                <TableRow key={d.id}>
-                  <TableCell className="font-semibold">{d.name}</TableCell>
-                  <TableCell>{d.category}</TableCell>
-                  <TableCell>v{d.version}</TableCell>
-                  <TableCell>{d.language}</TableCell>
-                  <TableCell className="text-text-muted">{formatDate(d.uploadedAt)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+        <PageSection title="Case Documents">
+          {docs.length === 0 ? (
+            <EmptyState title="No documents uploaded" description="Upload files related to this case to see them here." />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableHead>Name</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Version</TableHead>
+                <TableHead>Language</TableHead>
+                <TableHead>Uploaded</TableHead>
+              </TableHeader>
+              <TableBody>
+                {docs.map((d) => (
+                  <TableRow key={d.id}>
+                    <TableCell className="font-semibold">{d.name}</TableCell>
+                    <TableCell>{d.category}</TableCell>
+                    <TableCell>v{d.version}</TableCell>
+                    <TableCell>{d.language}</TableCell>
+                    <TableCell className="text-text-muted">{formatDate(d.uploadedAt)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </PageSection>
       )}
-
-      <Modal
-        open={uploadOpen}
-        onClose={() => setUploadOpen(false)}
-        title="Upload Document"
-      >
-        <UploadDocumentForm
-          onSubmit={() => setUploadOpen(false)}
-          onCancel={() => setUploadOpen(false)}
-        />
-      </Modal>
 
       {tab === "filings" && (
         <PageSection
           title="Court Filings"
           action={
-            <Button size="sm" onClick={() => setNewFilingOpen(true)}>
+            <Button onClick={() => setNewFilingOpen(true)}>
+              <Plus className="mr-1.5 h-4 w-4" />
               New Filing
             </Button>
           }
         >
           {filings.length === 0 ? (
-            <p className="text-sm text-text-muted">No filings for this case yet.</p>
+            <EmptyState title="No filings for this case yet" />
           ) : (
-            <Table compact>
+            <Table>
               <TableHeader>
                 <TableHead>Ref</TableHead>
                 <TableHead>Court</TableHead>
@@ -531,7 +578,24 @@ function CaseDetailContent({ id }: { id: string }) {
                     <TableCell>{formatCurrency(f.filingFee)}</TableCell>
                     <TableCell>{f.summonsDispatched ? "Sent" : "—"}</TableCell>
                     <TableCell>
-                      <Badge variant={filingStatusVariant(f.status)}>{f.status}</Badge>
+                      <select
+                        className="rounded-input border border-gray-200 bg-white px-2 py-1 text-xs"
+                        value={f.status}
+                        onChange={(e) =>
+                          updateFiling(f.id, {
+                            status: e.target.value as FilingStatus,
+                          })
+                        }
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {(["Draft", "Submitted", "Accepted", "Rejected"] as const).map(
+                          (s) => (
+                            <option key={s} value={s}>
+                              {s}
+                            </option>
+                          )
+                        )}
+                      </select>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -549,86 +613,115 @@ function CaseDetailContent({ id }: { id: string }) {
       >
         <NewFilingForm
           defaultCaseId={caseData.id}
-          onSubmit={() => setNewFilingOpen(false)}
+          onSubmit={handleCreateFiling}
           onCancel={() => setNewFilingOpen(false)}
         />
       </Modal>
 
+      <Modal
+        open={newHearingOpen}
+        onClose={() => setNewHearingOpen(false)}
+        title="Schedule Hearing"
+        className="max-w-xl"
+      >
+        <NewHearingForm
+          defaultCaseId={caseData.id}
+          onSubmit={handleCreateHearing}
+          onCancel={() => setNewHearingOpen(false)}
+        />
+      </Modal>
+
       {tab === "notes" && (
-        <PageSection title="Notes & Internal Memos" action={<Button size="sm">Add Note</Button>}>
-          <div className="space-y-3">
-            {notes.map((n) => (
-              <div key={n.id} className={`rounded-card border p-3 ${n.isMemo ? "border-amber/30 bg-amber-light/30" : "border-gray-200"}`}>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold">{n.author}</span>
-                  <div className="flex items-center gap-2">
-                    {n.isMemo && <Badge variant="amber">Internal Memo</Badge>}
-                    <span className="text-xs text-text-muted">{formatDate(n.createdAt)}</span>
+        <PageSection title="Notes & Internal Memos">
+          {notes.length === 0 ? (
+            <EmptyState title="No notes yet" description="Notes and internal memos for this case will appear here." />
+          ) : (
+            <div className="space-y-3">
+              {notes.map((n) => (
+                <div key={n.id} className={`rounded-card border p-3 ${n.isMemo ? "border-amber/30 bg-amber-light/30" : "border-gray-200"}`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-semibold">{n.author}</span>
+                    <div className="flex items-center gap-2">
+                      {n.isMemo && <Badge variant="amber">Internal Memo</Badge>}
+                      <span className="text-xs text-text-muted">{formatDate(n.createdAt)}</span>
+                    </div>
                   </div>
+                  <p className="mt-2 text-sm text-text-sec">{n.content}</p>
                 </div>
-                <p className="mt-2 text-sm text-text-sec">{n.content}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </PageSection>
       )}
 
       {tab === "billing" && (
         <div className="space-y-4">
-          <PageSection title="Invoices" action={<Link href="/billing/invoices"><Button size="sm">Create Invoice</Button></Link>}>
-            <Table compact>
-              <TableHeader>
-                <TableHead>Invoice #</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-              </TableHeader>
-              <TableBody>
-                {invoices.map((inv) => (
-                  <TableRow key={inv.id} onClick={() => router.push(`/billing/invoices/${inv.id}`)}>
-                    <TableCell className="font-semibold">{inv.invoiceNumber}</TableCell>
-                    <TableCell>{formatCurrency(inv.amount)}</TableCell>
-                    <TableCell><Badge variant={inv.status === "Paid" ? "green" : inv.status === "Overdue" ? "red" : "amber"}>{inv.status}</Badge></TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <PageSection title="Invoices">
+            {invoices.length === 0 ? (
+              <EmptyState title="No invoices for this case" />
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableHead>Invoice #</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableHeader>
+                <TableBody>
+                  {invoices.map((inv) => (
+                    <TableRow key={inv.id} onClick={() => router.push(`/billing/invoices/${inv.id}`)}>
+                      <TableCell className="font-semibold">{inv.invoiceNumber}</TableCell>
+                      <TableCell>{formatCurrency(inv.amount)}</TableCell>
+                      <TableCell><Badge variant={invoiceStatusVariant(inv.status)}>{inv.status}</Badge></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </PageSection>
           <PageSection title="Expenses">
-            <Table compact>
-              <TableHeader>
-                <TableHead>Description</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Date</TableHead>
-              </TableHeader>
-              <TableBody>
-                {expenses.map((e) => (
-                  <TableRow key={e.id}>
-                    <TableCell>{e.description}</TableCell>
-                    <TableCell>{e.category}</TableCell>
-                    <TableCell>{formatCurrency(e.amount)}</TableCell>
-                    <TableCell className="text-text-muted">{formatDate(e.date)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            {expenses.length === 0 ? (
+              <EmptyState title="No expenses logged for this case" />
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableHead>Description</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Date</TableHead>
+                </TableHeader>
+                <TableBody>
+                  {expenses.map((e) => (
+                    <TableRow key={e.id}>
+                      <TableCell>{e.description}</TableCell>
+                      <TableCell>{e.category}</TableCell>
+                      <TableCell>{formatCurrency(e.amount)}</TableCell>
+                      <TableCell className="text-text-muted">{formatDate(e.date)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </PageSection>
         </div>
       )}
 
       {tab === "thread" && (
-        <PageSection title="Internal Case Thread" action={<Button size="sm">Post Comment</Button>}>
-          <div className="space-y-3">
-            {comments.map((c) => (
-              <div key={c.id} className="rounded-card border border-gray-200 bg-cream-card p-3">
-                <div className="flex justify-between">
-                  <span className="text-sm font-semibold">{c.author}</span>
-                  <span className="text-xs text-text-muted">{formatDate(c.createdAt)}</span>
+        <PageSection title="Internal Case Thread">
+          {comments.length === 0 ? (
+            <EmptyState title="No comments yet" description="Start the internal discussion for this case." />
+          ) : (
+            <div className="space-y-3">
+              {comments.map((c) => (
+                <div key={c.id} className="rounded-card border border-gray-200 bg-cream-card p-3">
+                  <div className="flex justify-between">
+                    <span className="text-sm font-semibold">{c.author}</span>
+                    <span className="text-xs text-text-muted">{formatDate(c.createdAt)}</span>
+                  </div>
+                  <p className="mt-1.5 text-sm text-text-sec">{c.content}</p>
                 </div>
-                <p className="mt-1.5 text-sm text-text-sec">{c.content}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </PageSection>
       )}
     </div>

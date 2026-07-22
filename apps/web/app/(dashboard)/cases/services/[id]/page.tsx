@@ -6,10 +6,11 @@ import { CaseStatusSelect } from "@/components/cases/CaseStatusSelect";
 import { UploadDocumentForm } from "@/components/cases/UploadDocumentForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { ChecklistRow } from "@/components/ui/ChecklistRow";
 import { Textarea } from "@/components/ui/Form";
 import { Modal } from "@/components/ui/Modal";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
-import { DetailField, PageSection } from "@/components/ui/PageSection";
+import { DetailField, EmptyState, PageSection } from "@/components/ui/PageSection";
 import { Tabs } from "@/components/ui/Tabs";
 import {
   Table,
@@ -33,12 +34,13 @@ import {
 } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate, toDateInputValue } from "@/lib/utils/formatDate";
+import { invoiceStatusVariant } from "@/lib/utils/invoiceStatus";
 import {
   SERVICE_TYPES,
   type ServiceStage,
   type ServiceType,
 } from "@/types/service";
-import { CheckCircle2, Circle, Pencil } from "lucide-react";
+import { CheckCircle2, Circle, Pencil, Plus } from "lucide-react";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -69,6 +71,7 @@ export default function ServiceDetailPage({
   const [tab, setTab] = useState("overview");
   const [uploadOpen, setUploadOpen] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [milestoneOverrides, setMilestoneOverrides] = useState<Record<string, boolean>>({});
   const [draft, setDraft] = useState({
     matter: "",
     clientId: "",
@@ -132,7 +135,7 @@ export default function ServiceDetailPage({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-card border border-gray-200 bg-surface p-4">
+      <div className="rounded-card border border-gray-200 bg-surface p-3 sm:p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -154,7 +157,6 @@ export default function ServiceDetailPage({
           <div className="flex flex-wrap gap-2">
             <Button
               variant="secondary"
-              size="sm"
               onClick={() => (editing ? setEditing(false) : startEditing())}
             >
               {editing ? (
@@ -168,10 +170,9 @@ export default function ServiceDetailPage({
             </Button>
             <Button
               variant="secondary"
-              size="sm"
               onClick={() => router.push("/cases/services")}
             >
-              Back
+              Back to list
             </Button>
           </div>
         </div>
@@ -336,24 +337,20 @@ export default function ServiceDetailPage({
             Milestones
           </h3>
           <div className="space-y-2">
-            {mockServiceMilestones.map((m) => (
-              <label
-                key={m.id}
-                className="flex items-center gap-3 rounded-card border border-gray-200 px-3 py-2"
-              >
-                <input type="checkbox" defaultChecked={m.completed} />
-                <span
-                  className={`flex-1 text-sm ${m.completed ? "text-text-muted line-through" : "font-medium"}`}
-                >
-                  {m.title}
-                </span>
-                {m.dueDate ? (
-                  <span className="text-xs text-text-muted">
-                    {formatDate(m.dueDate)}
-                  </span>
-                ) : null}
-              </label>
-            ))}
+            {mockServiceMilestones.map((m) => {
+              const completed = milestoneOverrides[m.id] ?? m.completed;
+              return (
+                <ChecklistRow
+                  key={m.id}
+                  title={m.title}
+                  completed={completed}
+                  dueDate={m.dueDate ? formatDate(m.dueDate) : undefined}
+                  onToggle={() =>
+                    setMilestoneOverrides((prev) => ({ ...prev, [m.id]: !completed }))
+                  }
+                />
+              );
+            })}
           </div>
         </PageSection>
       )}
@@ -362,13 +359,14 @@ export default function ServiceDetailPage({
         <PageSection
           title="Service Documents"
           action={
-            <Button size="sm" onClick={() => setUploadOpen(true)}>
+            <Button onClick={() => setUploadOpen(true)}>
+              <Plus className="mr-1.5 h-4 w-4" />
               Upload Document
             </Button>
           }
         >
           {docs.length > 0 ? (
-            <Table compact>
+            <Table>
               <TableHeader>
                 <TableHead>Name</TableHead>
                 <TableHead>Category</TableHead>
@@ -391,9 +389,7 @@ export default function ServiceDetailPage({
               </TableBody>
             </Table>
           ) : (
-            <p className="py-8 text-center text-sm text-text-muted">
-              No documents uploaded yet.
-            </p>
+            <EmptyState title="No documents uploaded yet" />
           )}
         </PageSection>
       )}
@@ -412,7 +408,12 @@ export default function ServiceDetailPage({
       {tab === "notes" && (
         <PageSection
           title="Notes & Internal Memos"
-          action={<Button size="sm">Add Note</Button>}
+          action={
+            <Button>
+              <Plus className="mr-1.5 h-4 w-4" />
+              Add Note
+            </Button>
+          }
         >
           {notes.length > 0 ? (
             <div className="space-y-3">
@@ -437,9 +438,7 @@ export default function ServiceDetailPage({
               ))}
             </div>
           ) : (
-            <p className="py-8 text-center text-sm text-text-muted">
-              No notes yet.
-            </p>
+            <EmptyState title="No notes yet" />
           )}
         </PageSection>
       )}
@@ -450,12 +449,15 @@ export default function ServiceDetailPage({
             title="Invoices"
             action={
               <Link href="/billing/invoices">
-                <Button size="sm">Create Invoice</Button>
+                <Button>
+                  <Plus className="mr-1.5 h-4 w-4" />
+                  Create Invoice
+                </Button>
               </Link>
             }
           >
             {invoices.length > 0 ? (
-              <Table compact>
+              <Table>
                 <TableHeader>
                   <TableHead>Invoice #</TableHead>
                   <TableHead>Amount</TableHead>
@@ -472,15 +474,7 @@ export default function ServiceDetailPage({
                       </TableCell>
                       <TableCell>{formatCurrency(inv.amount)}</TableCell>
                       <TableCell>
-                        <Badge
-                          variant={
-                            inv.status === "Paid"
-                              ? "green"
-                              : inv.status === "Overdue"
-                                ? "red"
-                                : "amber"
-                          }
-                        >
+                        <Badge variant={invoiceStatusVariant(inv.status)}>
                           {inv.status}
                         </Badge>
                       </TableCell>
@@ -489,14 +483,12 @@ export default function ServiceDetailPage({
                 </TableBody>
               </Table>
             ) : (
-              <p className="py-8 text-center text-sm text-text-muted">
-                No invoices yet.
-              </p>
+              <EmptyState title="No invoices yet" />
             )}
           </PageSection>
           <PageSection title="Expenses">
             {expenses.length > 0 ? (
-              <Table compact>
+              <Table>
                 <TableHeader>
                   <TableHead>Description</TableHead>
                   <TableHead>Category</TableHead>
@@ -517,9 +509,7 @@ export default function ServiceDetailPage({
                 </TableBody>
               </Table>
             ) : (
-              <p className="py-8 text-center text-sm text-text-muted">
-                No expenses yet.
-              </p>
+              <EmptyState title="No expenses yet" />
             )}
           </PageSection>
         </div>
@@ -528,7 +518,7 @@ export default function ServiceDetailPage({
       {tab === "thread" && (
         <PageSection
           title="Internal Service Thread"
-          action={<Button size="sm">Post Comment</Button>}
+          action={<Button>Post Comment</Button>}
         >
           {comments.length > 0 ? (
             <div className="space-y-3">
@@ -548,9 +538,7 @@ export default function ServiceDetailPage({
               ))}
             </div>
           ) : (
-            <p className="py-8 text-center text-sm text-text-muted">
-              No comments yet.
-            </p>
+            <EmptyState title="No comments yet" />
           )}
         </PageSection>
       )}

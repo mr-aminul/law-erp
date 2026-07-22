@@ -1,5 +1,6 @@
 export const mainNav = [
   { href: "/dashboard", label: "Dashboard", icon: "LayoutDashboard" },
+  { href: "/clients", label: "Clients", icon: "Users" },
   {
     href: "/cases",
     label: "Matters",
@@ -9,9 +10,10 @@ export const mainNav = [
       { href: "/cases/services", label: "Services", icon: "Handshake" },
     ],
   },
-  { href: "/clients", label: "Clients", icon: "Users" },
   { href: "/calendar", label: "Calendar", icon: "Calendar" },
   { href: "/documents", label: "Documents", icon: "FileText" },
+  { href: "/court-filing", label: "Court Filing", icon: "Gavel" },
+  { href: "/communications", label: "Communications", icon: "MessageSquare" },
   {
     href: "/billing",
     label: "Billing",
@@ -25,25 +27,12 @@ export const mainNav = [
   {
     href: "/employees",
     label: "Employees",
-    icon: "Scale",
+    icon: "ContactRound",
     children: [
       { href: "/employees", label: "Directory", icon: "ContactRound" },
       { href: "/employees/attendance", label: "Attendance", icon: "Clock" },
       { href: "/employees/leave", label: "Leave", icon: "CalendarOff" },
       { href: "/employees/compensation", label: "Payroll", icon: "Banknote" },
-    ],
-  },
-  { href: "/court-filing", label: "Court Filing", icon: "Gavel" },
-  { href: "/reports", label: "Reports", icon: "BarChart3" },
-  {
-    href: "/communications",
-    label: "Communications",
-    icon: "MessageSquare",
-    children: [
-      { href: "/communications", label: "All", icon: "LayoutDashboard" },
-      { href: "/communications/internal", label: "Internal", icon: "MessagesSquare" },
-      { href: "/communications/email", label: "Email Log", icon: "Mail" },
-      { href: "/communications/notices", label: "Legal Notices", icon: "ScrollText" },
     ],
   },
 ] as const;
@@ -57,11 +46,4 @@ export const settingsSubNav = [
   { href: "/settings", label: "Firm Profile" },
   { href: "/settings/roles", label: "Roles & Access" },
   { href: "/settings/audit", label: "Audit Log" },
-];
-
-export const communicationsSubNav = [
-  { href: "/communications", label: "All", exact: true },
-  { href: "/communications/internal", label: "Internal" },
-  { href: "/communications/email", label: "Email Log" },
-  { href: "/communications/notices", label: "Legal Notices" },
 ];

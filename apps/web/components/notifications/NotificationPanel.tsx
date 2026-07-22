@@ -370,7 +370,7 @@ export function NotificationPanel({
   onRefresh,
   refreshing = false,
   unreadCount,
-  centerHref = "/communications",
+  centerHref = "",
   onCenterClick,
   onClose,
   titleId,
@@ -424,7 +424,7 @@ export function NotificationPanel({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg p-1.5 text-text-muted transition-colors hover:bg-cream-card hover:text-text-primary lg:hidden"
+              className="rounded-lg p-1.5 text-text-muted transition-colors hover:bg-cream-card hover:text-text-primary"
               aria-label="Close notifications"
             >
               <X className="h-4 w-4" />
@@ -496,15 +496,23 @@ export function NotificationPanel({
             onClick={onCenterClick}
             className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-cream-card"
           >
-            Go to notification center
+            Close
           </button>
-        ) : (
+        ) : centerHref ? (
           <Link
             href={centerHref}
             className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-cream-card"
           >
             Go to notification center
           </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold text-text-primary transition-colors hover:bg-cream-card"
+          >
+            Done
+          </button>
         )}
       </div>
     </div>

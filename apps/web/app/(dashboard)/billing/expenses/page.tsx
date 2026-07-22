@@ -1,8 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
 import { ListToolbar } from "@/components/ui/ListToolbar";
-import { PageSection } from "@/components/ui/PageSection";
+import { EmptyState } from "@/components/ui/PageSection";
 import {
   Table,
   TableBody,
@@ -14,21 +13,38 @@ import {
 import { mockExpenses } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate } from "@/lib/utils/formatDate";
-import { Plus } from "lucide-react";
+import { useMemo, useState } from "react";
 
 export default function ExpensesPage() {
+  const [search, setSearch] = useState("");
+
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase();
+    return mockExpenses.filter(
+      (e) =>
+        !q ||
+        e.description.toLowerCase().includes(q) ||
+        e.caseName.toLowerCase().includes(q) ||
+        e.category.toLowerCase().includes(q)
+    );
+  }, [search]);
+
   return (
     <div className="space-y-4">
       <ListToolbar
-        actions={
-          <Button>
-            <Plus className="mr-1.5 h-4 w-4" />
-            Add Expense
-          </Button>
-        }
+        search={{
+          value: search,
+          onChange: setSearch,
+          placeholder: "Search expenses...",
+        }}
       />
-      <PageSection title="Case Expenses" description="Court fees, stamp duty, travel — tracked per matter.">
-        <Table compact>
+      {filtered.length === 0 ? (
+        <EmptyState
+          title="No expenses found"
+          description="Try clearing your search or add a new expense."
+        />
+      ) : (
+        <Table>
           <TableHeader>
             <TableHead>Date</TableHead>
             <TableHead>Case</TableHead>
@@ -38,7 +54,7 @@ export default function ExpensesPage() {
             <TableHead>Recorded By</TableHead>
           </TableHeader>
           <TableBody>
-            {mockExpenses.map((e) => (
+            {filtered.map((e) => (
               <TableRow key={e.id}>
                 <TableCell className="text-text-muted">{formatDate(e.date)}</TableCell>
                 <TableCell className="max-w-[180px] truncate font-semibold">{e.caseName}</TableCell>
@@ -50,7 +66,7 @@ export default function ExpensesPage() {
             ))}
           </TableBody>
         </Table>
-      </PageSection>
+      )}
     </div>
   );
 }

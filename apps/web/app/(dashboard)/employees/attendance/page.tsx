@@ -4,6 +4,14 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { ListToolbar } from "@/components/ui/ListToolbar";
 import { PageSection } from "@/components/ui/PageSection";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/Table";
 import { UserAvatar } from "@/components/ui/UserChip";
 import { mockAttendance, mockStaff } from "@/lib/mock";
 import type { AttendanceRecord } from "@/types/staff";
@@ -89,35 +97,38 @@ export default function AttendancePage() {
             : `Mark present / absent per employee · ${markedCount} of ${mockStaff.length} marked`
         }
       >
-        <div className="space-y-2">
-          {mockStaff.map((s) => (
-            <div
-              key={s.id}
-              className="flex flex-col gap-2 rounded-card border border-gray-200 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
-            >
-              <span className="flex items-center gap-2.5 text-sm font-semibold">
-                <UserAvatar initials={s.initials} size="sm" />
-                {s.name}
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {STATUSES.map((status) => (
-                  <button
-                    key={status}
-                    type="button"
-                    onClick={() => setStatus(s.id, status)}
-                    className={`rounded-badge px-2.5 py-1 text-xs font-semibold ${
-                      marks[s.id] === status
-                        ? "bg-active-nav text-on-active-nav"
-                        : "bg-cream-card text-text-sec hover:bg-gray-100"
-                    }`}
-                  >
-                    {status}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
+        <Table>
+          <TableHeader>
+            <TableHead>Employee</TableHead>
+            <TableHead>Status</TableHead>
+          </TableHeader>
+          <TableBody>
+            {mockStaff.map((s) => (
+              <TableRow key={s.id}>
+                <TableCell>
+                  <span className="flex items-center gap-2.5 font-semibold">
+                    <UserAvatar initials={s.initials} size="sm" />
+                    {s.name}
+                  </span>
+                </TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-2">
+                    {STATUSES.map((status) => (
+                      <Button
+                        key={status}
+                        type="button"
+                        variant={marks[s.id] === status ? "default" : "outline"}
+                        onClick={() => setStatus(s.id, status)}
+                      >
+                        {status}
+                      </Button>
+                    ))}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </PageSection>
     </div>
   );

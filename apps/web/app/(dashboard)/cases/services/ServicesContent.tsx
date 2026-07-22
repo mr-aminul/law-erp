@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { ListToolbar } from "@/components/ui/ListToolbar";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 import { Modal } from "@/components/ui/Modal";
+import { EmptyState } from "@/components/ui/PageSection";
 import { Pagination } from "@/components/ui/Pagination";
 import {
   Table,
@@ -181,7 +182,14 @@ export default function ServicesContent() {
         }
       />
 
-      <Table>
+      {filtered.length === 0 ? (
+        <EmptyState
+          title="No services match your filters"
+          description="Try clearing filters or search terms."
+        />
+      ) : (
+        <>
+          <Table>
             <TableHeader>
               <TableHead>Client</TableHead>
               <TableHead>Title</TableHead>
@@ -225,35 +233,31 @@ export default function ServicesContent() {
                     {formatDate(s.createdAt)}
                   </TableCell>
                   <TableCell className="w-0 whitespace-nowrap">
-                    <div onClick={(e) => e.stopPropagation()}>
-                      <button
-                        type="button"
-                        className="rounded-input p-1.5 text-text-primary transition-all hover:bg-cream-card group-hover:opacity-80"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </button>
-                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="More actions"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
 
-          {filtered.length === 0 && (
-            <p className="py-12 text-center text-sm text-text-primary">
-              No services match your filters.
-            </p>
-          )}
-
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        totalItems={filtered.length}
-        pageSize={pageSize}
-        itemLabel="services"
-        onPageChange={setPage}
-        onPageSizeChange={handlePageSizeChange}
-      />
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            totalItems={filtered.length}
+            pageSize={pageSize}
+            itemLabel="services"
+            onPageChange={setPage}
+            onPageSizeChange={handlePageSizeChange}
+          />
+        </>
+      )}
 
       <Modal
         open={newServiceOpen}

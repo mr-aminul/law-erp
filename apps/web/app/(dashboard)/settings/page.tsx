@@ -2,16 +2,23 @@
 
 import { AppearanceSettings } from "@/components/settings/AppearanceSettings";
 import { ThemeColorSettings } from "@/components/settings/ThemeColorSettings";
-import { SubNav } from "@/components/layout/SubNav";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { FormField } from "@/components/ui/Form";
 import { Input } from "@/components/ui/Input";
 import { DetailField, PageSection } from "@/components/ui/PageSection";
-import { settingsSubNav } from "@/lib/config/navigation";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/Table";
 import { mockFirmProfile, mockSystemUsers } from "@/lib/mock";
 import { emailError, phoneError } from "@/lib/utils/validateContact";
 import { Download } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 export default function SettingsPage() {
@@ -36,8 +43,6 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-4">
-      <SubNav items={settingsSubNav} />
-
       <section className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-card border border-gray-200 bg-surface px-3 py-3 sm:px-4">
         <div className="flex items-center gap-2.5">
           <h2 className="text-sm font-bold text-text-primary">Brand Theme</h2>
@@ -85,7 +90,7 @@ export default function SettingsPage() {
           <DetailField label="Branches" value={firm.branches.join(", ")} />
         </div>
         <div className="mt-4 flex items-center gap-3">
-          <Button size="sm" type="button" onClick={handleSave}>
+          <Button type="button" onClick={handleSave}>
             Save Changes
           </Button>
           {saved ? (
@@ -94,27 +99,43 @@ export default function SettingsPage() {
         </div>
       </PageSection>
 
-      <PageSection title="Users" description="Managing Partner → Associate → Clerk role hierarchy.">
-        <div className="space-y-2">
-          {mockSystemUsers.map((u) => (
-            <div key={u.id} className="flex items-center justify-between rounded-card border border-gray-200 px-3 py-2">
-              <div>
-                <p className="text-sm font-semibold">{u.name}</p>
-                <p className="text-xs text-text-muted">{u.email}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="blue">{u.role}</Badge>
-                <Badge variant={u.status === "Active" ? "green" : "muted"}>{u.status}</Badge>
-              </div>
-            </div>
-          ))}
-        </div>
+      <PageSection
+        title="Users"
+        description="Managing Partner → Associate → Clerk role hierarchy."
+        action={
+          <Link href="/settings/roles">
+            <Button variant="ghost">Manage roles & access</Button>
+          </Link>
+        }
+      >
+        <Table>
+          <TableHeader>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead>Status</TableHead>
+          </TableHeader>
+          <TableBody>
+            {mockSystemUsers.map((u) => (
+              <TableRow key={u.id}>
+                <TableCell className="font-semibold">{u.name}</TableCell>
+                <TableCell className="text-text-sec">{u.email}</TableCell>
+                <TableCell>
+                  <Badge variant="blue">{u.role}</Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant={u.status === "Active" ? "green" : "muted"}>{u.status}</Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </PageSection>
 
       <PageSection title="Data Backup & Export">
         <div className="flex gap-3">
-          <Button variant="secondary" size="sm"><Download className="mr-1.5 h-4 w-4" />Export All Data (CSV)</Button>
-          <Button variant="secondary" size="sm"><Download className="mr-1.5 h-4 w-4" />Backup (PDF)</Button>
+          <Button variant="secondary"><Download className="mr-1.5 h-4 w-4" />Export All Data (CSV)</Button>
+          <Button variant="secondary"><Download className="mr-1.5 h-4 w-4" />Backup (PDF)</Button>
         </div>
       </PageSection>
     </div>

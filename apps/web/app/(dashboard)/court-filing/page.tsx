@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { ListToolbar } from "@/components/ui/ListToolbar";
 import { Modal } from "@/components/ui/Modal";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
+import { EmptyState } from "@/components/ui/PageSection";
 import {
   Table,
   TableBody,
@@ -14,7 +15,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
-import { mockFilings, mockStaff } from "@/lib/mock";
+import { mockStaff } from "@/lib/mock";
+import {
+  type CreateFilingInput,
+  useDomainStore,
+} from "@/lib/store/domainStore";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import type { FilingStatus } from "@/types/filing";
 import { Plus } from "lucide-react";
@@ -51,6 +56,8 @@ function CourtFilingContent() {
   const [typeFilters, setTypeFilters] = useState<string[]>([]);
   const [filedByFilters, setFiledByFilters] = useState<string[]>([]);
   const [newFilingOpen, setNewFilingOpen] = useState(false);
+  const filings = useDomainStore((s) => s.filings);
+  const createFiling = useDomainStore((s) => s.createFiling);
 
   const prefillCaseId = searchParams.get("case") ?? undefined;
 
@@ -60,7 +67,7 @@ function CourtFilingContent() {
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
-    return mockFilings.filter((f) => {
+    return filings.filter((f) => {
       const matchesSearch =
         !q ||
         f.filingRef.toLowerCase().includes(q) ||
@@ -75,7 +82,7 @@ function CourtFilingContent() {
         filedByFilters.length === 0 || filedByFilters.includes(f.filedBy);
       return matchesSearch && matchesStatus && matchesType && matchesFiledBy;
     });
-  }, [search, statusFilters, typeFilters, filedByFilters]);
+  }, [filings, search, statusFilters, typeFilters, filedByFilters]);
 
   function openNewFilingModal() {
     setNewFilingOpen(true);
@@ -96,8 +103,12 @@ function CourtFilingContent() {
     }
   }
 
-  function handleCreateFiling() {
+  function handleCreateFiling(input: CreateFilingInput) {
+    const created = createFiling(input);
     closeNewFilingModal();
+    if (created) {
+      router.push(`/cases/${created.caseId}?tab=filings&filing=${created.id}`);
+    }
   }
 
   return (
@@ -149,37 +160,44 @@ function CourtFilingContent() {
           </Button>
         }
       />
-      <Table compact>
-        <TableHeader>
-          <TableHead>Ref</TableHead>
-          <TableHead>Case</TableHead>
-          <TableHead>Court</TableHead>
-          <TableHead>Type</TableHead>
-          <TableHead>Filed By</TableHead>
-          <TableHead>Fee</TableHead>
-          <TableHead>Summons</TableHead>
-          <TableHead>Status</TableHead>
-        </TableHeader>
-        <TableBody>
-          {filtered.map((f) => (
-            <TableRow
-              key={f.id}
-              onClick={() =>
-                router.push(`/cases/${f.caseId}?tab=filings&filing=${f.id}`)
-              }
-            >
-              <TableCell className="font-semibold">{f.filingRef}</TableCell>
-              <TableCell className="max-w-[160px] truncate">{f.caseName}</TableCell>
-              <TableCell className="text-text-sec">{f.court}</TableCell>
-              <TableCell>{f.filingType}</TableCell>
-              <TableCell>{f.filedBy}</TableCell>
-              <TableCell>{formatCurrency(f.filingFee)}</TableCell>
-              <TableCell>{f.summonsDispatched ? "Sent" : "—"}</TableCell>
-              <TableCell><Badge variant={statusVariant(f.status)}>{f.status}</Badge></TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      {filtered.length === 0 ? (
+        <EmptyState
+          title="No filings match your filters"
+          description="Try clearing filters or search terms."
+        />
+      ) : (
+        <Table>
+          <TableHeader>
+            <TableHead>Ref</TableHead>
+            <TableHead>Case</TableHead>
+            <TableHead>Court</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Filed By</TableHead>
+            <TableHead>Fee</TableHead>
+            <TableHead>Summons</TableHead>
+            <TableHead>Status</TableHead>
+          </TableHeader>
+          <TableBody>
+            {filtered.map((f) => (
+              <TableRow
+                key={f.id}
+                onClick={() =>
+                  router.push(`/cases/${f.caseId}?tab=filings&filing=${f.id}`)
+                }
+              >
+                <TableCell className="font-semibold">{f.filingRef}</TableCell>
+                <TableCell className="max-w-[160px] truncate">{f.caseName}</TableCell>
+                <TableCell className="text-text-sec">{f.court}</TableCell>
+                <TableCell>{f.filingType}</TableCell>
+                <TableCell>{f.filedBy}</TableCell>
+                <TableCell>{formatCurrency(f.filingFee)}</TableCell>
+                <TableCell>{f.summonsDispatched ? "Sent" : "—"}</TableCell>
+                <TableCell><Badge variant={statusVariant(f.status)}>{f.status}</Badge></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      )}
 
       <Modal
         open={newFilingOpen}

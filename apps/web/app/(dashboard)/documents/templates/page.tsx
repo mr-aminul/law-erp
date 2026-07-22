@@ -1,50 +1,61 @@
 "use client";
 
-import { Button } from "@/components/ui/Button";
 import { ListToolbar } from "@/components/ui/ListToolbar";
-import { PageSection } from "@/components/ui/PageSection";
+import { EmptyState, PageSection } from "@/components/ui/PageSection";
 import { mockDocuments } from "@/lib/mock";
-import { FileText, Plus } from "lucide-react";
+import { FileText } from "lucide-react";
+import { useMemo, useState } from "react";
 
 export default function DocumentTemplatesPage() {
-  const templates = mockDocuments.filter((d) => d.isTemplate);
+  const [search, setSearch] = useState("");
+
+  const templates = useMemo(() => {
+    const q = search.toLowerCase();
+    return mockDocuments.filter(
+      (d) =>
+        d.isTemplate &&
+        (!q || d.name.toLowerCase().includes(q) || d.category.toLowerCase().includes(q))
+    );
+  }, [search]);
 
   return (
     <div className="space-y-4">
       <ListToolbar
-        actions={
-          <Button>
-            <Plus className="mr-1.5 h-4 w-4" />
-            New Template
-          </Button>
-        }
+        search={{
+          value: search,
+          onChange: setSearch,
+          placeholder: "Search templates...",
+        }}
       />
 
       <PageSection
         title="Template Library"
         description="Writ Petition, Vakalatnama, Legal Notice, Affidavit, MOA — Bangla + English support."
       >
-        <div className="grid-pair gap-3">
-          {templates.map((t) => (
-            <div key={t.id} className="rounded-card border border-gray-200 p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-input bg-green-light text-green">
-                  <FileText className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="font-semibold">{t.name}</p>
-                  <p className="text-xs text-text-muted">
-                    {t.category} · {t.language}
-                  </p>
-                  <div className="mt-2 flex gap-2">
-                    <Button variant="outline">Use Template</Button>
-                    <Button variant="ghost">Preview</Button>
+        {templates.length === 0 ? (
+          <EmptyState
+            title="No templates found"
+            description="Try clearing your search or create a new template."
+          />
+        ) : (
+          <div className="grid-pair gap-3">
+            {templates.map((t) => (
+              <div key={t.id} className="rounded-card border border-gray-200 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-input bg-green-light text-green">
+                    <FileText className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-semibold">{t.name}</p>
+                    <p className="text-xs text-text-muted">
+                      {t.category} · {t.language}
+                    </p>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </PageSection>
     </div>
   );

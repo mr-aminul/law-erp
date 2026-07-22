@@ -157,7 +157,7 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
         <div
           id={listId}
           role="listbox"
-          className="absolute right-0 top-[calc(100%+6px)] z-[120] max-h-[min(60dvh,420px)] w-[min(100vw-2rem,360px)] overflow-y-auto rounded-input border border-gray-200 bg-white py-1 shadow-lg sm:w-[360px]"
+          className="scrollbar-slick absolute right-0 top-[calc(100%+6px)] z-[120] max-h-[min(60dvh,420px)] w-[min(100vw-2rem,360px)] overflow-y-auto rounded-input border border-gray-200 bg-white py-1 shadow-lg sm:w-[360px]"
         >
           {hits.length === 0 ? (
             <p className="px-3 py-6 text-center text-sm text-text-muted">
@@ -192,10 +192,9 @@ export function GlobalSearch({ className }: GlobalSearchProps) {
                             {hit.initials ? (
                               <UserAvatar initials={hit.initials} size="sm" />
                             ) : (
-                              <Icon
-                                className="h-4 w-4 shrink-0 text-text-muted"
-                                aria-hidden
-                              />
+                              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-theme-subtle text-theme">
+                                <Icon className="h-4 w-4" aria-hidden />
+                              </span>
                             )}
                             <span className="min-w-0 flex-1">
                               <span className="block truncate text-sm font-medium">

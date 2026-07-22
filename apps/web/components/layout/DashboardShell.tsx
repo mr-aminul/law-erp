@@ -11,11 +11,8 @@ import {
   Gavel,
   Handshake,
   LayoutDashboard,
-  Mail,
   MessageSquare,
-  MessagesSquare,
   Scale,
-  ScrollText,
   Settings,
   Users,
   type LucideIcon,
@@ -24,7 +21,6 @@ import {
 function getPageTitle(pathname: string): string {
   const titles: [RegExp | string, string][] = [
     ["/dashboard", "Dashboard"],
-    ["/cases/new", "New Case"],
     [/^\/cases\/services\/[^/]+$/, "Service Detail"],
     ["/cases/services", "Services"],
     [/^\/cases\/[^/]+$/, "Case Detail"],
@@ -45,9 +41,6 @@ function getPageTitle(pathname: string): string {
     ["/employees", "Employees"],
     ["/court-filing", "Court Filing"],
     ["/reports", "Reports & Analytics"],
-    ["/communications/internal", "Internal"],
-    ["/communications/email", "Email Log"],
-    ["/communications/notices", "Legal Notices"],
     ["/communications", "Communications"],
     ["/settings/roles", "Roles & Access"],
     ["/settings/audit", "Audit Log"],
@@ -75,9 +68,6 @@ function getPageIcon(pathname: string): LucideIcon {
   if (pathname.startsWith("/employees")) return Scale;
   if (pathname.startsWith("/court-filing")) return Gavel;
   if (pathname.startsWith("/reports")) return BarChart3;
-  if (pathname.startsWith("/communications/internal")) return MessagesSquare;
-  if (pathname.startsWith("/communications/email")) return Mail;
-  if (pathname.startsWith("/communications/notices")) return ScrollText;
   if (pathname.startsWith("/communications")) return MessageSquare;
   if (pathname.startsWith("/settings")) return Settings;
   if (pathname === "/dashboard") return LayoutDashboard;

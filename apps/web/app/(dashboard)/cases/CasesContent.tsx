@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { ListToolbar } from "@/components/ui/ListToolbar";
 import { MultiSelectDropdown } from "@/components/ui/MultiSelectDropdown";
 import { Modal } from "@/components/ui/Modal";
+import { EmptyState } from "@/components/ui/PageSection";
 import { Pagination } from "@/components/ui/Pagination";
 import {
   Table,
@@ -16,7 +17,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
-import { mockCases, mockStaff } from "@/lib/mock/data";
+import { mockStaff } from "@/lib/mock/data";
+import {
+  type CreateCaseInput,
+  useDomainStore,
+} from "@/lib/store/domainStore";
 import { CASE_STATUSES } from "@/lib/utils/caseStatus";
 import { formatDate } from "@/lib/utils/formatDate";
 import { clampPage, getPageSlice } from "@/lib/utils/pagination";
@@ -53,19 +58,16 @@ export default function CasesContent() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const [newCaseOpen, setNewCaseOpen] = useState(false);
-  const [statusOverrides, setStatusOverrides] = useState<
-    Record<string, CaseStatus>
-  >({});
+  const storeCases = useDomainStore((s) => s.cases);
+  const createCase = useDomainStore((s) => s.createCase);
+  const updateCase = useDomainStore((s) => s.updateCase);
+  const defaultClientId = searchParams.get("client") ?? undefined;
 
   useEffect(() => {
     setNewCaseOpen(searchParams.get("new") === "1");
   }, [searchParams]);
 
-  const cases = useMemo(() => {
-    return mockCases.map((c) =>
-      statusOverrides[c.id] ? { ...c, status: statusOverrides[c.id] } : c
-    );
-  }, [statusOverrides]);
+  const cases = storeCases;
 
   const filtered = useMemo(() => {
     return cases.filter((c) => {
@@ -110,13 +112,14 @@ export default function CasesContent() {
     }
   }
 
-  function handleCreateCase() {
+  function handleCreateCase(input: CreateCaseInput) {
+    const created = createCase(input);
     closeNewCaseModal();
-    router.push("/cases/1");
+    router.push(`/cases/${created.id}`);
   }
 
   function updateCaseStatus(caseId: string, status: CaseStatus) {
-    setStatusOverrides((prev) => ({ ...prev, [caseId]: status }));
+    updateCase(caseId, { status });
   }
 
   function handlePageSizeChange(next: number) {
@@ -187,7 +190,14 @@ export default function CasesContent() {
         }
       />
 
-      <Table>
+      {filtered.length === 0 ? (
+        <EmptyState
+          title="No cases match your filters"
+          description="Try clearing filters or search terms."
+        />
+      ) : (
+        <>
+          <Table>
             <TableHeader>
               <TableHead>Client</TableHead>
               <TableHead>Title</TableHead>
@@ -231,35 +241,31 @@ export default function CasesContent() {
                     {formatDate(c.createdAt)}
                   </TableCell>
                   <TableCell className="w-0 whitespace-nowrap">
-                    <div onClick={(e) => e.stopPropagation()}>
-                      <button
-                        type="button"
-                        className="rounded-input p-1.5 text-text-primary transition-all hover:bg-cream-card group-hover:opacity-80"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </button>
-                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="More actions"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
 
-          {filtered.length === 0 && (
-            <p className="py-12 text-center text-sm text-text-primary">
-              No cases match your filters.
-            </p>
-          )}
-
-      <Pagination
-        page={page}
-        totalPages={totalPages}
-        totalItems={filtered.length}
-        pageSize={pageSize}
-        itemLabel="cases"
-        onPageChange={setPage}
-        onPageSizeChange={handlePageSizeChange}
-      />
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            totalItems={filtered.length}
+            pageSize={pageSize}
+            itemLabel="cases"
+            onPageChange={setPage}
+            onPageSizeChange={handlePageSizeChange}
+          />
+        </>
+      )}
 
       <Modal
         open={newCaseOpen}
@@ -267,7 +273,11 @@ export default function CasesContent() {
         title="New Case"
         className="max-w-2xl"
       >
-        <NewCaseForm onSubmit={handleCreateCase} onCancel={closeNewCaseModal} />
+        <NewCaseForm
+          onSubmit={handleCreateCase}
+          onCancel={closeNewCaseModal}
+          defaultClientId={defaultClientId}
+        />
       </Modal>
     </div>
   );

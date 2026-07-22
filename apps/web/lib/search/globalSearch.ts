@@ -4,8 +4,6 @@ import {
   settingsSubNav,
 } from "@/lib/config/navigation";
 import {
-  mockCases,
-  mockClients,
   mockInvoices,
   mockServices,
   mockStaff,
@@ -13,8 +11,8 @@ import {
 import {
   mockCommunications,
   mockDocuments,
-  mockFilings,
 } from "@/lib/mock/extended";
+import { useDomainStore } from "@/lib/store/domainStore";
 
 export type SearchCategory =
   | "Pages"
@@ -71,7 +69,6 @@ function flattenNavPages(): SearchHit[] {
       id: `page:${href}`,
       category: "Pages",
       title: label,
-      subtitle: href,
       href,
       keywords: blob(label, href.replace(/\//g, " ")),
     });
@@ -99,9 +96,11 @@ function flattenNavPages(): SearchHit[] {
 }
 
 function buildIndex(): SearchHit[] {
+  const { clients: storeClients, cases: storeCases, filings: storeFilings } =
+    useDomainStore.getState();
   const pages = flattenNavPages();
 
-  const clients: SearchHit[] = mockClients.map((c) => ({
+  const clients: SearchHit[] = storeClients.map((c) => ({
     id: `client:${c.id}`,
     category: "Clients" as const,
     title: c.name,
@@ -120,7 +119,7 @@ function buildIndex(): SearchHit[] {
     initials: s.initials,
   }));
 
-  const cases: SearchHit[] = mockCases.map((c) => ({
+  const cases: SearchHit[] = storeCases.map((c) => ({
     id: `case:${c.id}`,
     category: "Cases" as const,
     title: c.matter,
@@ -151,16 +150,16 @@ function buildIndex(): SearchHit[] {
     subtitle: [d.category, d.caseName ?? d.clientName]
       .filter(Boolean)
       .join(" · "),
-    href: "/documents",
+    href: d.caseId ? `/cases/${d.caseId}?tab=documents` : "/documents",
     keywords: blob(d.name, d.category, d.caseName, d.clientName),
   }));
 
-  const filings: SearchHit[] = mockFilings.map((f) => ({
+  const filings: SearchHit[] = storeFilings.map((f) => ({
     id: `filing:${f.id}`,
     category: "Filings" as const,
     title: f.filingRef,
     subtitle: [f.caseName, f.court, f.filedBy].filter(Boolean).join(" · "),
-    href: "/court-filing",
+    href: `/cases/${f.caseId}?tab=filings&filing=${f.id}`,
     keywords: blob(f.filingRef, f.caseName, f.court, f.filedBy),
   }));
 
