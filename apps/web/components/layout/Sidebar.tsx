@@ -7,7 +7,6 @@ import {
   Banknote,
   Briefcase,
   Calendar,
-  CalendarOff,
   ChevronDown,
   Clock,
   ContactRound,
@@ -49,7 +48,6 @@ const ICONS: Record<string, LucideIcon> = {
   Wallet,
   ContactRound,
   Clock,
-  CalendarOff,
   Banknote,
   Settings,
 };

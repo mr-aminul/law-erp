@@ -459,8 +459,8 @@ export const mockServiceNotes: CaseNote[] = [
 // ponytail: seed one month of weekday marks so week/month views aren't empty
 const ATTENDANCE_SEED: Record<string, AttendanceRecord["status"][]> = {
   "1": ["Present", "Present", "Present", "Present", "Late", "Present", "Present", "Present", "Present", "Present", "Absent", "Present", "Present", "Present", "Present", "Present", "Late", "Present", "Present", "Present", "Present", "Present"],
-  "2": ["Present", "Present", "Late", "Present", "Present", "Present", "Present", "Absent", "Present", "Present", "Present", "Present", "Late", "Present", "Present", "Present", "Present", "Present", "Present", "Leave", "Leave", "Present"],
-  "3": ["Present", "Late", "Late", "Present", "Present", "Leave", "Leave", "Leave", "Present", "Present", "Present", "Late", "Present", "Present", "Absent", "Present", "Present", "Present", "Late", "Present", "Present", "Present"],
+  "2": ["Present", "Present", "Late", "Present", "Present", "Present", "Present", "Absent", "Present", "Present", "Present", "Present", "Late", "Present", "Present", "Present", "Present", "Present", "Present", "Present", "Present", "Present"],
+  "3": ["Present", "Late", "Late", "Present", "Present", "Present", "Present", "Present", "Present", "Present", "Present", "Late", "Present", "Present", "Absent", "Present", "Present", "Present", "Late", "Present", "Present", "Present"],
   "4": ["Present", "Present", "Present", "Present", "Present", "Present", "Late", "Present", "Present", "Present", "Present", "Present", "Present", "Absent", "Present", "Present", "Present", "Present", "Present", "Present", "Late", "Present"],
 };
 
@@ -503,8 +503,18 @@ export const mockLeaveRequests: LeaveRequest[] = [
     type: "Annual",
     from: "2026-06-15",
     to: "2026-06-17",
-    status: "Pending",
+    status: "Approved",
     reason: "Family event in Sylhet",
+  },
+  {
+    id: "lr2",
+    staffId: "2",
+    staffName: "Tanvir Ahmed",
+    type: "Sick",
+    from: "2026-06-26",
+    to: "2026-06-27",
+    status: "Pending",
+    reason: "Fever",
   },
 ];
 

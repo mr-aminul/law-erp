@@ -30,8 +30,7 @@ export const mainNav = [
     icon: "ContactRound",
     children: [
       { href: "/employees", label: "Directory", icon: "ContactRound" },
-      { href: "/employees/attendance", label: "Attendance", icon: "Clock" },
-      { href: "/employees/leave", label: "Leave", icon: "CalendarOff" },
+      { href: "/employees/attendance", label: "Attendance & Leave", icon: "Clock" },
       { href: "/employees/compensation", label: "Payroll", icon: "Banknote" },
     ],
   },

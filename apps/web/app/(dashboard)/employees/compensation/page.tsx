@@ -23,12 +23,35 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-function currentMonthLabel() {
-  return new Date().toLocaleString("en-GB", { month: "long", year: "numeric" });
+const MONTH_NAMES = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+] as const;
+
+function currentMonthValue() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 }
 
 function todayISO() {
   return new Date().toISOString().slice(0, 10);
+}
+
+/** `YYYY-MM` → `July 2026` */
+function formatMonthLabel(value: string) {
+  const [year, month] = value.split("-").map(Number);
+  if (!year || !month || month < 1 || month > 12) return "";
+  return `${MONTH_NAMES[month - 1]} ${year}`;
 }
 
 export default function CompensationPage() {
@@ -39,10 +62,11 @@ export default function CompensationPage() {
   const [paidFilter, setPaidFilter] = useState("all");
   const [open, setOpen] = useState(false);
   const [staffId, setStaffId] = useState(mockStaff[0]?.id ?? "");
-  const [month, setMonth] = useState(currentMonthLabel);
+  const [monthValue, setMonthValue] = useState(currentMonthValue);
   const [gross, setGross] = useState(String(mockStaff[0]?.salary ?? ""));
   const [net, setNet] = useState(String(mockStaff[0]?.salary ?? ""));
   const [paidAt, setPaidAt] = useState(todayISO);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const monthOptions = useMemo(() => {
     const months = Array.from(new Set(records.map((r) => r.month))).sort();
@@ -83,29 +107,55 @@ export default function CompensationPage() {
 
   function openModal() {
     selectStaff(staffId || mockStaff[0]?.id || "");
-    setMonth(currentMonthLabel());
+    setMonthValue(currentMonthValue());
     setPaidAt(todayISO());
+    setFormError(null);
     setOpen(true);
   }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const staff = mockStaff.find((s) => s.id === staffId);
+    const monthLabel = formatMonthLabel(monthValue);
     const grossValue = Number(gross);
     const netValue = Number(net);
-    if (!staff || !month.trim() || !(grossValue > 0) || !(netValue > 0)) return;
+
+    if (!staff) {
+      setFormError("Select an employee.");
+      return;
+    }
+    if (!monthLabel) {
+      setFormError("Select a valid month and year.");
+      return;
+    }
+    if (!(grossValue > 0) || !(netValue > 0)) {
+      setFormError("Gross and net pay must be greater than zero.");
+      return;
+    }
+    if (netValue > grossValue) {
+      setFormError("Net pay cannot exceed gross.");
+      return;
+    }
+    if (
+      records.some((r) => r.staffId === staff.id && r.month === monthLabel)
+    ) {
+      setFormError(`Payroll for ${staff.name} in ${monthLabel} already exists.`);
+      return;
+    }
+
     setRecords((prev) => [
       {
         id: `cr-${Date.now()}`,
         staffId: staff.id,
         staffName: staff.name,
-        month: month.trim(),
+        month: monthLabel,
         grossSalary: grossValue,
         netSalary: netValue,
         paidAt: paidAt || undefined,
       },
       ...prev,
     ]);
+    setFormError(null);
     setOpen(false);
   }
 
@@ -207,9 +257,12 @@ export default function CompensationPage() {
             <FormField label="Month" required>
               <Input
                 required
-                value={month}
-                onChange={(e) => setMonth(e.target.value)}
-                placeholder="e.g. June 2026"
+                type="month"
+                value={monthValue}
+                onChange={(e) => {
+                  setMonthValue(e.target.value);
+                  setFormError(null);
+                }}
               />
             </FormField>
             <FormField label="Gross (BDT)" required>
@@ -236,6 +289,11 @@ export default function CompensationPage() {
               <Input type="date" value={paidAt} onChange={(e) => setPaidAt(e.target.value)} />
             </FormField>
           </div>
+          {formError ? (
+            <p className="text-sm font-medium text-red" role="alert">
+              {formError}
+            </p>
+          ) : null}
           <div className="flex justify-end gap-3 border-t border-gray-200 pt-4">
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
               Cancel
