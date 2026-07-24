@@ -7,7 +7,6 @@ import {
   useEffect,
   useLayoutEffect,
   useRef,
-  useState,
   type ReactNode,
 } from "react";
 
@@ -34,8 +33,6 @@ const sizeClasses = {
   md: "px-3 py-1.5 text-xs",
 } as const;
 
-type PillRect = { left: number; width: number };
-
 /** Full-round split control with a sliding active pill (notification-panel style). */
 export function SegmentedControl({
   items,
@@ -48,22 +45,26 @@ export function SegmentedControl({
   const activeIndex = items.findIndex((item) => item.id === value);
   const trackRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
-  const [pill, setPill] = useState<PillRect | null>(null);
+  const pillRef = useRef<HTMLDivElement>(null);
 
+  // Imperative pill sync — avoids setState ↔ ResizeObserver update loops.
   const syncPill = useCallback(() => {
     if (fill) return;
+    const pillEl = pillRef.current;
+    if (!pillEl) return;
     const el = itemRefs.current[activeIndex];
-    const track = trackRef.current;
-    if (!el || !track || activeIndex < 0) {
-      setPill(null);
+    if (!el || activeIndex < 0) {
+      pillEl.style.opacity = "0";
       return;
     }
-    setPill({ left: el.offsetLeft, width: el.offsetWidth });
+    pillEl.style.opacity = "1";
+    pillEl.style.left = `${el.offsetLeft}px`;
+    pillEl.style.width = `${el.offsetWidth}px`;
   }, [activeIndex, fill]);
 
   useLayoutEffect(() => {
     syncPill();
-  }, [syncPill, items]);
+  }, [syncPill, activeIndex, items.length, value]);
 
   useEffect(() => {
     if (fill) return;
@@ -101,11 +102,11 @@ export function SegmentedControl({
           }}
         />
       ) : null}
-      {!fill && pill ? (
+      {!fill ? (
         <div
+          ref={pillRef}
           aria-hidden
-          className="pointer-events-none absolute bottom-1 top-1 rounded-full bg-primary transition-[left,width] duration-300 ease-out"
-          style={{ left: pill.left, width: pill.width }}
+          className="pointer-events-none absolute bottom-1 top-1 rounded-full bg-primary opacity-0 transition-[left,width,opacity] duration-300 ease-out"
         />
       ) : null}
       {items.map((item, index) => {

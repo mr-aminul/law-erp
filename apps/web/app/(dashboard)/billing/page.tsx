@@ -1,3 +1,5 @@
+"use client";
+
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { PageSection } from "@/components/ui/PageSection";
@@ -10,23 +12,25 @@ import {
   TableRow,
 } from "@/components/ui/Table";
 import { StatCard } from "@/components/dashboard/StatCard";
-import { mockExpenses, mockInvoices, mockPayments } from "@/lib/mock";
+import { mockExpenses, mockPayments } from "@/lib/mock";
+import { useDomainStore } from "@/lib/store/domainStore";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { invoiceStatusVariant } from "@/lib/utils/invoiceStatus";
 import { CreditCard, Receipt, TrendingUp, Wallet } from "lucide-react";
 import Link from "next/link";
 
 export default function BillingPage() {
-  const totalInvoiced = mockInvoices.reduce((s, i) => s + i.amount, 0);
+  const invoices = useDomainStore((s) => s.invoices);
+  const totalInvoiced = invoices.reduce((s, i) => s + i.amount, 0);
   const collected = mockPayments.reduce((s, p) => s + p.amount, 0);
   const outstanding = totalInvoiced - collected;
-  const overdue = mockInvoices.filter((i) => i.status === "Overdue").reduce((s, i) => s + i.amount, 0);
+  const overdue = invoices.filter((i) => i.status === "Overdue").reduce((s, i) => s + i.amount, 0);
   const totalExpenses = mockExpenses.reduce((s, e) => s + e.amount, 0);
 
   return (
     <div className="space-y-4">
       <div className="grid-stats">
-        <StatCard title="Invoiced" icon={Receipt} accent="blue" primaryValue={formatCurrency(totalInvoiced)} primaryLabel="Total billed" metrics={[{ label: "Invoices", value: mockInvoices.length }]} />
+        <StatCard title="Invoiced" icon={Receipt} accent="blue" primaryValue={formatCurrency(totalInvoiced)} primaryLabel="Total billed" metrics={[{ label: "Invoices", value: invoices.length }]} />
         <StatCard title="Collected" icon={Wallet} accent="green" primaryValue={formatCurrency(collected)} primaryLabel="Payments received" metrics={[{ label: "Receipts", value: mockPayments.length, highlight: true }]} />
         <StatCard title="Outstanding" icon={TrendingUp} accent="amber" primaryValue={formatCurrency(outstanding)} primaryLabel="Awaiting payment" metrics={[{ label: "Overdue", value: formatCurrency(overdue), highlight: true }]} />
         <StatCard title="Expenses" icon={CreditCard} accent="sidebar" primaryValue={formatCurrency(totalExpenses)} primaryLabel="Case expenses logged" metrics={[{ label: "Entries", value: mockExpenses.length }]} />
@@ -49,7 +53,7 @@ export default function BillingPage() {
               <TableHead>Status</TableHead>
             </TableHeader>
             <TableBody>
-              {mockInvoices.slice(0, 4).map((inv) => (
+              {invoices.slice(0, 4).map((inv) => (
                 <TableRow key={inv.id}>
                   <TableCell className="font-semibold">
                     <Link href={`/billing/invoices/${inv.id}`} className="hover:underline">

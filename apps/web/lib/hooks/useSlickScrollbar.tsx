@@ -53,19 +53,19 @@ export function useSlickScrollbar(hideDelayMs = 700): {
       return;
     }
 
-    const height = Math.max(28, (clientHeight / scrollHeight) * clientHeight);
+    const height = Math.round(
+      Math.max(28, (clientHeight / scrollHeight) * clientHeight)
+    );
     const maxTop = clientHeight - height;
     const top =
       maxTop <= 0
         ? 0
-        : (scrollTop / (scrollHeight - clientHeight)) * maxTop;
+        : Math.round((scrollTop / (scrollHeight - clientHeight)) * maxTop);
 
-    setThumb((prev) => ({
-      ...prev,
-      show: true,
-      top,
-      height,
-    }));
+    setThumb((prev) => {
+      if (prev.show && prev.top === top && prev.height === height) return prev;
+      return { ...prev, show: true, top, height };
+    });
   }, []);
 
   const scrollRef = useCallback<RefCallback<HTMLElement | null>>(
@@ -88,12 +88,12 @@ export function useSlickScrollbar(hideDelayMs = 700): {
 
   const onScroll = useCallback(() => {
     syncThumb();
-    setThumb((prev) => ({ ...prev, visible: true }));
+    setThumb((prev) => (prev.visible ? prev : { ...prev, visible: true }));
     if (hideTimeout.current !== null) {
       window.clearTimeout(hideTimeout.current);
     }
     hideTimeout.current = window.setTimeout(() => {
-      setThumb((prev) => ({ ...prev, visible: false }));
+      setThumb((prev) => (prev.visible ? { ...prev, visible: false } : prev));
       hideTimeout.current = null;
     }, hideDelayMs);
   }, [hideDelayMs, syncThumb]);

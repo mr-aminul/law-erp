@@ -24,7 +24,6 @@ import { UserChip } from "@/components/ui/UserChip";
 import {
   getServiceById,
   mockClients,
-  mockDocuments,
   mockExpenses,
   mockInvoices,
   mockServiceComments,
@@ -32,6 +31,10 @@ import {
   mockServiceNotes,
   mockStaff,
 } from "@/lib/mock";
+import {
+  type CreateDocumentInput,
+  useDomainStore,
+} from "@/lib/store/domainStore";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate, toDateInputValue } from "@/lib/utils/formatDate";
 import { invoiceStatusVariant } from "@/lib/utils/invoiceStatus";
@@ -68,6 +71,8 @@ export default function ServiceDetailPage({
 }) {
   const router = useRouter();
   const service = getServiceById(params.id);
+  const documents = useDomainStore((s) => s.documents);
+  const createDocument = useDomainStore((s) => s.createDocument);
   const [tab, setTab] = useState("overview");
   const [uploadOpen, setUploadOpen] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -86,7 +91,7 @@ export default function ServiceDetailPage({
   if (!service) notFound();
 
   // ponytail: reuse case-linked docs until service docs exist
-  const docs = mockDocuments.filter((d) => d.caseId === service.id);
+  const docs = documents.filter((d) => d.caseId === service.id && !d.isTemplate);
   const invoices = mockInvoices.filter((i) => i.caseId === service.serviceId);
   const expenses = mockExpenses.filter((e) => e.caseId === service.id);
   const notes = mockServiceNotes.filter((n) => n.caseId === service.id);
@@ -361,7 +366,7 @@ export default function ServiceDetailPage({
           action={
             <Button onClick={() => setUploadOpen(true)}>
               <Plus className="mr-1.5 h-4 w-4" />
-              Upload Document
+              Add Document
             </Button>
           }
         >
@@ -376,7 +381,10 @@ export default function ServiceDetailPage({
               </TableHeader>
               <TableBody>
                 {docs.map((d) => (
-                  <TableRow key={d.id}>
+                  <TableRow
+                    key={d.id}
+                    onClick={() => router.push(`/documents/${d.id}`)}
+                  >
                     <TableCell className="font-semibold">{d.name}</TableCell>
                     <TableCell>{d.category}</TableCell>
                     <TableCell>v{d.version}</TableCell>
@@ -397,10 +405,19 @@ export default function ServiceDetailPage({
       <Modal
         open={uploadOpen}
         onClose={() => setUploadOpen(false)}
-        title="Upload Document"
+        title="Add Document"
       >
         <UploadDocumentForm
-          onSubmit={() => setUploadOpen(false)}
+          defaultCaseId={service.id}
+          onSubmit={(input: CreateDocumentInput) => {
+            const created = createDocument(input);
+            setUploadOpen(false);
+            if (created) {
+              router.push(`/documents/${created.id}`);
+              return;
+            }
+            setTab("documents");
+          }}
           onCancel={() => setUploadOpen(false)}
         />
       </Modal>
@@ -448,7 +465,7 @@ export default function ServiceDetailPage({
           <PageSection
             title="Invoices"
             action={
-              <Link href="/billing/invoices">
+              <Link href="/billing/invoices?new=1">
                 <Button>
                   <Plus className="mr-1.5 h-4 w-4" />
                   Create Invoice

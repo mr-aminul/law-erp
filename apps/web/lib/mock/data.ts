@@ -22,7 +22,6 @@ export const mockStaff: Staff[] = [
     salary: 350000,
     joinDate: "2010-03-01",
     email: "rahima@ukil.ai",
-    cleHours: 24,
   },
   {
     id: "2",
@@ -41,7 +40,6 @@ export const mockStaff: Staff[] = [
     salary: 180000,
     joinDate: "2016-01-15",
     email: "tanvir@ukil.ai",
-    cleHours: 18,
   },
   {
     id: "3",
@@ -60,7 +58,6 @@ export const mockStaff: Staff[] = [
     salary: 165000,
     joinDate: "2018-06-01",
     email: "nusrat@ukil.ai",
-    cleHours: 12,
   },
   {
     id: "4",

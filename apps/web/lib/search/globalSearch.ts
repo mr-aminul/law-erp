@@ -10,7 +10,6 @@ import {
 } from "@/lib/mock/data";
 import {
   mockCommunications,
-  mockDocuments,
 } from "@/lib/mock/extended";
 import { useDomainStore } from "@/lib/store/domainStore";
 
@@ -96,7 +95,7 @@ function flattenNavPages(): SearchHit[] {
 }
 
 function buildIndex(): SearchHit[] {
-  const { clients: storeClients, cases: storeCases, filings: storeFilings } =
+  const { clients: storeClients, cases: storeCases, filings: storeFilings, documents: storeDocuments } =
     useDomainStore.getState();
   const pages = flattenNavPages();
 
@@ -143,14 +142,14 @@ function buildIndex(): SearchHit[] {
     keywords: blob(s.matter, s.serviceId, s.clientName),
   }));
 
-  const documents: SearchHit[] = mockDocuments.map((d) => ({
+  const documents: SearchHit[] = storeDocuments.map((d) => ({
     id: `doc:${d.id}`,
     category: "Documents" as const,
     title: d.name,
     subtitle: [d.category, d.caseName ?? d.clientName]
       .filter(Boolean)
       .join(" · "),
-    href: d.caseId ? `/cases/${d.caseId}?tab=documents` : "/documents",
+    href: `/documents/${d.id}`,
     keywords: blob(d.name, d.category, d.caseName, d.clientName),
   }));
 

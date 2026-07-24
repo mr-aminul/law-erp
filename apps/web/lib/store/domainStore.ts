@@ -3,13 +3,22 @@
 import {
   mockCases,
   mockClients,
+  mockDocuments,
   mockFilings,
   mockHearings,
+  mockInvoices,
 } from "@/lib/mock";
 import type { Case, CaseStatus, CaseType } from "@/types/case";
 import type { Client, ClientStatus, ClientType } from "@/types/client";
+import type {
+  Document,
+  DocumentCategory,
+  DocumentLanguage,
+} from "@/types/document";
+import { documentAccessUsers } from "@/types/document";
 import type { CourtFiling, FilingStatus } from "@/types/filing";
 import type { CourtLevel, Hearing, HearingEventType } from "@/types/hearing";
+import type { Invoice, InvoiceStatus } from "@/types/invoice";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -40,6 +49,18 @@ function caseCode() {
 
 function filingRef(id: string) {
   return `FL-${new Date().getFullYear()}-${id.padStart(3, "0")}`;
+}
+
+function nextInvoiceNumber(invoices: Invoice[]) {
+  const year = new Date().getFullYear();
+  const prefix = `INV-${year}-`;
+  let max = 0;
+  for (const inv of invoices) {
+    if (!inv.invoiceNumber.startsWith(prefix)) continue;
+    const n = Number(inv.invoiceNumber.slice(prefix.length));
+    if (Number.isFinite(n)) max = Math.max(max, n);
+  }
+  return `${prefix}${String(max + 1).padStart(3, "0")}`;
 }
 
 export type CreateClientInput = {
@@ -107,11 +128,39 @@ export type CreateFilingInput = {
 
 export type UpdateFilingInput = Partial<Omit<CourtFiling, "id" | "filingRef">>;
 
+export type CreateInvoiceInput = {
+  /** Domain case `id` (numeric store key). */
+  caseId: string;
+  amount: number;
+  dueDate: string;
+  status?: InvoiceStatus;
+};
+
+export type UpdateInvoiceInput = Partial<
+  Omit<Invoice, "id" | "invoiceNumber" | "createdAt">
+>;
+
+export type CreateDocumentInput = {
+  name: string;
+  category: DocumentCategory;
+  language: DocumentLanguage;
+  accessUsers: string[];
+  size?: string;
+  /** Case-linked document (also stamps client from the case). */
+  caseId?: string;
+  /** Client-profile document (no case). Ignored when caseId or invoiceId is set. */
+  clientId?: string;
+  /** Invoice attachment (also stamps client / case from the invoice). */
+  invoiceId?: string;
+};
+
 interface DomainState {
   clients: Client[];
   cases: Case[];
   hearings: Hearing[];
   filings: CourtFiling[];
+  invoices: Invoice[];
+  documents: Document[];
   hydrated: boolean;
   setHydrated: (value: boolean) => void;
 
@@ -128,6 +177,12 @@ interface DomainState {
 
   createFiling: (input: CreateFilingInput) => CourtFiling | null;
   updateFiling: (id: string, input: UpdateFilingInput) => CourtFiling | null;
+
+  createInvoice: (input: CreateInvoiceInput) => Invoice | null;
+  updateInvoice: (id: string, input: UpdateInvoiceInput) => Invoice | null;
+  getInvoice: (id: string) => Invoice | undefined;
+
+  createDocument: (input: CreateDocumentInput) => Document | null;
 }
 
 export const useDomainStore = create<DomainState>()(
@@ -137,11 +192,14 @@ export const useDomainStore = create<DomainState>()(
       cases: mockCases,
       hearings: mockHearings,
       filings: mockFilings,
+      invoices: mockInvoices,
+      documents: mockDocuments,
       hydrated: false,
       setHydrated: (value) => set({ hydrated: value }),
 
       getClient: (id) => get().clients.find((c) => c.id === id),
       getCase: (id) => get().cases.find((c) => c.id === id),
+      getInvoice: (id) => get().invoices.find((i) => i.id === id),
 
       createClient: (input) => {
         const id = nextNumericId(get().clients);
@@ -338,15 +396,158 @@ export const useDomainStore = create<DomainState>()(
         }));
         return updated;
       },
+
+      createInvoice: (input) => {
+        const matter = get().getCase(input.caseId);
+        if (!matter || !(input.amount > 0) || !input.dueDate) return null;
+        const id = nextNumericId(get().invoices);
+        const invoice: Invoice = {
+          id,
+          invoiceNumber: nextInvoiceNumber(get().invoices),
+          clientId: matter.clientId,
+          clientName: matter.clientName,
+          caseId: matter.caseId,
+          caseName: matter.matter,
+          amount: Math.round(input.amount),
+          status: input.status ?? "Draft",
+          dueDate: input.dueDate,
+          createdAt: todayIso(),
+        };
+        set((state) => ({ invoices: [invoice, ...state.invoices] }));
+        return invoice;
+      },
+
+      updateInvoice: (id, input) => {
+        let updated: Invoice | null = null;
+        set((state) => ({
+          invoices: state.invoices.map((invoice) => {
+            if (invoice.id !== id) return invoice;
+            updated = { ...invoice, ...input };
+            return updated;
+          }),
+        }));
+        return updated;
+      },
+
+      createDocument: (input) => {
+        if (!input.name.trim() || input.accessUsers.length === 0) return null;
+        const id = nextNumericId(get().documents);
+        const accessUsers = input.accessUsers
+          .map((name) => name.trim())
+          .filter(Boolean);
+
+        if (input.invoiceId) {
+          const invoice = get().getInvoice(input.invoiceId);
+          if (!invoice) return null;
+          const matter = get().cases.find((c) => c.caseId === invoice.caseId);
+          const doc: Document = {
+            id,
+            name: input.name.trim(),
+            category: input.category,
+            invoiceId: invoice.id,
+            invoiceNumber: invoice.invoiceNumber,
+            caseId: matter?.id,
+            caseName: invoice.caseName,
+            clientId: invoice.clientId,
+            clientName: invoice.clientName,
+            language: input.language,
+            version: 1,
+            uploadedBy: "Firm",
+            uploadedAt: todayIso(),
+            size: input.size?.trim() || "—",
+            accessUsers,
+          };
+          set((state) => ({ documents: [doc, ...state.documents] }));
+          return doc;
+        }
+
+        if (input.caseId) {
+          const matter = get().getCase(input.caseId);
+          if (!matter) return null;
+          const doc: Document = {
+            id,
+            name: input.name.trim(),
+            category: input.category,
+            caseId: matter.id,
+            caseName: matter.matter,
+            clientId: matter.clientId,
+            clientName: matter.clientName,
+            language: input.language,
+            version: 1,
+            uploadedBy: matter.assignedLawyers[0] ?? "Firm",
+            uploadedAt: todayIso(),
+            size: input.size?.trim() || "—",
+            accessUsers,
+          };
+          set((state) => ({ documents: [doc, ...state.documents] }));
+          return doc;
+        }
+
+        if (input.clientId) {
+          const client = get().getClient(input.clientId);
+          if (!client) return null;
+          const doc: Document = {
+            id,
+            name: input.name.trim(),
+            category: input.category,
+            clientId: client.id,
+            clientName: client.name,
+            language: input.language,
+            version: 1,
+            uploadedBy: "Firm",
+            uploadedAt: todayIso(),
+            size: input.size?.trim() || "—",
+            accessUsers,
+          };
+          set((state) => ({ documents: [doc, ...state.documents] }));
+          return doc;
+        }
+
+        return null;
+      },
     }),
     {
       name: "ukil-domain-v1",
+      // Always provide storage so persist API attaches during SSR (default
+      // createJSONStorage(() => localStorage) returns undefined without window).
+      skipHydration: true,
+      storage: {
+        getItem: (name) => {
+          if (typeof window === "undefined") return null;
+          const raw = window.localStorage.getItem(name);
+          return raw ? (JSON.parse(raw) as { state: unknown; version?: number }) : null;
+        },
+        setItem: (name, value) => {
+          if (typeof window === "undefined") return;
+          window.localStorage.setItem(name, JSON.stringify(value));
+        },
+        removeItem: (name) => {
+          if (typeof window === "undefined") return;
+          window.localStorage.removeItem(name);
+        },
+      },
       partialize: (state) => ({
         clients: state.clients,
         cases: state.cases,
         hearings: state.hearings,
         filings: state.filings,
+        invoices: state.invoices,
+        documents: state.documents,
       }),
+      merge: (persisted, current) => {
+        const p = (persisted ?? {}) as Partial<DomainState>;
+        const rawDocs = p.documents ?? current.documents;
+        return {
+          ...current,
+          ...p,
+          // Older localStorage blobs lack newer collections / field shapes
+          documents: rawDocs.map((doc) => ({
+            ...doc,
+            accessUsers: documentAccessUsers(doc),
+          })),
+          invoices: p.invoices ?? current.invoices,
+        };
+      },
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);
       },

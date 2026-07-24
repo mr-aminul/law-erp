@@ -13,13 +13,27 @@ import {
   TableRow,
 } from "@/components/ui/Table";
 import { Tabs } from "@/components/ui/Tabs";
-import { getStaffById, mockCases, mockStaff } from "@/lib/mock";
+import { getStaffById, mockCases, mockCompensation, mockStaff } from "@/lib/mock";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate, toDateInputValue } from "@/lib/utils/formatDate";
 import { emailError, phoneError } from "@/lib/utils/validateContact";
 import { STAFF_EMPLOYEE_TYPES } from "@/components/employees/NewEmployeeForm";
 import type { EmployeeType, StaffStatus } from "@/types/staff";
-import { Pencil } from "lucide-react";
+import {
+  BadgeCheck,
+  Briefcase,
+  Building2,
+  Calendar,
+  ClipboardCheck,
+  Hash,
+  IdCard,
+  Pencil,
+  Phone,
+  Scale,
+  UserCheck,
+  Users,
+  Wallet,
+} from "lucide-react";
 import { notFound, useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -28,6 +42,8 @@ const EMPLOYEE_STATUS_OPTIONS = [
   { value: "On Leave" as const, label: "On Leave", variant: "amber" as const },
   { value: "Inactive" as const, label: "Inactive", variant: "muted" as const },
 ];
+
+const unset = <span className="font-normal text-text-muted">Not set</span>;
 
 export default function EmployeeProfilePage({ params }: { params: { id: string } }) {
   const router = useRouter();
@@ -51,7 +67,6 @@ export default function EmployeeProfilePage({ params }: { params: { id: string }
     joinDate: "",
     phone: "",
     salary: "",
-    cleHours: "",
   });
 
   if (!staff) notFound();
@@ -59,6 +74,7 @@ export default function EmployeeProfilePage({ params }: { params: { id: string }
   const assignedCases = mockCases.filter((c) =>
     c.assignedLawyers.some((l) => l === staff.name)
   );
+  const payroll = mockCompensation.filter((c) => c.staffId === staff.id);
   const workloadPct = staff.capacity
     ? Math.round((staff.activeCases / staff.capacity) * 100)
     : 0;
@@ -81,7 +97,6 @@ export default function EmployeeProfilePage({ params }: { params: { id: string }
       joinDate: toDateInputValue(staff!.joinDate),
       phone: staff!.phone ?? "",
       salary: staff!.salary != null ? String(staff!.salary) : "",
-      cleHours: staff!.cleHours != null ? String(staff!.cleHours) : "",
     });
     setContactErrors({ email: null, phone: null });
     setEditing(true);
@@ -191,6 +206,7 @@ export default function EmployeeProfilePage({ params }: { params: { id: string }
       <Tabs
         tabs={[
           { id: "profile", label: "Profile" },
+          { id: "compensation", label: "Compensation" },
           { id: "cases", label: "Assigned Cases" },
           { id: "workload", label: "Workload" },
         ]}
@@ -199,108 +215,161 @@ export default function EmployeeProfilePage({ params }: { params: { id: string }
       />
 
       {tab === "profile" && (
-        <PageSection title="Employee Profile">
-          <div className="grid-fields-3">
-            <DetailField
-              label="Employee ID"
-              value={draft.employeeId || staff.employeeId || "—"}
-              editing={editing}
-              editValue={draft.employeeId}
-              onChange={(v) => patchDraft("employeeId", v)}
-            />
-            <DetailField
-              label="Designation"
-              value={displayDesignation}
-              editing={editing}
-              editValue={draft.designation}
-              onChange={(v) => patchDraft("designation", v)}
-              options={[
-                "Partner",
-                "Advocate",
-                "Associate",
-                "Junior Associate",
-                "Paralegal",
-                "Clerk",
-                "Admin",
-              ].map((r) => ({ value: r, label: r }))}
-            />
-            <DetailField
-              label="Employee Type"
-              value={displayEmployeeType}
-              editing={editing}
-              editValue={draft.employeeType}
-              onChange={(v) => patchDraft("employeeType", v)}
-              options={STAFF_EMPLOYEE_TYPES.map((t) => ({ value: t, label: t }))}
-            />
-            <DetailField
-              label="Department"
-              value={draft.department || staff.department || "—"}
-              editing={editing}
-              editValue={draft.department}
-              onChange={(v) => patchDraft("department", v)}
-            />
-            <DetailField
-              label="Line Manager"
-              value={draft.lineManager || staff.lineManager || "—"}
-              editing={editing}
-              editValue={draft.lineManager}
-              onChange={(v) => patchDraft("lineManager", v)}
-              options={[
-                { value: "", label: "None" },
-                ...mockStaff
-                  .filter((s) => s.id !== staff.id)
-                  .map((s) => ({ value: s.name, label: s.name })),
-              ]}
-            />
-            <DetailField
-              label="Bar Council No."
-              value={draft.barCouncilNo || staff.barCouncilNo || "—"}
-              editing={editing}
-              editValue={draft.barCouncilNo}
-              onChange={(v) => patchDraft("barCouncilNo", v)}
-            />
-            <DetailField
-              label="Join Date"
-              value={displayJoinDate ? formatDate(displayJoinDate) : "—"}
-              editing={editing}
-              editValue={draft.joinDate}
-              onChange={(v) => patchDraft("joinDate", v)}
-              inputType="date"
-            />
-            <DetailField
-              label="Phone"
-              value={draft.phone || staff.phone || "—"}
-              editing={editing}
-              editValue={draft.phone}
-              onChange={(v) => patchDraft("phone", v)}
-              inputType="tel"
-              error={editing ? contactErrors.phone : null}
-            />
-            <DetailField
-              label="Salary (BDT)"
-              value={
-                draft.salary
-                  ? formatCurrency(Number(draft.salary) || 0)
-                  : staff.salary
-                    ? formatCurrency(staff.salary)
-                    : "—"
-              }
-              editing={editing}
-              editValue={draft.salary}
-              onChange={(v) => patchDraft("salary", v)}
-              inputType="number"
-            />
-            <DetailField
-              label="CLE Hours"
-              value={draft.cleHours || (staff.cleHours ?? "—")}
-              editing={editing}
-              editValue={draft.cleHours}
-              onChange={(v) => patchDraft("cleHours", v)}
-              inputType="number"
-            />
-            <DetailField label="Attendance" value={`${staff.attendancePercent}%`} />
-          </div>
-        </PageSection>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <PageSection title="Employment" icon={Briefcase}>
+            <div className="grid-fields-2">
+              <DetailField
+                label="Employee ID"
+                icon={Hash}
+                value={draft.employeeId || staff.employeeId || unset}
+                editing={editing}
+                editValue={draft.employeeId}
+                onChange={(v) => patchDraft("employeeId", v)}
+              />
+              <DetailField
+                label="Designation"
+                icon={IdCard}
+                value={displayDesignation}
+                editing={editing}
+                editValue={draft.designation}
+                onChange={(v) => patchDraft("designation", v)}
+                options={[
+                  "Partner",
+                  "Advocate",
+                  "Associate",
+                  "Junior Associate",
+                  "Paralegal",
+                  "Clerk",
+                  "Admin",
+                ].map((r) => ({ value: r, label: r }))}
+              />
+              <DetailField
+                label="Employee Type"
+                icon={Users}
+                value={displayEmployeeType}
+                editing={editing}
+                editValue={draft.employeeType}
+                onChange={(v) => patchDraft("employeeType", v)}
+                options={STAFF_EMPLOYEE_TYPES.map((t) => ({ value: t, label: t }))}
+              />
+              <DetailField
+                label="Department"
+                icon={Building2}
+                value={draft.department || staff.department || unset}
+                editing={editing}
+                editValue={draft.department}
+                onChange={(v) => patchDraft("department", v)}
+              />
+              <DetailField
+                label="Line Manager"
+                icon={UserCheck}
+                value={draft.lineManager || staff.lineManager || unset}
+                editing={editing}
+                editValue={draft.lineManager}
+                onChange={(v) => patchDraft("lineManager", v)}
+                options={[
+                  { value: "", label: "None" },
+                  ...mockStaff
+                    .filter((s) => s.id !== staff.id)
+                    .map((s) => ({ value: s.name, label: s.name })),
+                ]}
+              />
+              <DetailField
+                label="Join Date"
+                icon={Calendar}
+                value={displayJoinDate ? formatDate(displayJoinDate) : unset}
+                editing={editing}
+                editValue={draft.joinDate}
+                onChange={(v) => patchDraft("joinDate", v)}
+                inputType="date"
+              />
+              <DetailField
+                label="Attendance"
+                icon={ClipboardCheck}
+                value={`${staff.attendancePercent}%`}
+              />
+            </div>
+          </PageSection>
+
+          <PageSection title="Contact & credentials" icon={BadgeCheck}>
+            <div className="grid-fields-2">
+              <DetailField
+                label="Phone"
+                icon={Phone}
+                value={draft.phone || staff.phone || unset}
+                editing={editing}
+                editValue={draft.phone}
+                onChange={(v) => patchDraft("phone", v)}
+                inputType="tel"
+                error={editing ? contactErrors.phone : null}
+              />
+              <DetailField
+                label="Bar Council No."
+                icon={Scale}
+                value={draft.barCouncilNo || staff.barCouncilNo || unset}
+                editing={editing}
+                editValue={draft.barCouncilNo}
+                onChange={(v) => patchDraft("barCouncilNo", v)}
+              />
+            </div>
+          </PageSection>
+        </div>
+      )}
+
+      {tab === "compensation" && (
+        <div className="space-y-4">
+          <PageSection title="Compensation & benefits" icon={Wallet}>
+            <div className="grid-fields-2">
+              <DetailField
+                label="Base Salary (BDT)"
+                icon={Wallet}
+                value={
+                  draft.salary
+                    ? formatCurrency(Number(draft.salary) || 0)
+                    : staff.salary
+                      ? formatCurrency(staff.salary)
+                      : unset
+                }
+                editing={editing}
+                editValue={draft.salary}
+                onChange={(v) => patchDraft("salary", v)}
+                inputType="number"
+              />
+            </div>
+          </PageSection>
+
+          <PageSection title="Payroll history">
+            {payroll.length === 0 ? (
+              <EmptyState
+                title="No payroll records"
+                description="Pay cycles for this employee will appear here."
+              />
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableHead>Month</TableHead>
+                  <TableHead>Gross</TableHead>
+                  <TableHead>Net Pay</TableHead>
+                  <TableHead>Paid</TableHead>
+                </TableHeader>
+                <TableBody>
+                  {payroll.map((c) => (
+                    <TableRow key={c.id}>
+                      <TableCell className="font-semibold">{c.month}</TableCell>
+                      <TableCell>{formatCurrency(c.grossSalary)}</TableCell>
+                      <TableCell className="font-bold text-green">
+                        {formatCurrency(c.netSalary)}
+                      </TableCell>
+                      <TableCell className="text-text-muted">
+                        {c.paidAt ? formatDate(c.paidAt) : "Pending"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </PageSection>
+        </div>
       )}
 
       {tab === "cases" && (

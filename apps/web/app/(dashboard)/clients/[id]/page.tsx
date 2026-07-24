@@ -1,9 +1,12 @@
 "use client";
 
 import { CaseStatusBadge } from "@/components/cases/CaseStatusBadge";
+import { AssignedLawyers } from "@/components/cases/AssignedLawyers";
+import { UploadDocumentForm } from "@/components/cases/UploadDocumentForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ChipStatusSelect } from "@/components/ui/ChipStatusSelect";
+import { Modal } from "@/components/ui/Modal";
 import { DetailField, EmptyState, PageSection } from "@/components/ui/PageSection";
 import { Tabs } from "@/components/ui/Tabs";
 import {
@@ -14,31 +17,51 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
-import { getInvoicesByClientId, mockContactLogs } from "@/lib/mock";
-import { useDomainStore } from "@/lib/store/domainStore";
+import { mockContactLogs } from "@/lib/mock";
+import {
+  type CreateDocumentInput,
+  useDomainStore,
+} from "@/lib/store/domainStore";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate } from "@/lib/utils/formatDate";
 import { invoiceStatusVariant } from "@/lib/utils/invoiceStatus";
 import { emailError, phoneError } from "@/lib/utils/validateContact";
 import type { ClientStatus, ClientType } from "@/types/client";
+import { documentAccessUsers } from "@/types/document";
 import { Pencil, Plus } from "lucide-react";
 import Link from "next/link";
-import { notFound, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { notFound, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
-export default function ClientDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+const CLIENT_TABS = [
+  "overview",
+  "cases",
+  "documents",
+  "invoices",
+  "contacts",
+  "kyc",
+] as const;
+
+function ClientDetailContent({ id }: { id: string }) {
   const router = useRouter();
-  const [ready, setReady] = useState(() => useDomainStore.persist.hasHydrated());
-  const client = useDomainStore((s) => s.clients.find((c) => c.id === params.id));
-  const cases = useDomainStore((s) =>
-    s.cases.filter((c) => c.clientId === params.id)
-  );
+  const searchParams = useSearchParams();
+  const ready = useDomainStore((s) => s.hydrated);
+  const clients = useDomainStore((s) => s.clients);
+  const allCases = useDomainStore((s) => s.cases);
+  const allInvoices = useDomainStore((s) => s.invoices);
+  const allDocuments = useDomainStore((s) => s.documents);
   const updateClient = useDomainStore((s) => s.updateClient);
-  const [tab, setTab] = useState("overview");
+  const createDocument = useDomainStore((s) => s.createDocument);
+  // Filter outside the selector — inline .filter() breaks getServerSnapshot.
+  const client = clients.find((c) => c.id === id);
+  const cases = allCases.filter((c) => c.clientId === id);
+  const tabParam = searchParams.get("tab");
+  const initialTab =
+    tabParam && (CLIENT_TABS as readonly string[]).includes(tabParam)
+      ? tabParam
+      : "overview";
+  const [tab, setTab] = useState(initialTab);
+  const [uploadOpen, setUploadOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [contactErrors, setContactErrors] = useState<{
     email: string | null;
@@ -59,12 +82,11 @@ export default function ClientDetailPage({
   });
 
   useEffect(() => {
-    if (useDomainStore.persist.hasHydrated()) {
-      setReady(true);
-      return;
+    const nextTab = searchParams.get("tab");
+    if (nextTab && (CLIENT_TABS as readonly string[]).includes(nextTab)) {
+      setTab(nextTab);
     }
-    return useDomainStore.persist.onFinishHydration(() => setReady(true));
-  }, []);
+  }, [searchParams]);
 
   if (!ready) {
     return <div className="p-4 text-sm text-text-muted">Loading client…</div>;
@@ -72,13 +94,18 @@ export default function ClientDetailPage({
 
   if (!client) notFound();
 
-  const invoices = getInvoicesByClientId(client.id);
+  const invoices = allInvoices.filter((i) => i.clientId === client.id);
+  // Client-profile docs only — case files live on the matter.
+  const profileDocs = allDocuments.filter(
+    (d) => d.clientId === client.id && !d.caseId && !d.isTemplate
+  );
   const contacts = mockContactLogs.filter((c) => c.clientId === client.id);
   const displayStatus = (draft.status || client.status) as ClientStatus;
 
   const tabs = [
     { id: "overview", label: "Overview" },
     { id: "cases", label: "Cases" },
+    { id: "documents", label: "Documents" },
     { id: "invoices", label: "Invoices" },
     { id: "contacts", label: "Contact History" },
     { id: "kyc", label: "KYC Vault" },
@@ -133,6 +160,16 @@ export default function ClientDetailPage({
     if (key === "phone" && typeof value === "string") {
       setContactErrors((prev) => ({ ...prev, phone: phoneError(value) }));
     }
+  }
+
+  function handleCreateDocument(input: CreateDocumentInput) {
+    const created = createDocument(input);
+    setUploadOpen(false);
+    if (created) {
+      router.push(`/documents/${created.id}`);
+      return;
+    }
+    setTab("documents");
   }
 
   return (
@@ -335,8 +372,68 @@ export default function ClientDetailPage({
         </PageSection>
       )}
 
+      {tab === "documents" && (
+        <PageSection
+          title="Client Documents"
+          description="Profile records not tied to a specific case — title deeds, property schedules, and similar."
+          action={
+            <Button onClick={() => setUploadOpen(true)}>
+              <Plus className="mr-1.5 h-4 w-4" />
+              Add Document
+            </Button>
+          }
+        >
+          {profileDocs.length === 0 ? (
+            <EmptyState
+              title="No client documents yet"
+              description="Upload title deeds, property records, and other profile files here."
+            />
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableHead>Document</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Version</TableHead>
+                <TableHead>Access</TableHead>
+                <TableHead>Uploaded</TableHead>
+              </TableHeader>
+              <TableBody>
+                {profileDocs.map((d) => (
+                  <TableRow
+                    key={d.id}
+                    onClick={() => router.push(`/documents/${d.id}`)}
+                  >
+                    <TableCell className="font-semibold">{d.name}</TableCell>
+                    <TableCell>{d.category}</TableCell>
+                    <TableCell className="text-text-muted">
+                      v{d.version} · {d.language} · {d.size}
+                    </TableCell>
+                    <TableCell>
+                      <AssignedLawyers lawyers={documentAccessUsers(d)} />
+                    </TableCell>
+                    <TableCell className="text-text-muted">
+                      {formatDate(d.uploadedAt)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </PageSection>
+      )}
+
       {tab === "invoices" && (
-        <PageSection title="Invoices">
+        <PageSection
+          title="Invoices"
+          action={
+            <Link href={`/billing/invoices?new=1`}>
+              <Button>
+                <Plus className="mr-1.5 h-4 w-4" />
+                New Invoice
+              </Button>
+            </Link>
+          }
+        >
           {invoices.length === 0 ? (
             <EmptyState
               title="No invoices"
@@ -434,6 +531,31 @@ export default function ClientDetailPage({
           )}
         </PageSection>
       )}
+
+      <Modal
+        open={uploadOpen}
+        onClose={() => setUploadOpen(false)}
+        title="Add Client Document"
+        className="max-w-xl"
+      >
+        <UploadDocumentForm
+          defaultClientId={client.id}
+          onSubmit={handleCreateDocument}
+          onCancel={() => setUploadOpen(false)}
+        />
+      </Modal>
     </div>
+  );
+}
+
+export default function ClientDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  return (
+    <Suspense fallback={<div className="p-4 text-sm text-text-muted">Loading client…</div>}>
+      <ClientDetailContent id={params.id} />
+    </Suspense>
   );
 }

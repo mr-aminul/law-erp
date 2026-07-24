@@ -35,7 +35,6 @@ export interface Staff {
   capacity?: number;
   barCouncilNo?: string;
   salary?: number;
-  cleHours?: number;
 }
 
 export interface AttendanceRecord {
@@ -63,7 +62,6 @@ export interface CompensationRecord {
   staffName: string;
   month: string;
   grossSalary: number;
-  tds: number;
   netSalary: number;
   paidAt?: string;
 }

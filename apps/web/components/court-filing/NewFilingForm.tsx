@@ -58,7 +58,7 @@ export function NewFilingForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid max-h-[60vh] gap-4 overflow-y-auto pr-1">
+      <div className="grid gap-4">
         <FormField label="Case" required>
           <Select
             required

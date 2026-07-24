@@ -4,6 +4,7 @@ import { NewHearingForm } from "@/components/calendar/NewHearingForm";
 import { AssignedLawyers } from "@/components/cases/AssignedLawyers";
 import { CaseStatusBadge } from "@/components/cases/CaseStatusBadge";
 import { CaseStatusSelect } from "@/components/cases/CaseStatusSelect";
+import { UploadDocumentForm } from "@/components/cases/UploadDocumentForm";
 import { NewFilingForm } from "@/components/court-filing/NewFilingForm";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -24,14 +25,13 @@ import {
 import { UserChip } from "@/components/ui/UserChip";
 import {
   mockCaseComments,
-  mockDocuments,
   mockExpenses,
-  mockInvoices,
   mockMilestones,
   mockCaseNotes,
   mockStaff,
 } from "@/lib/mock";
 import {
+  type CreateDocumentInput,
   type CreateFilingInput,
   type CreateHearingInput,
   useDomainStore,
@@ -88,14 +88,21 @@ const CASE_TABS = [
 function CaseDetailContent({ id }: { id: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [ready, setReady] = useState(() => useDomainStore.persist.hasHydrated());
-  const caseData = useDomainStore((s) => s.cases.find((c) => c.id === id));
+  const ready = useDomainStore((s) => s.hydrated);
+  const cases = useDomainStore((s) => s.cases);
   const clients = useDomainStore((s) => s.clients);
-  const filings = useDomainStore((s) => s.filings.filter((f) => f.caseId === id));
+  const allFilings = useDomainStore((s) => s.filings);
+  const allDocuments = useDomainStore((s) => s.documents);
   const updateCase = useDomainStore((s) => s.updateCase);
   const createFiling = useDomainStore((s) => s.createFiling);
   const updateFiling = useDomainStore((s) => s.updateFiling);
   const createHearing = useDomainStore((s) => s.createHearing);
+  const createDocument = useDomainStore((s) => s.createDocument);
+  const allInvoices = useDomainStore((s) => s.invoices);
+  // Filter outside the selector — inline .filter() returns a new array every
+  // call and breaks useSyncExternalStore getServerSnapshot (infinite loop).
+  const caseData = cases.find((c) => c.id === id);
+  const filings = allFilings.filter((f) => f.caseId === id);
   const tabParam = searchParams.get("tab");
   const filingParam = searchParams.get("filing");
   const initialTab =
@@ -107,6 +114,7 @@ function CaseDetailContent({ id }: { id: string }) {
   const [tab, setTab] = useState(initialTab);
   const [newFilingOpen, setNewFilingOpen] = useState(false);
   const [newHearingOpen, setNewHearingOpen] = useState(false);
+  const [uploadOpen, setUploadOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [milestoneOverrides, setMilestoneOverrides] = useState<Record<string, boolean>>({});
   const [draft, setDraft] = useState({
@@ -128,14 +136,6 @@ function CaseDetailContent({ id }: { id: string }) {
   });
 
   useEffect(() => {
-    if (useDomainStore.persist.hasHydrated()) {
-      setReady(true);
-      return;
-    }
-    return useDomainStore.persist.onFinishHydration(() => setReady(true));
-  }, []);
-
-  useEffect(() => {
     const nextTab = searchParams.get("tab");
     if (nextTab && (CASE_TABS as readonly string[]).includes(nextTab)) {
       setTab(nextTab);
@@ -144,8 +144,8 @@ function CaseDetailContent({ id }: { id: string }) {
     if (searchParams.get("filing")) setTab("filings");
   }, [searchParams]);
 
-  const docs = mockDocuments.filter((d) => d.caseId === id);
-  const invoices = mockInvoices.filter((i) => i.caseId === caseData?.caseId);
+  const docs = allDocuments.filter((d) => d.caseId === id && !d.isTemplate);
+  const invoices = allInvoices.filter((i) => i.caseId === caseData?.caseId);
   const expenses = mockExpenses.filter((e) => e.caseId === id);
   const notes = mockCaseNotes.filter((n) => n.caseId === id);
   const comments = mockCaseComments.filter((c) => c.caseId === id);
@@ -252,6 +252,16 @@ function CaseDetailContent({ id }: { id: string }) {
   function handleCreateHearing(input: CreateHearingInput) {
     createHearing(input);
     setNewHearingOpen(false);
+  }
+
+  function handleCreateDocument(input: CreateDocumentInput) {
+    const created = createDocument(input);
+    setUploadOpen(false);
+    if (created) {
+      router.push(`/documents/${created.id}`);
+      return;
+    }
+    changeTab("documents");
   }
 
   return (
@@ -510,7 +520,15 @@ function CaseDetailContent({ id }: { id: string }) {
       )}
 
       {tab === "documents" && (
-        <PageSection title="Case Documents">
+        <PageSection
+          title="Case Documents"
+          action={
+            <Button onClick={() => setUploadOpen(true)}>
+              <Plus className="mr-1.5 h-4 w-4" />
+              Add Document
+            </Button>
+          }
+        >
           {docs.length === 0 ? (
             <EmptyState title="No documents uploaded" description="Upload files related to this case to see them here." />
           ) : (
@@ -524,7 +542,10 @@ function CaseDetailContent({ id }: { id: string }) {
               </TableHeader>
               <TableBody>
                 {docs.map((d) => (
-                  <TableRow key={d.id}>
+                  <TableRow
+                    key={d.id}
+                    onClick={() => router.push(`/documents/${d.id}`)}
+                  >
                     <TableCell className="font-semibold">{d.name}</TableCell>
                     <TableCell>{d.category}</TableCell>
                     <TableCell>v{d.version}</TableCell>
@@ -631,6 +652,19 @@ function CaseDetailContent({ id }: { id: string }) {
         />
       </Modal>
 
+      <Modal
+        open={uploadOpen}
+        onClose={() => setUploadOpen(false)}
+        title="Add Document"
+        className="max-w-xl"
+      >
+        <UploadDocumentForm
+          defaultCaseId={caseData.id}
+          onSubmit={handleCreateDocument}
+          onCancel={() => setUploadOpen(false)}
+        />
+      </Modal>
+
       {tab === "notes" && (
         <PageSection title="Notes & Internal Memos">
           {notes.length === 0 ? (
@@ -656,7 +690,17 @@ function CaseDetailContent({ id }: { id: string }) {
 
       {tab === "billing" && (
         <div className="space-y-4">
-          <PageSection title="Invoices">
+          <PageSection
+            title="Invoices"
+            action={
+              <Link href={`/billing/invoices?new=1&caseId=${id}`}>
+                <Button>
+                  <Plus className="mr-1.5 h-4 w-4" />
+                  New Invoice
+                </Button>
+              </Link>
+            }
+          >
             {invoices.length === 0 ? (
               <EmptyState title="No invoices for this case" />
             ) : (

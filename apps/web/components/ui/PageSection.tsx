@@ -1,9 +1,11 @@
 import { Select } from "@/components/ui/Select";
 import { cn } from "@/lib/utils/cn";
+import type { LucideIcon } from "lucide-react";
 
 interface PageSectionProps {
   title: string;
   description?: string;
+  icon?: LucideIcon;
   action?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
@@ -12,6 +14,7 @@ interface PageSectionProps {
 export function PageSection({
   title,
   description,
+  icon: Icon,
   action,
   children,
   className,
@@ -20,7 +23,10 @@ export function PageSection({
     <section className={cn("rounded-card border border-gray-200 bg-surface p-3 sm:p-4", className)}>
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0">
-          <h2 className="text-sm font-bold text-text-primary">{title}</h2>
+          <h2 className="flex items-center gap-2 text-sm font-bold text-text-primary">
+            {Icon ? <Icon className="h-4 w-4 shrink-0 text-text-muted" aria-hidden /> : null}
+            {title}
+          </h2>
           {description && (
             <p className="mt-0.5 text-xs text-text-muted">{description}</p>
           )}
@@ -78,6 +84,7 @@ interface DetailFieldOption {
 interface DetailFieldProps {
   label: string;
   value: React.ReactNode;
+  icon?: LucideIcon;
   /** When set with onChange, renders an underline editor instead of plain text. */
   editing?: boolean;
   editValue?: string;
@@ -96,6 +103,7 @@ const underlineClass =
 export function DetailField({
   label,
   value,
+  icon: Icon,
   editing,
   editValue,
   onChange,
@@ -107,39 +115,46 @@ export function DetailField({
   const isEditable = Boolean(editing && (editSlot || onChange));
 
   return (
-    <div>
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
-        {label}
-      </p>
-      {isEditable && editSlot ? (
-        <div className="mt-0.5">{editSlot}</div>
-      ) : isEditable && options ? (
-        <Select
-          variant="underline"
-          value={editValue ?? ""}
-          onChange={(e) => onChange?.(e.target.value)}
-        >
-          {options.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </Select>
-      ) : isEditable ? (
-        <input
-          type={inputType}
-          value={editValue ?? ""}
-          onChange={(e) => onChange?.(e.target.value)}
-          aria-invalid={Boolean(error) || undefined}
-          className={cn(
-            underlineClass,
-            error && "border-red focus:border-red"
-          )}
-        />
-      ) : (
-        <p className="mt-0.5 text-sm font-medium text-text-primary">{value}</p>
-      )}
-      {error ? <p className="mt-1 text-xs text-red">{error}</p> : null}
+    <div className={Icon ? "flex gap-2.5" : undefined}>
+      {Icon ? (
+        <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-cream-card text-text-muted">
+          <Icon className="h-3.5 w-3.5" aria-hidden />
+        </div>
+      ) : null}
+      <div className="min-w-0 flex-1">
+        <p className="text-[11px] font-semibold uppercase tracking-wide text-text-muted">
+          {label}
+        </p>
+        {isEditable && editSlot ? (
+          <div className="mt-0.5">{editSlot}</div>
+        ) : isEditable && options ? (
+          <Select
+            variant="underline"
+            value={editValue ?? ""}
+            onChange={(e) => onChange?.(e.target.value)}
+          >
+            {options.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </Select>
+        ) : isEditable ? (
+          <input
+            type={inputType}
+            value={editValue ?? ""}
+            onChange={(e) => onChange?.(e.target.value)}
+            aria-invalid={Boolean(error) || undefined}
+            className={cn(
+              underlineClass,
+              error && "border-red focus:border-red"
+            )}
+          />
+        ) : (
+          <p className="mt-0.5 text-sm font-medium text-text-primary">{value}</p>
+        )}
+        {error ? <p className="mt-1 text-xs text-red">{error}</p> : null}
+      </div>
     </div>
   );
 }

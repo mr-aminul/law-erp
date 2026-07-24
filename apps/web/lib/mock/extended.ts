@@ -82,13 +82,14 @@ export const mockDocuments: Document[] = [
     category: "Writ Petition",
     caseId: "1",
     caseName: "Land dispute — Gulshan Block C",
+    clientId: "1",
     clientName: "Bashundhara Group",
     language: "English",
     version: 3,
     uploadedBy: "Tanvir Ahmed",
     uploadedAt: "2026-05-20",
     size: "2.4 MB",
-    accessLevel: "Partner",
+    accessUsers: ["Rahima Khan", "Tanvir Ahmed"],
   },
   {
     id: "d2",
@@ -96,13 +97,14 @@ export const mockDocuments: Document[] = [
     category: "Vakalatnama",
     caseId: "3",
     caseName: "Divorce petition",
+    clientId: "2",
     clientName: "Mohammad Ali",
     language: "Bangla",
     version: 1,
     uploadedBy: "Farhana Begum",
     uploadedAt: "2026-05-01",
     size: "540 KB",
-    accessLevel: "All",
+    accessUsers: ["Farhana Begum", "Rahima Khan", "Tanvir Ahmed", "Nusrat Jahan"],
   },
   {
     id: "d3",
@@ -110,13 +112,57 @@ export const mockDocuments: Document[] = [
     category: "Legal Notice",
     caseId: "2",
     caseName: "Contract breach",
+    clientId: "3",
     clientName: "Square Pharmaceuticals",
     language: "Bilingual",
     version: 2,
     uploadedBy: "Nusrat Jahan",
     uploadedAt: "2026-04-10",
     size: "890 KB",
-    accessLevel: "Associate",
+    accessUsers: ["Nusrat Jahan", "Farhana Begum"],
+  },
+  {
+    id: "d6",
+    name: "Property Ownership Schedule — Gulshan parcels",
+    category: "Property Record",
+    clientId: "1",
+    clientName: "Bashundhara Group",
+    language: "English",
+    version: 2,
+    uploadedBy: "Tanvir Ahmed",
+    uploadedAt: "2026-03-12",
+    size: "1.1 MB",
+    accessUsers: ["Rahima Khan", "Tanvir Ahmed"],
+  },
+  {
+    id: "d7",
+    name: "Title Deed Bundle — Plot 42 Block C",
+    category: "Title Deed",
+    clientId: "1",
+    clientName: "Bashundhara Group",
+    language: "Bilingual",
+    version: 1,
+    uploadedBy: "Rahima Khan",
+    uploadedAt: "2026-02-28",
+    size: "4.8 MB",
+    accessUsers: ["Rahima Khan"],
+  },
+  {
+    id: "d8",
+    name: "Invoice PDF — INV-2026-042",
+    category: "Invoice",
+    invoiceId: "1",
+    invoiceNumber: "INV-2026-042",
+    caseId: "1",
+    caseName: "Land dispute — Gulshan Block C",
+    clientId: "1",
+    clientName: "Bashundhara Group",
+    language: "English",
+    version: 1,
+    uploadedBy: "Tanvir Ahmed",
+    uploadedAt: "2026-05-01",
+    size: "320 KB",
+    accessUsers: ["Rahima Khan", "Tanvir Ahmed"],
   },
   {
     id: "d4",
@@ -128,7 +174,7 @@ export const mockDocuments: Document[] = [
     uploadedAt: "2025-01-01",
     size: "120 KB",
     isTemplate: true,
-    accessLevel: "All",
+    accessUsers: ["Rahima Khan", "Tanvir Ahmed", "Nusrat Jahan", "Farhana Begum"],
   },
   {
     id: "d5",
@@ -140,7 +186,7 @@ export const mockDocuments: Document[] = [
     uploadedAt: "2025-01-01",
     size: "95 KB",
     isTemplate: true,
-    accessLevel: "All",
+    accessUsers: ["Rahima Khan", "Tanvir Ahmed", "Nusrat Jahan", "Farhana Begum"],
   },
 ];
 
@@ -410,12 +456,44 @@ export const mockServiceNotes: CaseNote[] = [
   },
 ];
 
-export const mockAttendance: AttendanceRecord[] = [
-  { id: "a1", staffId: "1", staffName: "Rahima Khan", date: "2026-06-03", status: "Present" },
-  { id: "a2", staffId: "2", staffName: "Tanvir Ahmed", date: "2026-06-03", status: "Present" },
-  { id: "a3", staffId: "3", staffName: "Nusrat Jahan", date: "2026-06-03", status: "Late" },
-  { id: "a4", staffId: "4", staffName: "Farhana Begum", date: "2026-06-03", status: "Present" },
-];
+// ponytail: seed one month of weekday marks so week/month views aren't empty
+const ATTENDANCE_SEED: Record<string, AttendanceRecord["status"][]> = {
+  "1": ["Present", "Present", "Present", "Present", "Late", "Present", "Present", "Present", "Present", "Present", "Absent", "Present", "Present", "Present", "Present", "Present", "Late", "Present", "Present", "Present", "Present", "Present"],
+  "2": ["Present", "Present", "Late", "Present", "Present", "Present", "Present", "Absent", "Present", "Present", "Present", "Present", "Late", "Present", "Present", "Present", "Present", "Present", "Present", "Leave", "Leave", "Present"],
+  "3": ["Present", "Late", "Late", "Present", "Present", "Leave", "Leave", "Leave", "Present", "Present", "Present", "Late", "Present", "Present", "Absent", "Present", "Present", "Present", "Late", "Present", "Present", "Present"],
+  "4": ["Present", "Present", "Present", "Present", "Present", "Present", "Late", "Present", "Present", "Present", "Present", "Present", "Present", "Absent", "Present", "Present", "Present", "Present", "Present", "Present", "Late", "Present"],
+};
+
+function buildJuneAttendance(): AttendanceRecord[] {
+  const staff = [
+    { id: "1", name: "Rahima Khan" },
+    { id: "2", name: "Tanvir Ahmed" },
+    { id: "3", name: "Nusrat Jahan" },
+    { id: "4", name: "Farhana Begum" },
+  ];
+  const records: AttendanceRecord[] = [];
+  let n = 0;
+  for (let day = 1; day <= 30; day++) {
+    const date = new Date(2026, 5, day);
+    if (date.getDay() === 0 || date.getDay() === 6) continue; // skip weekends
+    const iso = `2026-06-${String(day).padStart(2, "0")}`;
+    for (const s of staff) {
+      const status = ATTENDANCE_SEED[s.id][n];
+      if (!status) continue;
+      records.push({
+        id: `a-${s.id}-${iso}`,
+        staffId: s.id,
+        staffName: s.name,
+        date: iso,
+        status,
+      });
+    }
+    n += 1;
+  }
+  return records;
+}
+
+export const mockAttendance: AttendanceRecord[] = buildJuneAttendance();
 
 export const mockLeaveRequests: LeaveRequest[] = [
   {
@@ -437,8 +515,7 @@ export const mockCompensation: CompensationRecord[] = [
     staffName: "Rahima Khan",
     month: "May 2026",
     grossSalary: 350000,
-    tds: 35000,
-    netSalary: 315000,
+    netSalary: 350000,
     paidAt: "2026-05-28",
   },
   {
@@ -447,8 +524,7 @@ export const mockCompensation: CompensationRecord[] = [
     staffName: "Tanvir Ahmed",
     month: "May 2026",
     grossSalary: 180000,
-    tds: 18000,
-    netSalary: 162000,
+    netSalary: 180000,
     paidAt: "2026-05-28",
   },
 ];

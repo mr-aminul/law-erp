@@ -2,21 +2,24 @@
 
 import { ListToolbar } from "@/components/ui/ListToolbar";
 import { EmptyState, PageSection } from "@/components/ui/PageSection";
-import { mockDocuments } from "@/lib/mock";
+import { useDomainStore } from "@/lib/store/domainStore";
 import { FileText } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 export default function DocumentTemplatesPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
+  const documents = useDomainStore((s) => s.documents);
 
   const templates = useMemo(() => {
     const q = search.toLowerCase();
-    return mockDocuments.filter(
+    return documents.filter(
       (d) =>
         d.isTemplate &&
         (!q || d.name.toLowerCase().includes(q) || d.category.toLowerCase().includes(q))
     );
-  }, [search]);
+  }, [documents, search]);
 
   return (
     <div className="space-y-4">
@@ -40,7 +43,12 @@ export default function DocumentTemplatesPage() {
         ) : (
           <div className="grid-pair gap-3">
             {templates.map((t) => (
-              <div key={t.id} className="rounded-card border border-gray-200 p-4">
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => router.push(`/documents/${t.id}`)}
+                className="rounded-card border border-gray-200 p-4 text-left transition-colors hover:border-gray-300 hover:bg-cream-card/40"
+              >
                 <div className="flex items-start gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-input bg-green-light text-green">
                     <FileText className="h-5 w-5" />
@@ -52,7 +60,7 @@ export default function DocumentTemplatesPage() {
                     </p>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         )}

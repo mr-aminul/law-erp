@@ -2,6 +2,7 @@
 
 import { SegmentedControl } from "@/components/ui/SegmentedControl";
 import { usePathname } from "next/navigation";
+import { useMemo } from "react";
 
 interface SubNavItem {
   href: string;
@@ -35,14 +36,19 @@ export function SubNav({ items, className }: SubNavProps) {
   }
 
   const active = items.find(isActive) ?? items[0];
-
-  return (
-    <SegmentedControl
-      items={items.map((item) => ({
+  const segments = useMemo(
+    () =>
+      items.map((item) => ({
         id: item.href,
         label: item.label,
         href: item.href,
-      }))}
+      })),
+    [items]
+  );
+
+  return (
+    <SegmentedControl
+      items={segments}
       value={active?.href ?? ""}
       className={className}
     />

@@ -29,6 +29,7 @@ function getPageTitle(pathname: string): string {
     ["/clients", "Clients"],
     ["/calendar", "Calendar"],
     ["/documents/templates", "Document Templates"],
+    [/^\/documents\/[^/]+$/, "Document"],
     ["/documents", "Documents"],
     ["/billing/invoices/", "Invoice Detail"],
     ["/billing/invoices", "Invoices"],

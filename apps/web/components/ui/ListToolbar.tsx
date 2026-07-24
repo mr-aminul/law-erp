@@ -80,7 +80,8 @@ function useRowWouldBreak(
     function update() {
       const available = container!.clientWidth;
       const needed = measure!.scrollWidth;
-      setCompact(needed > available + 1);
+      const next = needed > available + 1;
+      setCompact((prev) => (prev === next ? prev : next));
     }
 
     update();
@@ -165,7 +166,7 @@ export function ListToolbar({
       {/* Off-flow measure of the ideal single-row width */}
       <div
         ref={measureRef}
-        inert
+        inert=""
         className="pointer-events-none absolute left-0 top-0 -z-10 flex w-max items-end gap-3 opacity-0"
         aria-hidden
       >

@@ -1,5 +1,10 @@
+"use client";
+
+import { UploadDocumentForm } from "@/components/cases/UploadDocumentForm";
+import { AssignedLawyers } from "@/components/cases/AssignedLawyers";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 import { DetailField, EmptyState, PageSection } from "@/components/ui/PageSection";
 import {
   Table,
@@ -9,19 +14,41 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/Table";
-import { mockInvoices, mockPayments } from "@/lib/mock";
+import { mockPayments } from "@/lib/mock";
+import {
+  type CreateDocumentInput,
+  useDomainStore,
+} from "@/lib/store/domainStore";
 import { formatCurrency } from "@/lib/utils/formatCurrency";
 import { formatDate } from "@/lib/utils/formatDate";
 import { invoiceStatusVariant } from "@/lib/utils/invoiceStatus";
+import { documentAccessUsers } from "@/types/document";
+import { FileText, Plus } from "lucide-react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function InvoiceDetailPage({ params }: { params: { id: string } }) {
-  const invoice = mockInvoices.find((i) => i.id === params.id);
-  if (!invoice) notFound();
+  const router = useRouter();
+  const ready = useDomainStore((s) => s.hydrated);
+  const invoices = useDomainStore((s) => s.invoices);
+  const documents = useDomainStore((s) => s.documents);
+  const createDocument = useDomainStore((s) => s.createDocument);
+  const invoice = invoices.find((i) => i.id === params.id);
+  const [uploadOpen, setUploadOpen] = useState(false);
+
+  if (ready && !invoice) notFound();
+  if (!invoice) return null;
 
   const payments = mockPayments.filter((p) => p.invoiceId === invoice.id);
+  const files = documents.filter((d) => d.invoiceId === invoice.id);
   const vat = Math.round(invoice.amount * 0.15);
+
+  function handleCreateDocument(input: CreateDocumentInput) {
+    const created = createDocument(input);
+    setUploadOpen(false);
+    if (created) router.push(`/documents/${created.id}`);
+  }
 
   return (
     <div className="space-y-4">
@@ -51,6 +78,57 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
         </div>
       </PageSection>
 
+      <PageSection
+        title="Files"
+        description="Invoice PDFs, receipts, and supporting records — same access model as Documents."
+        action={
+          <Button type="button" onClick={() => setUploadOpen(true)}>
+            <Plus className="mr-1.5 h-4 w-4" />
+            Add Document
+          </Button>
+        }
+      >
+        {files.length === 0 ? (
+          <EmptyState
+            title="No files attached"
+            description="Upload the invoice PDF, payment receipts, or supporting docs."
+          />
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableHead>Document</TableHead>
+              <TableHead>Version</TableHead>
+              <TableHead>Access</TableHead>
+              <TableHead>Uploaded</TableHead>
+            </TableHeader>
+            <TableBody>
+              {files.map((doc) => (
+                <TableRow
+                  key={doc.id}
+                  onClick={() => router.push(`/documents/${doc.id}`)}
+                >
+                  <TableCell className="font-semibold">
+                    <span className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 shrink-0 text-text-muted" />
+                      {doc.name}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-text-muted">
+                    v{doc.version} · {doc.language} · {doc.size}
+                  </TableCell>
+                  <TableCell>
+                    <AssignedLawyers lawyers={documentAccessUsers(doc)} />
+                  </TableCell>
+                  <TableCell className="text-text-muted">
+                    {formatDate(doc.uploadedAt)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </PageSection>
+
       <PageSection title="Payment Receipts">
         {payments.length === 0 ? (
           <EmptyState title="No payments recorded" />
@@ -75,6 +153,20 @@ export default function InvoiceDetailPage({ params }: { params: { id: string } }
           </Table>
         )}
       </PageSection>
+
+      <Modal
+        open={uploadOpen}
+        onClose={() => setUploadOpen(false)}
+        title="Add Invoice Document"
+        className="max-w-xl"
+      >
+        <UploadDocumentForm
+          key={invoice.id}
+          defaultInvoiceId={invoice.id}
+          onSubmit={handleCreateDocument}
+          onCancel={() => setUploadOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }
